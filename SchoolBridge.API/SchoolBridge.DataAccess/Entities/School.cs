@@ -10,10 +10,9 @@ namespace SchoolBridge.DataAccess.Entities
         public string Id { get; set; }
         [Required, MaxLength(120)]
         public string Name { get; set; }
-        [Required, MaxLength(120)]
-        public string Region { get; set; } // Область
-        [Required, MaxLength(120)]
-        public string District { get; set; } // Район
+        [ForeignKey("RegionDistinct")]
+        public int RegionDistinctId { get; set; }
+        public RegionDistinct RegionDistinct { get; set; }
 
         [ForeignKey("Director")]
         public string DirectorId { get; set; }

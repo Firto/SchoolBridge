@@ -3,17 +3,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolBridge.DataAccess.Entities
 {
-    public class SchoolTeacher
+    public class SchoolUnit // SchoolHeadTeachers, SchoolModerators
     {
         [Key]
-        public int Id { get; set; }
-        
-        [ForeignKey("Teacher")]
-        public string TeacherId { get; set; }
-        public User Teacher { get; set; }
-
         [ForeignKey("User")]
         public string SchoolId { get; set; }
         public School School { get; set; }
+
+        [Key]
+        [ForeignKey("Unit")]
+        public string UnitId { get; set; }
+        public User Unit { get; set; }
     }
 }

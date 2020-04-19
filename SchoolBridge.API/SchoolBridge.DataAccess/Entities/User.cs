@@ -8,18 +8,19 @@ namespace SchoolBridge.DataAccess.Entities
 {
     public class User : AuthUser
     {
-        [Required]
+        [Required, MaxLength(120)]
         public string Login { get; set; }
-        [Required]
+        [Required, MaxLength(120)]
         public string Email { get; set; }
-        [Required]
+        [Required, MaxLength(120)]
         public bool EmailConfirmed { get; set; } = false;
-        [Required]
+        [Required, MaxLength(120)]
         public string Name { get; set; }
-        [Required]
+        [Required, MaxLength(120)]
         public string Surname { get; set; }
+        [Required, MaxLength(120)]
         public string Lastname { get; set; }
-        [Required]
+        [Required, MaxLength(120)]
         public string PasswordHash { get; set; }
 
         [ForeignKey("Role")]
