@@ -1,10 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace SchoolBridge.DataAccess.Migrations
 {
-    public partial class init : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -24,7 +23,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -153,7 +152,7 @@ namespace SchoolBridge.DataAccess.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Email", "EmailConfirmed", "Lastname", "Login", "Name", "PasswordHash", "PhotoId", "RoleId", "Surname" },
-                values: new object[] { "admin", "admin@admin.admin", true, "Admin", "admin", "Admin", "09A46UO2OTN+JNB33ED70B48E6E5C321A8A78AC1FA415EE80FA9B5BAC5541D1E8002CBEC23FC87D6071316093F958E01BF83EFF716", "default-user-photo", 1, "Admin" });
+                values: new object[] { "admin", "admin@admin.admin", true, "Admin", "admin", "Admin", "DA6DFGQ4B1PUGNI493BCAB0BC1A8482AF3DA1619C1EFF26AB65C6823242958BD344C98376E8BA83063D6A838034768E19066F202AF", "default-user-photo", 1, "Admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ActiveRefreshTokens_UserId",
