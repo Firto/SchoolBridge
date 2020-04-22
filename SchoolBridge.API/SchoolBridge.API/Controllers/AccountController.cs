@@ -30,11 +30,11 @@ namespace GreenP.API.Controllers
         public async Task<ResultDto> RefreshToken([FromBody] RefreshTokenDto model, [BindNever]string uuid)
             => ResultDto.Create(await _accountService.RefreshToken(model, uuid));
 
-        [UUID]
+        /*[UUID]
         [HttpPost]
         [MyNoAutorize]
         public async Task<ResultDto> Register([FromBody] RegisterDto model, [BindNever]string uuid)
-            => ResultDto.Create(await _accountService.Register(model, uuid));
+            => ResultDto.Create(await _accountService.Register(model, uuid));*/
 
         [HttpGet]
         [MyAutorize]

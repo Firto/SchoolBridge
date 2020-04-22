@@ -13,8 +13,6 @@ namespace SchoolBridge.DataAccess.Entities
         [Required, MaxLength(120)]
         public string Email { get; set; }
         [Required, MaxLength(120)]
-        public bool EmailConfirmed { get; set; } = false;
-        [Required, MaxLength(120)]
         public string Name { get; set; }
         [Required, MaxLength(120)]
         public string Surname { get; set; }
@@ -27,9 +25,9 @@ namespace SchoolBridge.DataAccess.Entities
         public int RoleId { get; set; }
         public Role Role { get; set; }
 
-        [ForeignKey("Photo")]
+        /*[ForeignKey("Photo")]
         public string PhotoId { get; set; }
-        public Image Photo { get; set; }
+        public Image Photo { get; set; }*/
 
         public IEnumerable<Notification<User>> Notifications { get; set; }
     }

@@ -122,7 +122,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             return await _tokenService.Login(users.First(), uuid);
         }
 
-        public async Task<LoggedDto> Register(RegisterDto entity, string uuid)
+        /*public async Task<LoggedDto> Register(RegisterDto entity, string uuid)
         {
             ValidateLogin(entity.Login);
             ValidatePassword(entity.Password);
@@ -145,7 +145,7 @@ namespace SchoolBridge.Domain.Services.Implementation
 
             await _usersGR.CreateAsync(user);
             return await Login(new LoginDto { Login = entity.Login, Password = entity.Password }, uuid);
-        }
+        }*/
 
         public async Task<LoggedDto> RefreshToken(RefreshTokenDto entity, string uuid)
             => await _tokenService.RefreshToken(entity.RefreshToken, uuid);
@@ -175,11 +175,11 @@ namespace SchoolBridge.Domain.Services.Implementation
                 user.Email = entity.Email;
             }
 
-            if (entity.Photo != null)
-            {
-                remPhotoId = user.PhotoId;
-                user.PhotoId = await _imageService.Add(DataImage.TryParse(entity.Photo));
-            }
+            //if (entity.Photo != null)
+            //{
+            //    remPhotoId = user.PhotoId;
+            //    user.PhotoId = await _imageService.Add(DataImage.TryParse(entity.Photo));
+            //}
 
             await _usersGR.UpdateAsync(user);
             if (remPhotoId != null) await _imageService.Remove(remPhotoId);

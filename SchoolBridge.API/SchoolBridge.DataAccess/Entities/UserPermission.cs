@@ -5,14 +5,21 @@ namespace SchoolBridge.DataAccess.Entities
 {
     public class UserPermission
     {
-        [Key]
         [ForeignKey("User")]
         public string UserId { get; set; }
         public User User { get; set; }
 
-        [Key]
         [ForeignKey("Permission")]
         public int PermissionId { get; set; }
         public Permission Permission { get; set; }
+
+        public object Clone()
+           => new UserPermission
+           {
+               UserId = UserId,
+               User = User,
+               PermissionId = PermissionId,
+               Permission = Permission
+           };
     }
 }

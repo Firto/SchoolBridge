@@ -19,90 +19,46 @@ namespace GreenP.DataAccess
     {
         public DbSet<Notification<User>> Notifications { get; set; }
 
-        public DbSet<Image> Photos { get; set; }
+        public DbSet<File> Files { get; set; }
+        public DbSet<Image> Images { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Panel> Panels { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+
+        public DbSet<PanelPermission> PanelPermissions { get; set; }
+        public DbSet<UserPermission> UserPermissions { get; set; }
+        public DbSet<RolePanel> RolePanels { get; set; }
+        public DbSet<UserPanel> UserPanels { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options){}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Image>().HasKey((x) => x.FileId);
+            modelBuilder.Entity<PanelPermission>().HasKey((x) => new { x.PanelId,x.PermissionId });
+            modelBuilder.Entity<UserPermission>().HasKey((x) => new { x.UserId, x.PermissionId });
+            modelBuilder.Entity<RolePanel>().HasKey((x) => new { x.RoleId, x.PanelId });
+            modelBuilder.Entity<UserPanel>().HasKey((x) => new { x.UserId, x.PanelId });
+
             modelBuilder.Entity<Role>().HasData(
                new Role { Id = 1, Name = "Admin" },
-               new Role { Id = 2, Name = "Moderator" },
-               new Role { Id = 3, Name = "RegionModerator" },
-               new Role { Id = 4, Name = "DistinctModerator" },
-               new Role { Id = 6, Name = "SchoolModerator" },
-               new Role { Id = 7, Name = "HeadTeacher" },
-               new Role { Id = 8, Name = "Teacher" },
                new Role { Id = 9, Name = "Pupil" }
             );
 
             modelBuilder.Entity<Panel>().HasData(
                 new Panel { Id = 1, Name = "Admin" },
-                new Panel { Id = 2, Name = "Moderator" },
-                new Panel { Id = 3, Name = "RegionModerator" },
-                new Panel { Id = 4, Name = "DistinctModerator" },
-                new Panel { Id = 6, Name = "SchoolModerator" },
-                new Panel { Id = 7, Name = "HeadTeacher" },
-                new Panel { Id = 8, Name = "Teacher" },
                 new Panel { Id = 9, Name = "Pupil" }
             );
 
             modelBuilder.Entity<Permission>().HasData(
                 new Permission { Id = 1, Name = "CreateAdmin"},
-                new Permission { Id = 1, Name = "EditMyAdmin" },
-                new Permission { Id = 1, Name = "EditOtherAdmin" },
-                new Permission { Id = 1, Name = "EditOtherAdminPermissions" },
-                new Permission { Id = 1, Name = "RemoveMyAdmin" },
-                new Permission { Id = 1, Name = "RemoveOtherAdmin" },
+                new Permission { Id = 2, Name = "EditAdmin" },
+                new Permission { Id = 3, Name = "EditAdminPermissions" },
+                new Permission { Id = 4, Name = "RemoveAdmin" },
 
-                new Permission { Id = 1, Name = "CreateModerator" },
-                new Permission { Id = 1, Name = "EditMyModerator" },
-                new Permission { Id = 1, Name = "EditOtherModerator" },
-                new Permission { Id = 1, Name = "EditOtherModeratorPermissions" },
-                new Permission { Id = 1, Name = "RemoveMyModerator" },
-                new Permission { Id = 1, Name = "RemoveOtherModerator" },
-
-                new Permission { Id = 1, Name = "CreateRegionModerator" },
-                new Permission { Id = 1, Name = "EditMyRegionModerator" },
-                new Permission { Id = 1, Name = "EditOtherRegionModerator" },
-                new Permission { Id = 1, Name = "EditOtherRegionModerator" },
-                new Permission { Id = 1, Name = "RemoveMyRegionModerator" },
-                new Permission { Id = 1, Name = "RemoveOtherRegionModerator" },
-
-                new Permission { Id = 1, Name = "CreateDistinctModerator" },
-                new Permission { Id = 1, Name = "EditMyDistinctModerator" },
-                new Permission { Id = 1, Name = "EditOtherDistinctModerator" },
-                new Permission { Id = 1, Name = "EditOtherDistinctModerator" },
-                new Permission { Id = 1, Name = "RemoveMyDistinctModerator" },
-                new Permission { Id = 1, Name = "RemoveOtherDistinctModerator" },
-
-                new Permission { Id = 1, Name = "CreateSchoolModerator" },
-                new Permission { Id = 1, Name = "EditMySchoolModerator" },
-                new Permission { Id = 1, Name = "EditOtherSchoolModerator" },
-                new Permission { Id = 1, Name = "EditOtherSchoolModerator" },
-                new Permission { Id = 1, Name = "RemoveMySchoolModerator" },
-                new Permission { Id = 1, Name = "RemoveOtherSchoolModerator" },
-
-                new Permission { Id = 1, Name = "CreateHeadTeacher" },
-                new Permission { Id = 1, Name = "EditMyHeadTeacher" },
-                new Permission { Id = 1, Name = "EditOtherHeadTeacher" },
-                new Permission { Id = 1, Name = "EditOtherHeadTeacher" },
-                new Permission { Id = 1, Name = "RemoveMyHeadTeacher" },
-                new Permission { Id = 1, Name = "RemoveOtherHeadTeacher" },
-
-                new Permission { Id = 1, Name = "CreateTeacher" },
-                new Permission { Id = 1, Name = "EditMyTeacher" },
-                new Permission { Id = 1, Name = "EditOtherTeacher" },
-                new Permission { Id = 1, Name = "EditOtherTeacher" },
-                new Permission { Id = 1, Name = "RemoveMyTeacher" },
-                new Permission { Id = 1, Name = "RemoveOtherTeacher" },
-
-                new Permission { Id = 1, Name = "CreatePupil" },
-                new Permission { Id = 1, Name = "EditMyPupil" },
-                new Permission { Id = 1, Name = "EditOtherPupil" },
-                new Permission { Id = 1, Name = "EditOtherPupil" },
-                new Permission { Id = 1, Name = "RemoveMyPupil" },
-                new Permission { Id = 1, Name = "RemoveOtherPupil" },
+                new Permission { Id = 5, Name = "CreatePupil" },
+                new Permission { Id = 6, Name = "EditPupilPermissions" },
+                new Permission { Id = 7, Name = "EditPupil" },
+                new Permission { Id = 8, Name = "RemovePupil" },
 
                 // Get 
 
@@ -117,36 +73,50 @@ namespace GreenP.DataAccess
                 new Panel { Id = 9, Name = "Pupil" }
                  */
 
-                new Permission { Id = 1, Name = "GetAdminsList" },
-                new Permission { Id = 1, Name = "GetAdminInfo" },
-                new Permission { Id = 1, Name = "GetMyAdminsList" },
-                new Permission { Id = 1, Name = "GetMyAdminInfo" },
+                new Permission { Id = 9, Name = "GetAdminsList" },
+                new Permission { Id = 10, Name = "GetAdminInfo" },
 
-                new Permission { Id = 1, Name = "GetModeratorsList" },
-                new Permission { Id = 1, Name = "GetModeratorInfo" },
-                new Permission { Id = 1, Name = "GetMyModeratorsList" },
-                new Permission { Id = 1, Name = "GetMyModeratorInfo" },
-
-                new Permission { Id = 1, Name = "GetRegionModeratorsList" },
-                new Permission { Id = 1, Name = "GetRegionModeratorsInfo" },
-                new Permission { Id = 1, Name = "GetMyRegionModeratorsList" },
-                new Permission { Id = 1, Name = "GetMyRegionModeratorsInfo" },
-
-                new Permission { Id = 1, Name = "GetDistinctModeratorsList" },
-                new Permission { Id = 1, Name = "GetDistinctModeratorsInfo" },
-                new Permission { Id = 1, Name = "GetMyDistinctModeratorsList" },
-                new Permission { Id = 1, Name = "GetMyDistinctModeratorsInfo" },
-
-                new Permission { Id = 1, Name = "GetHeadTeachersList" },
-                new Permission { Id = 1, Name = "GetHeadTeachersInfo" },
-                new Permission { Id = 1, Name = "GetMyHeadTeachersList" },
-                new Permission { Id = 1, Name = "GetMyHeadTeachersInfo" },
-
-                new Permission { Id = 1, Name = "GetTeachersList" },
-                new Permission { Id = 1, Name = "GetTeachersInfo" },
-                new Permission { Id = 1, Name = "GetMyTeachersList" },
-                new Permission { Id = 1, Name = "GetMyTeachersInfo" },
+                new Permission { Id = 11, Name = "GetPupilsList" },
+                new Permission { Id = 12, Name = "GetPupilsInfo" }
             );
+
+            modelBuilder.Entity<PanelPermission>().HasData(
+                /*new PanelPermission { PanelId = 1, PermissionId = 1 },
+                new PanelPermission { PanelId = 1, PermissionId = 2 },
+                new PanelPermission { PanelId = 1, PermissionId = 3 },
+                new PanelPermission { PanelId = 1, PermissionId = 4 },*/
+                new PanelPermission { PanelId = 1, PermissionId = 5 },
+                new PanelPermission { PanelId = 1, PermissionId = 6 },
+                new PanelPermission { PanelId = 1, PermissionId = 7 },
+                new PanelPermission { PanelId = 1, PermissionId = 10 },
+                new PanelPermission { PanelId = 1, PermissionId = 11 },
+                new PanelPermission { PanelId = 1, PermissionId = 12 }
+            );
+
+            modelBuilder.Entity<RolePanel>().HasData(
+                new RolePanel { RoleId = 1, PanelId = 1 },
+                new RolePanel { RoleId = 1, PanelId = 9 },
+                new RolePanel { RoleId = 9, PanelId = 9 }
+            );
+
+            modelBuilder.Entity<UserPermission>().HasData(
+                new UserPermission { UserId = "admin", PermissionId = 1 },
+                new UserPermission { UserId = "admin", PermissionId = 2 },
+                new UserPermission { UserId = "admin", PermissionId = 3 },
+                new UserPermission { UserId = "admin", PermissionId = 4 },
+                new UserPermission { UserId = "admin", PermissionId = 5 },
+                new UserPermission { UserId = "admin", PermissionId = 6 },
+                new UserPermission { UserId = "admin", PermissionId = 7 },
+                new UserPermission { UserId = "admin", PermissionId = 10 },
+                new UserPermission { UserId = "admin", PermissionId = 11 },
+                new UserPermission { UserId = "admin", PermissionId = 12 }
+            );
+
+            modelBuilder.Entity<UserPanel>().HasData(
+               new UserPanel { UserId = "admin", PanelId = 1 },
+               new UserPanel { UserId = "admin", PanelId = 9 }
+            );
+           
 
             modelBuilder.Entity<File>().HasData(
                new File { Id = "default-user-photo"}
@@ -162,14 +132,12 @@ namespace GreenP.DataAccess
                 Surname = "Admin",
                 Lastname = "Admin",
                 Email = "admin@admin.admin",
-                EmailConfirmed = true,
                 Login = "admin",
                 PasswordHash = PasswordHandler.CreatePasswordHash("admin"),
-                PhotoId = "default-user-photo",
                 RoleId = 1
             });
 
-            modelBuilder.Entity<Image>().HasKey((x) => x.FileId);
+           
 
             modelBuilder.Entity<Notification<User>>()
                .HasOne((x) => x.User)

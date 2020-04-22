@@ -5,14 +5,21 @@ namespace SchoolBridge.DataAccess.Entities
 {
     public class RolePanel
     {
-        [Key]
         [ForeignKey("Role")]
         public int RoleId { get; set; }
         public Role Role { get; set; }
 
-        [Key]
         [ForeignKey("Panel")]
         public int PanelId { get; set; }
         public Panel Panel { get; set; }
+
+        public object Clone()
+            => new RolePanel
+            {
+                RoleId = RoleId,
+                Role = Role,
+                PanelId = PanelId,
+                Panel = Panel
+            };
     }
 }

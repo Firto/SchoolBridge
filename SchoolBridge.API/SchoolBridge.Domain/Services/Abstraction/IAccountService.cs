@@ -9,7 +9,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
     public interface IAccountService
     {
         // security
-        Task<LoggedDto> Register(RegisterDto entity, string uuid);
+        //Task<LoggedDto> Register(RegisterDto entity, string uuid);
         Task<LoggedDto> RefreshToken(RefreshTokenDto entity, string uuid);
         Task<LoggedDto> Login(LoginDto entity, string uuid);
         Task Logout(IHeaderDictionary headers);
