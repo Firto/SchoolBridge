@@ -10,52 +10,37 @@ using SchoolBridge.Helpers.AddtionalClases.DataBaseNotoficationService;
 
 namespace SchoolBridge.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
         IWebHostEnvironment _webHostEnvironment;
         IDataBaseNotificationService<User> _dataBaseNotificationManager;
         IGenericRepository<User> _userGR;
-
-        public ValuesController(IWebHostEnvironment webHostEnvironment, 
+        IEmailService _emailService;
+        public ValuesController(IWebHostEnvironment webHostEnvironment,
                                 IDataBaseNotificationService<User> dataBaseNotificationManager,
-                                IGenericRepository<User> userGR) {
+                                IGenericRepository<User> userGR,
+                                IEmailService emailService) {
             _webHostEnvironment = webHostEnvironment;
             _dataBaseNotificationManager = dataBaseNotificationManager;
             _userGR = userGR;
+            _emailService = emailService;
         }
         // GET api/values
         [HttpGet]
+        [ActionName("")]
         public async Task<ActionResult<IEnumerable<string>>> Get()
         {
             await _dataBaseNotificationManager.Notify(_userGR.GetAll((x) => x.Login == "admin").First(), "test", new MessageNotificationSource { Message = "Baboola" });
             return new string[] { _webHostEnvironment.ContentRootPath, _webHostEnvironment.WebRootPath };
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<string>>> SendEmail()
         {
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            _emailService.SendDefaultByDraft("profliste@gmail.com", "Registration", "email-registration", null, null, "https://github.com/Firto/SchoolBridge/");
+            return new string[] { _webHostEnvironment.ContentRootPath, _webHostEnvironment.WebRootPath };
         }
     }
 }

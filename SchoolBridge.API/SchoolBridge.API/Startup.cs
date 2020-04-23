@@ -1,4 +1,6 @@
 using System;
+using System.Net;
+using System.Net.Mail;
 using System.Text;
 using AutoMapper;
 using GreenP.DataAccess;
@@ -75,9 +77,39 @@ namespace SchoolBridge.API
                 RefreshTokenRemove = TimeSpan.FromDays(int.Parse(_jwtConfiguration["RefreshRemoveDays"]))
             });
 
+            services.AddSingleton(new NotificationServiceConfiguration
+            {
+                PermanentTokenValidation = new TokenValidationParameters
+                {
+                    ValidateLifetime = true,
+                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidIssuer = _jwtConfiguration["Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration["PermanentKey"])),
+                    ClockSkew = TimeSpan.Zero
+                },
+                PermanentTokenExpires = TimeSpan.FromMinutes(int.Parse(_jwtConfiguration["PermanentExpireMinuts"]))
+            });
+
             services.AddSingleton(new FileServiceConfiguration
             {
                 SaveDirectory = _env.ContentRootPath + "/" + "Files"
+            });
+
+            services.AddSingleton(new EmailServiceConfiguration
+            {
+                DraftsPath = _env.ContentRootPath + "/" + "EmailDrafts",
+                DefaultSendFrom = "registration@schoolbridge.com",
+                MaxIntervalSendEmail = 1000,
+                SendEmailInterval = TimeSpan.FromSeconds(10),
+                SmtpClient = new SmtpClient() {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential("profliste2@gmail.com", "wretum4183")
+                }
             });
 
             services.AddSingleton(new ImageServiceConfiguration());
@@ -85,9 +117,11 @@ namespace SchoolBridge.API
             // Singleton
             services.AddSingleton<ClientErrorManager>();
             services.AddSingleton(typeof(INotificationService<>), typeof(NotificationService<>));
+            services.AddSingleton<IEmailService, EmailService>();
 
             // Hosted Services
             services.AddHostedService<TokenRemoveHosting<User>>();
+            services.AddHostedService<EmailServiceHosting>();
 
             // Scoped Services
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

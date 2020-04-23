@@ -14,18 +14,24 @@ namespace SchoolBridge.Domain.SignalR.Hubs
             _notificationService = notificationService;
         }
 
-        public async Task Subscribe(string token)
+        public void Subscribe(string token)
         {
-            await _notificationService.OnConnected(Context, token);
+            _notificationService.OnConnected(Context, token);
         }
-        public async Task UnSubscribe()
+
+        public void PermanentSubscribe(string token)
         {
-            await _notificationService.OnDisconnected(Context);
+            _notificationService.OnConnected(Context, token);
+        }
+
+        public void UnSubscribe()
+        {
+            _notificationService.OnDisconnected(Context);
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)
         {
-            await _notificationService.OnDisconnected(Context);
+            _notificationService.OnDisconnected(Context);
             await base.OnDisconnectedAsync(ex);
         }
     }

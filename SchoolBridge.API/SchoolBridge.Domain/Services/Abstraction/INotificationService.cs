@@ -16,7 +16,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
 
         Task Read(AUser usr, string last, int count);
 
-        Task OnConnected(HubCallerContext hubCallerContext, string token);
-        Task OnDisconnected(HubCallerContext hubCallerContext);
+        void OnConnected(HubCallerContext hubCallerContext, string token);
+        void OnPermanentConnected(HubCallerContext hubCallerContext, string token);
+        void OnDisconnected(HubCallerContext hubCallerContext);
     }
 }
