@@ -29,12 +29,14 @@ namespace SchoolBridge.API
     {
         private readonly IConfiguration _configuration;
         private readonly IConfiguration _jwtConfiguration;
+        private readonly IConfiguration _emailServiceConfiguration;
         private readonly IWebHostEnvironment _env;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             _configuration = configuration;
             _jwtConfiguration = _configuration.GetSection("JwtSettings");
+            _emailServiceConfiguration = _configuration.GetSection("EmailService");
             _env = env;
         }
 
@@ -84,53 +86,18 @@ namespace SchoolBridge.API
             });
             services.UseFileService(new FileServiceConfiguration
             {
-                SaveDirectory = _env.ContentRootPath + "/" + "Files"
+                SaveDirectory = _env.ContentRootPath + "/Assets/Files"
             });
             services.UseImageService(new ImageServiceConfiguration());
+
             services.UseEmailService(new EmailServiceConfiguration
             {
-                DraftsPath = _env.ContentRootPath + "/" + "EmailDrafts",
-                DefaultSendFrom = "registration@schoolbridge.com",
-                MaxSendEmailInOneThread = 1000,
-                SendEmailInterval = TimeSpan.FromMinutes(1),
-                SmtpClients = new SmtpClient[]{
-                    new SmtpClient() {
-                        Host = "smtp.gmail.com",
-                        Port = 587,
-                        EnableSsl = true,
-                        DeliveryMethod = SmtpDeliveryMethod.Network,
-                        UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential("profliste2@gmail.com", "wretum4183"),
-                        Timeout = 0
-                    },
-                    new SmtpClient() {
-                        Host = "smtp.gmail.com",
-                        Port = 587,
-                        EnableSsl = true,
-                        DeliveryMethod = SmtpDeliveryMethod.Network,
-                        UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential("prochliste@gmail.com", "wretum4183"),
-                        Timeout = 0
-                    },
-                    new SmtpClient() {
-                        Host = "smtp.gmail.com",
-                        Port = 587,
-                        EnableSsl = true,
-                        DeliveryMethod = SmtpDeliveryMethod.Network,
-                        UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential("profliste3@gmail.com", "wretum4183"),
-                        Timeout = 0
-                    },
-                    new SmtpClient() {
-                        Host = "smtp.gmail.com",
-                        Port = 587,
-                        EnableSsl = true,
-                        DeliveryMethod = SmtpDeliveryMethod.Network,
-                        UseDefaultCredentials = false,
-                        Credentials = new NetworkCredential("profliste4@gmail.com", "wretum4183"),
-                        Timeout = 0
-                    }
-                }
+                DraftsPath = _env.ContentRootPath + "/" + _emailServiceConfiguration["DraftsPath"],
+                EmailServersConfigPath = _env.ContentRootPath + "/" + _emailServiceConfiguration["EmailServersConfigPath"],
+                SendEmailInterval = TimeSpan.FromMinutes(_emailServiceConfiguration.GetValue<uint>("SendEmailIntervalMinuts")),
+                MaxSendEmailInOneThread = _emailServiceConfiguration.GetValue<uint>("MaxSendEmailInOneThread"),
+                MaxSendThreads = _emailServiceConfiguration.GetValue<uint>("MaxSendThreads"),
+                DefaultSendFrom = _emailServiceConfiguration["DefaultSendFrom"],
             });
 
             services.AddSingleton(new MapperConfiguration(mc =>

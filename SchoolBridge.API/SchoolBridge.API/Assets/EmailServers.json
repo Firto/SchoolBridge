@@ -1,0 +1,28 @@
+[
+  {
+    "Name": "Gmail",
+    "Host": "smtp.gmail.com",
+    "Port": 587,
+    "EnableSsl": true,
+    "DeliveryMethod": 0,
+    "Timeout": 0,
+    "Accounts": [
+      {
+        "UserName": "profliste2@gmail.com",
+        "Password": "wretum4183"
+      },
+      {
+        "UserName": "profliste3@gmail.com",
+        "Password": "wretum4183"
+      },
+      {
+        "UserName": "profliste4@gmail.com",
+        "Password": "wretum4183"
+      },
+      {
+        "UserName": "prochliste@gmail.com",
+        "Password": "wretum4183"
+      }
+    ]
+  }
+]

@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Helpers.AddtionalClases.EmailService;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Net;
 using System.Net.Mail;
 using System.Threading;
@@ -17,7 +17,7 @@ namespace SchoolBridge.Domain.Hostings
         private Timer _timer;
         private readonly EmailServiceConfiguration _configuration;
         private readonly IEmailService _emailService;
-        private readonly SmtpClient[] _oSMTPClients;
+        private readonly List<SmtpClient> _oSMTPClients = new List<SmtpClient>();
         private readonly List<SmtpClient> _usingSMTPClients = new List<SmtpClient>();
         private  uint _countWorkThreads = 0;
 
@@ -28,7 +28,33 @@ namespace SchoolBridge.Domain.Hostings
             _configuration = configuration;
             _emailService = emailService;
 
-            _oSMTPClients = _configuration.SmtpClients;
+            ReloadEmailServers();
+        }
+
+        public void ReloadEmailServers() {
+            _oSMTPClients.Clear();
+
+            if (_configuration.SmtpClients != null)
+                _oSMTPClients.AddRange(_configuration.SmtpClients);
+
+            if (_configuration.EmailServersConfigPath != null)
+            {
+                IEnumerable<EmailServerConfig> servCfg = JsonConvert.DeserializeObject<IEnumerable<EmailServerConfig>>(System.IO.File.ReadAllText(_configuration.EmailServersConfigPath));
+                SmtpClient client;
+                foreach (var item in servCfg)
+                {
+                    foreach (var i in item.Accounts)
+                    {
+                        client = new SmtpClient(item.Host, item.Port);
+                        client.EnableSsl = item.EnableSsl;
+                        client.UseDefaultCredentials = false;
+                        client.DeliveryMethod = (SmtpDeliveryMethod)item.DeliveryMethod;
+                        client.Timeout = item.Timeout;
+                        client.Credentials = new NetworkCredential(i.UserName, i.Password);
+                        _oSMTPClients.Add(client);
+                    }
+                }
+            }
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -43,9 +69,9 @@ namespace SchoolBridge.Domain.Hostings
         {
             SmtpClient SMTPClient = null;
             lock (_lockObj) {
-                if (_usingSMTPClients.Count < _oSMTPClients.Length && (_countWorkThreads < _configuration.MaxSendThreads || _configuration.MaxSendThreads == 0)) {
+                if (_usingSMTPClients.Count < _oSMTPClients.Count && (_countWorkThreads < _configuration.MaxSendThreads || _configuration.MaxSendThreads == 0)) {
                     int i = 0;
-                    for (; i < _oSMTPClients.Length; i++)
+                    for (; i < _oSMTPClients.Count; i++)
                     {
                         if (!_usingSMTPClients.Contains(_oSMTPClients[i])) {
                             _usingSMTPClients.Add(_oSMTPClients[i]);
@@ -54,7 +80,7 @@ namespace SchoolBridge.Domain.Hostings
                             break;
                         }
                     }
-                    if (i == _oSMTPClients.Length)
+                    if (i == _oSMTPClients.Count)
                         return;
                 }
                 else return;
@@ -85,7 +111,7 @@ namespace SchoolBridge.Domain.Hostings
                         Console.WriteLine(e);
                         isSended = false;
                     }
-                    Console.WriteLine($"Sended {isSended}!");
+                    Console.WriteLine($"Sended from {((NetworkCredential)SMTPClient.Credentials).UserName} {isSended}!");
                     emailEntity.CompletedEventHandler?.Invoke(new EmailSendCompleatedEntity
                         {
                             EmailEntity = emailEntity,
