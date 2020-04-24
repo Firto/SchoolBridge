@@ -3,7 +3,9 @@ using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Helpers.AddtionalClases.EmailService;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
 using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,15 +17,18 @@ namespace SchoolBridge.Domain.Hostings
         private Timer _timer;
         private readonly EmailServiceConfiguration _configuration;
         private readonly IEmailService _emailService;
-        private readonly SmtpClient oSMTPClient;
+        private readonly SmtpClient[] _oSMTPClients;
+        private readonly List<SmtpClient> _usingSMTPClients = new List<SmtpClient>();
+        private  uint _countWorkThreads = 0;
+
+        private object _lockObj = new object(); 
         public EmailServiceHosting(IEmailService emailService,
                                   EmailServiceConfiguration configuration)
         {
             _configuration = configuration;
             _emailService = emailService;
 
-            oSMTPClient = _configuration.SmtpClient;
-            oSMTPClient.SendCompleted += OnCompleateSend;
+            _oSMTPClients = _configuration.SmtpClients;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -34,30 +39,66 @@ namespace SchoolBridge.Domain.Hostings
             return Task.CompletedTask;
         }
 
-        private void OnCompleateSend(object obj, AsyncCompletedEventArgs e) 
-        {
-            var entity = (EmailEntity)e.UserState;
-
-            Console.WriteLine($"Sended {!e.Cancelled && e.Error == null}!");
-            if (e.Error != null)
-                Console.WriteLine(e.Error);
-
-            entity.CompletedEventHandler?.Invoke(new EmailSendCompleatedEntity
-                {
-                    EmailEntity = entity,
-                    EndSendingTime = DateTime.Now,
-                    IsSended = !e.Cancelled && e.Error == null
-                }
-            );
-        }
-
         private void DoWork(object state)
         {
-            Console.WriteLine("Sending emails!");
+            SmtpClient SMTPClient = null;
+            lock (_lockObj) {
+                if (_usingSMTPClients.Count < _oSMTPClients.Length && (_countWorkThreads < _configuration.MaxSendThreads || _configuration.MaxSendThreads == 0)) {
+                    int i = 0;
+                    for (; i < _oSMTPClients.Length; i++)
+                    {
+                        if (!_usingSMTPClients.Contains(_oSMTPClients[i])) {
+                            _usingSMTPClients.Add(_oSMTPClients[i]);
+                            SMTPClient = _oSMTPClients[i];
+                            _countWorkThreads++;
+                            break;
+                        }
+                    }
+                    if (i == _oSMTPClients.Length)
+                        return;
+                }
+                else return;
+            }
+
+            Console.WriteLine($"Sending emails from {((NetworkCredential)SMTPClient.Credentials).UserName}!");
+            /* = new SmtpClient(oSMTPClient.Host, oSMTPClient.Port);
+            SMTPClient.Credentials = oSMTPClient.Credentials;
+            SMTPClient.EnableSsl = oSMTPClient.EnableSsl;
+            SMTPClient.UseDefaultCredentials = oSMTPClient.UseDefaultCredentials;
+            SMTPClient.DeliveryMethod = oSMTPClient.DeliveryMethod;
+            SMTPClient.PickupDirectoryLocation = oSMTPClient.PickupDirectoryLocation;
+            SMTPClient.DeliveryFormat = oSMTPClient.DeliveryFormat;
+            SMTPClient.Timeout = oSMTPClient.Timeout;
+            SMTPClient.TargetName = oSMTPClient.TargetName;*/
             EmailEntity emailEntity = null;
-            for (int i = 0; i < _configuration.MaxIntervalSendEmail && _emailService.EmailQueue.Count > 0; i++) 
+            bool isSended = true;
+            for (int i = 0; i < _configuration.MaxSendEmailInOneThread && _emailService.EmailQueue.Count > 0; i++)
                 if (_emailService.EmailQueue.TryDequeue(out emailEntity))
-                    oSMTPClient.SendAsync(emailEntity.Message, emailEntity);
+                {
+                    isSended = true;
+                    try
+                    {
+                        SMTPClient.Send(emailEntity.Message);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        isSended = false;
+                    }
+                    Console.WriteLine($"Sended {isSended}!");
+                    emailEntity.CompletedEventHandler?.Invoke(new EmailSendCompleatedEntity
+                        {
+                            EmailEntity = emailEntity,
+                            EndSendingTime = DateTime.Now,
+                            IsSended = isSended
+                        }
+                    );
+                }
+            lock (_lockObj)
+            {
+                _usingSMTPClients.Remove(SMTPClient);
+                _countWorkThreads--;
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

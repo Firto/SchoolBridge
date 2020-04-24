@@ -5,7 +5,7 @@ using SchoolBridge.DataAccess.Entities.Files;
 using SchoolBridge.DataAccess.Entities.Files.Images;
 using SchoolBridge.Helpers.Managers;
 
-namespace GreenP.DataAccess
+namespace SchoolBridge.DataAccess
 {
     public class AuthContext<AUser> : DbContext where AUser: AuthUser
     {
