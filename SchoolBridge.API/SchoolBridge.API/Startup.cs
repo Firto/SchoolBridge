@@ -30,6 +30,8 @@ namespace SchoolBridge.API
         private readonly IConfiguration _configuration;
         private readonly IConfiguration _jwtConfiguration;
         private readonly IConfiguration _emailServiceConfiguration;
+        private readonly IConfiguration _notificationServiceConfiguration;
+        private readonly IConfiguration _registrationServiceConfiguration;
         private readonly IWebHostEnvironment _env;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
@@ -37,6 +39,8 @@ namespace SchoolBridge.API
             _configuration = configuration;
             _jwtConfiguration = _configuration.GetSection("JwtSettings");
             _emailServiceConfiguration = _configuration.GetSection("EmailService");
+            _notificationServiceConfiguration = _configuration.GetSection("NotificationService");
+            _registrationServiceConfiguration = _configuration.GetSection("RegistrationService");
             _env = env;
         }
 
@@ -79,10 +83,10 @@ namespace SchoolBridge.API
                     ValidateAudience = false,
                     ValidateIssuer = true,
                     ValidIssuer = _jwtConfiguration["Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration["PermanentKey"])),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_notificationServiceConfiguration["PermanentKey"])),
                     ClockSkew = TimeSpan.Zero
                 },
-                PermanentTokenExpires = TimeSpan.FromMinutes(int.Parse(_jwtConfiguration["PermanentExpireMinuts"]))
+                PermanentTokenExpires = TimeSpan.FromMinutes(int.Parse(_notificationServiceConfiguration["PermanentExpireMinuts"]))
             });
             services.UseFileService(new FileServiceConfiguration
             {
@@ -94,12 +98,25 @@ namespace SchoolBridge.API
             {
                 DraftsPath = _env.ContentRootPath + "/" + _emailServiceConfiguration["DraftsPath"],
                 EmailServersConfigPath = _env.ContentRootPath + "/" + _emailServiceConfiguration["EmailServersConfigPath"],
-                SendEmailInterval = TimeSpan.FromMinutes(_emailServiceConfiguration.GetValue<uint>("SendEmailIntervalMinuts")),
+                //SendEmailInterval = TimeSpan.FromMinutes(_emailServiceConfiguration.GetValue<uint>("SendEmailIntervalMinuts")),
+                SendEmailInterval = TimeSpan.FromSeconds(10),
                 MaxSendEmailInOneThread = _emailServiceConfiguration.GetValue<uint>("MaxSendEmailInOneThread"),
                 MaxSendThreads = _emailServiceConfiguration.GetValue<uint>("MaxSendThreads"),
                 DefaultSendFrom = _emailServiceConfiguration["DefaultSendFrom"],
             });
 
+            services.UseRegistrationService(new RegistrationServiceConfiguration {
+                RegistrationTokenValidation = new TokenValidationParameters
+                {
+                    ValidateLifetime = true,
+                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidIssuer = _jwtConfiguration["Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_registrationServiceConfiguration["RegistrationKey"])),
+                    ClockSkew = TimeSpan.Zero
+                },
+                RegistrationTokenExpires = TimeSpan.FromDays(int.Parse(_registrationServiceConfiguration["RegistrationExpireDays"]))
+            });
             services.AddSingleton(new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new DomainMapperProfile());
@@ -107,6 +124,12 @@ namespace SchoolBridge.API
 
             // Scoped Services
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<IPanelService, PanelService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRegistrationService, RegistrationService>();
+
             services.AddScoped<IAccountService, AccountService>();
 
             //SignalR

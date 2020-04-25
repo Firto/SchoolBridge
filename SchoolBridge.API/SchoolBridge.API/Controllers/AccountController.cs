@@ -59,10 +59,10 @@ namespace GreenP.API.Controllers
         public async Task<ResultDto> GetProfile([BindNever]User user)
             => ResultDto.Create(await _accountService.GetProfileInfo(user));
 
-        [HttpPost]
+        /*[HttpPost]
         [MyAutorize]
         [RequestSizeLimit(100 * 1024 * 1024)]     // set the maximum file size limit to 100 MB
         public async Task<ResultDto> SetProfile([FromBody]ProfileDto model, [BindNever]User user)
-           => ResultDto.Create(await _accountService.SetProfileInfo(user, model));
+           => ResultDto.Create(await _accountService.SetProfileInfo(user, model));*/
     }
 }

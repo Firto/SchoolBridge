@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolBridge.DataAccess.Entities
@@ -10,5 +11,6 @@ namespace SchoolBridge.DataAccess.Entities
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
+        public IEnumerable<PanelPermission> Permissions { get; set; }
     }
 }

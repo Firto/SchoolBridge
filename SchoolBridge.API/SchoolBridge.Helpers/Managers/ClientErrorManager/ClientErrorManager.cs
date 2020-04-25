@@ -30,9 +30,9 @@ namespace SchoolBridge.Helpers.Managers.CClientErrorManager
             };
         }
 
-        public override ClientBaseErrorsInfoDto GetInfo()
+        public override ClientErrorsInfoDto GetInfo()
         {
-            ClientBaseErrorsInfoDto dto = new ClientBaseErrorsInfoDto();
+            ClientErrorsInfoDto dto = new ClientErrorsInfoDto();
             if (_clientErrors.Count > 0)
             {
                 dto.Errors = new Dictionary<string, ClientErrorInfoDto>();
@@ -41,7 +41,7 @@ namespace SchoolBridge.Helpers.Managers.CClientErrorManager
             }
             if (_childLists.Count > 0)
             {
-                var set = new List<ClientBaseErrorsInfoDto>();
+                var set = new List<ClientErrorsInfoDto>();
                 foreach (var item in _childLists)
                     set.Add(item.GetInfo());
                 dto.Dictionaries = set;

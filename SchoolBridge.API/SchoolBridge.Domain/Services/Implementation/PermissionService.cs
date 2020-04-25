@@ -42,14 +42,7 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task<IEnumerable<PanelPermission>> AddDefaultPermissions(Panel panel, IEnumerable<Permission> permissions)
         {
-            var template = new PanelPermission { PanelId = panel.Id };
-            var arr = new PanelPermission[permissions.Count()];
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = (PanelPermission)template.Clone();
-                arr[i].Permission = permissions.ElementAt(i);
-            }
-            return await _panelPermissionGR.CreateAsync(arr);
+            return await _panelPermissionGR.CreateAsync(permissions.Select(x => new PanelPermission { PanelId = panel.Id, PermissionId = x.Id }));
         }
 
         public async Task<UserPermission> AddPermission(User user, Permission permission)
@@ -59,14 +52,7 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task<IEnumerable<UserPermission>> AddPermissions(User user, IEnumerable<Permission> permissions)
         {
-            var template = new UserPermission { UserId = user.Id };
-            var arr = new UserPermission[permissions.Count()];
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = (UserPermission)template.Clone();
-                arr[i].Permission = permissions.ElementAt(i);
-            }
-            return await _userPermissionGR.CreateAsync(arr);
+            return await _userPermissionGR.CreateAsync(permissions.Select(x => new UserPermission { UserId = user.Id, PermissionId = x.Id }));
         }
 
         public async Task<IEnumerable<Permission>> GetAllPermissions()
@@ -77,6 +63,11 @@ namespace SchoolBridge.Domain.Services.Implementation
         public async Task<IEnumerable<Permission>> GetDefaultPermissions(Panel panel)
         {
             return _mapper.Map<IEnumerable<PanelPermission>, IEnumerable<Permission>>(await _panelPermissionGR.GetAllIncludeAsync((x) => x.PanelId == panel.Id, (x) => x.Permission));
+        }
+
+        public async Task<IEnumerable<Permission>> GetDefaultPermissions(IEnumerable<Panel> panels)
+        {
+            return _mapper.Map<IEnumerable<PanelPermission>, IEnumerable<Permission>>(await _panelPermissionGR.GetAllIncludeAsync((x) => panels.Select(s => s.Id).Contains(x.PanelId), (x) => x.Permission));
         }
 
         public async Task<IEnumerable<Permission>> GetPermissions(User user)
@@ -130,5 +121,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 throw new ClientException("inc-perm-name");
             return HasAllPermissions(user, p);
         }
+
+        
     }
 }

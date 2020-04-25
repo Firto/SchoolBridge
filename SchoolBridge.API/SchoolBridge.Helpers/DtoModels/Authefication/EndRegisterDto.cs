@@ -1,6 +1,6 @@
 ﻿namespace SchoolBridge.Helpers.DtoModels.Authefication
 {
-    public class TwoRegisterDto
+    public class EndRegisterDto
     {
         public string RegistrationToken { get; set; }
 

@@ -9,6 +9,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Task<IEnumerable<Permission>> GetAllPermissions();
         Task<IEnumerable<Permission>> GetPermissions(User user);
         Task<IEnumerable<Permission>> GetDefaultPermissions(Panel panel);
+        Task<IEnumerable<Permission>> GetDefaultPermissions(IEnumerable<Panel> panels);
 
         Task<UserPermission> AddPermission(User user, Permission permission);
         Task<IEnumerable<UserPermission>> AddPermissions(User user, IEnumerable<Permission> permissions);

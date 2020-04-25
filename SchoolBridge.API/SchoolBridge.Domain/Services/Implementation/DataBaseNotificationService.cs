@@ -36,8 +36,8 @@ namespace SchoolBridge.Domain.Services.Implementation
             _jsonSerializerSettings = new JsonSerializerSettings();
             _jsonSerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
-            if (!clientErrorManager.IsIssetErrors("Notification"))
-                clientErrorManager.AddErrors(new ClientErrors("Notification",
+            if (!clientErrorManager.IsIssetErrors("DataBaseNotification"))
+                clientErrorManager.AddErrors(new ClientErrors("DataBaseNotification",
                     new Dictionary<string, ClientError>
                     {
                         {"inc-ntf-id", new ClientError("Incorrect notification id!")}

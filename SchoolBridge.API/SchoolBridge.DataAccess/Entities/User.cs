@@ -30,5 +30,7 @@ namespace SchoolBridge.DataAccess.Entities
         public Image Photo { get; set; }*/
 
         public IEnumerable<Notification<User>> Notifications { get; set; }
+        public IEnumerable<UserPanel> Panels { get; set; }
+        public IEnumerable<UserPermission> Permissions { get; set; }
     }
 }

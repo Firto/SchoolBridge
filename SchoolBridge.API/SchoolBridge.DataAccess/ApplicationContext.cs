@@ -137,11 +137,25 @@ namespace SchoolBridge.DataAccess
                 RoleId = 1
             });
 
-           
-
             modelBuilder.Entity<Notification<User>>()
                .HasOne((x) => x.User)
                .WithMany(x => x.Notifications);
+
+            modelBuilder.Entity<UserPanel>()
+               .HasOne((x) => x.User)
+               .WithMany(x => x.Panels);
+
+            modelBuilder.Entity<UserPermission>()
+               .HasOne((x) => x.User)
+               .WithMany(x => x.Permissions);
+
+            modelBuilder.Entity<RolePanel>()
+               .HasOne((x) => x.Role)
+               .WithMany(x => x.Panels);
+
+            modelBuilder.Entity<PanelPermission>()
+               .HasOne((x) => x.Panel)
+               .WithMany(x => x.Permissions);
 
             modelBuilder.Entity<User>()
                .HasOne(t => t.Role)

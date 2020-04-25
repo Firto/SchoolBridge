@@ -16,6 +16,7 @@ using SchoolBridge.Domain.Services.Configuration;
 using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
+using SchoolBridge.Helpers.Managers.CClientErrorManager;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
@@ -30,14 +31,26 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public NotificationService(IHubContext<NotificationHub<AUser>, INotificationClient> hubContext,
                                     NotificationServiceConfiguration configuration,
-                                    IServiceProvider serviceProvider) {
+                                    IServiceProvider serviceProvider,
+                                    ClientErrorManager clientErrorManager) {
             _hubContext = hubContext;
             _serviceProvider = serviceProvider;
             _configuration = configuration;
+
+            if (!clientErrorManager.IsIssetErrors("Notification"))
+                clientErrorManager.AddErrors(new ClientErrors("Notification",
+                    new Dictionary<string, ClientError>
+                    {
+                        {"inc-permanent-token", new ClientError("Incorrect permanent token!")}
+                    }
+                ));
         }
 
-        public PermanentSubscribeDto CreatePermanentToken() {
-            var expires = DateTime.Now.Add(_configuration.PermanentTokenExpires);
+        public PermanentSubscribeDto CreatePermanentToken(TimeSpan ?exp = null) {
+            DateTime expires = DateTime.Now;
+            if (!exp.HasValue)
+                expires.Add(_configuration.PermanentTokenExpires);
+            else expires.Add(exp.Value);
 
             var claims = new List<Claim>
             {

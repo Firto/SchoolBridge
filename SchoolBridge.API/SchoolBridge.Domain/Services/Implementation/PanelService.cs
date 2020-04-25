@@ -52,38 +52,17 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task<IEnumerable<UserPanel>> AddPanels(User user, IEnumerable<Panel> panels)
         {
-            var template = new UserPanel { UserId = user.Id };
-            var arr = new UserPanel[panels.Count()];
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = (UserPanel)template.Clone();
-                arr[i].Panel = panels.ElementAt(i);
-            }
-            return await _userPanelGR.CreateAsync(arr);
+            return await _userPanelGR.CreateAsync(panels.Select(x => new UserPanel { UserId = user.Id, PanelId = x.Id}));
         }
 
         public async Task<IEnumerable<RolePanel>> AddPanelsDefault(Role role, IEnumerable<Panel> panels)
         {
-            var template = new RolePanel { RoleId = role.Id };
-            var arr = new RolePanel[panels.Count()];
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = (RolePanel)template.Clone();
-                arr[i].Panel = panels.ElementAt(i);
-            }
-            return await _rolePanelGR.CreateAsync(arr);
+            return await _rolePanelGR.CreateAsync(panels.Select(x => new RolePanel { RoleId = role.Id, PanelId = x.Id }));
         }
 
         public async Task<IEnumerable<RolePanel>> AddPanelsDefault(string role, IEnumerable<Panel> panels)
         {
-            var template = new RolePanel { RoleId = (await _roleService.Get(role)).Id };
-            var arr = new RolePanel[panels.Count()];
-            for (int i = 0; i < arr.Length; i++)
-            {
-                arr[i] = (RolePanel)template.Clone();
-                arr[i].Panel = panels.ElementAt(i);
-            }
-            return await _rolePanelGR.CreateAsync(arr);
+            return await AddPanelsDefault(await _roleService.Get(role), panels);
         }
 
         public async Task<IEnumerable<Panel>> GetAllPanels()
@@ -93,18 +72,18 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task<IEnumerable<Panel>> GetDefaultPanels(Role role)
         {
-            return _mapper.Map<IEnumerable<RolePanel>, IEnumerable<Panel>>(await _rolePanelGR.GetAllIncludeAsync((x) => x.RoleId == role.Id, (x) => x.Panel));
+            return _mapper.Map<IEnumerable<RolePanel>, IEnumerable<Panel>>(await _rolePanelGR.GetAllIncludeAsync((x) => x.RoleId == role.Id, (s) => s.Panel));
         }
 
         public async Task<IEnumerable<Panel>> GetDefaultPanels(string role)
         {
             var ro = await _roleService.Get(role);
-            return _mapper.Map<IEnumerable<RolePanel>, IEnumerable<Panel>>(await _rolePanelGR.GetAllIncludeAsync((x) => x.RoleId == ro.Id, (x) => x.Panel));
+            return _mapper.Map<IEnumerable<RolePanel>, IEnumerable<Panel>>(await _rolePanelGR.GetAllIncludeAsync((x) => x.RoleId == ro.Id, (s) => s.Panel));
         }
 
         public async Task<IEnumerable<Panel>> GetPanels(User user)
         {
-            return _mapper.Map<IEnumerable<UserPanel>, IEnumerable<Panel>>(await _userPanelGR.GetAllIncludeAsync((x) => x.UserId == user.Id, (x) => x.Panel));
+            return _mapper.Map<IEnumerable<UserPanel>, IEnumerable<Panel>>(await _userPanelGR.GetAllIncludeAsync((x) => x.UserId == user.Id, (s) => s.Panel));
         }
 
         public async Task RemovePanel(User user, Panel panel)

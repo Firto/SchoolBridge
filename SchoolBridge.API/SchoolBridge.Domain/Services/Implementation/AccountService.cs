@@ -54,19 +54,6 @@ namespace SchoolBridge.Domain.Services.Implementation
                             {"inc-log-pass", new ClientError("Incorrect login or password!")},
                             {"too-many-devices", new ClientError("Too many devices logged!")}
                         }),
-                        new ClientErrors("Register", new Dictionary<string, ClientError>()
-                        {
-                            {"r-input-login", new ClientError("Input your login!")},
-                            {"too-long-login", new ClientError("Too long login(max 25 characters)!")},
-                            {"r-input-pass", new ClientError("Input your password!")},
-                            {"login-spec-chars", new ClientError("Login musn't have specials chars!")},
-                            {"pass-count-chars", new ClientError("Password must have eight and more chars!")},
-                            {"pass-count-digit", new ClientError("Password must have minimum one digit!")},
-                            {"too-long-pass", new ClientError("Too long password(max 25 characters)!")},
-                            {"input-repeat-pass", new ClientError("Input repeat your password!")},
-                            {"inc-repeat-pass", new ClientError("Passwords do not match!")},
-                            {"already-registered", new ClientError("User with this login is already registered!")}
-                        }),
                         new ClientErrors("Edit", new Dictionary<string, ClientError>(){
                             {"inc-email", new ClientError("Incorrect email!")},
                             {"alrd-reg-login", new ClientError("User with this login is already registered!")},
@@ -75,33 +62,6 @@ namespace SchoolBridge.Domain.Services.Implementation
                         })
                     }
                 ));
-        }
-
-        void ValidateLogin(string login) {
-            if (string.IsNullOrEmpty(login))
-                throw new ClientException("r-input-login");
-            else if (login.Length > 25)
-                throw new ClientException("too-long-login");
-            else if (!Regex.Match(login, "^[a-zA-Z_0-9]*$").Success)
-                throw new ClientException("login-spec-chars");
-        }
-
-        void ValidatePassword(string password)
-        {
-            if (string.IsNullOrEmpty(password))
-                throw new ClientException("r-input-pass");
-            else if (password.Length > 25)
-                throw new ClientException("too-long-pass");
-            else if (password.Length < 8)
-                throw new ClientException("pass-count-chars");
-            else if (!password.Any(c => char.IsDigit(c)))
-                throw new ClientException("pass-count-digit");
-        }
-
-        void ValidateEmail(string email)
-        {
-            if (Regex.IsMatch(email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
-                throw new ClientException("inc-email");
         }
 
         public async Task<LoggedDto> Login(LoginDto entity, string uuid)
@@ -153,7 +113,7 @@ namespace SchoolBridge.Domain.Services.Implementation
         public async Task<ProfileDto> GetProfileInfo(User user)
             => _mapper.Map<User, ProfileDto>(await _usersGR.FindAsync(user.Id));
 
-        public async Task<ProfileDto> SetProfileInfo(User user, ProfileDto entity)
+        /*public async Task<ProfileDto> SetProfileInfo(User user, ProfileDto entity)
         {
             string remPhotoId = null;
             user = _usersGR.Find(user.Id);
@@ -184,7 +144,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             await _usersGR.UpdateAsync(user);
             if (remPhotoId != null) await _imageService.Remove(remPhotoId);
             return await GetProfileInfo(await _usersGR.FindAsync(user.Id));
-        }
+        }*/
 
         public async Task Logout(IHeaderDictionary headers)
             => await _tokenService.DeactivateToken(headers);

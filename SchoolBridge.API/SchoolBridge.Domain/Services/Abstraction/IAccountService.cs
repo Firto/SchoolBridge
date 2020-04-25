@@ -15,7 +15,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Task Logout(IHeaderDictionary headers);
         Task LogoutAll(IHeaderDictionary headers);
         // basic
-        Task<ProfileDto> SetProfileInfo(User user, ProfileDto entity);
+        //Task<ProfileDto> SetProfileInfo(User user, ProfileDto entity);
         Task<ProfileDto> GetProfileInfo(User user);
     }
 }
