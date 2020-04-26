@@ -5,42 +5,42 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SchoolBridge.Helpers.DtoModels;
 using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Helpers.DtoModels.Authefication;
-using SchoolBridge.DataAccess.Entities;
 
 namespace GreenP.API.Controllers
 {
     [Route("api/[controller]/[action]")]
-    public class AccountController : ControllerBase
+    public class LoginController : ControllerBase
     {
-        private readonly IAccountService _accountService;
-        public AccountController(IAccountService accountService)
-            => _accountService = accountService;
+        private readonly ILoginService _loginService;
+        public LoginController(ILoginService loginService)
+            => _loginService = loginService;
 
         // security
 
         [UUID]
         [HttpPost]
         [MyNoAutorize]
+        [ActionName("")]
         public async Task<ResultDto> Login([FromBody] LoginDto model, [BindNever]string uuid)
-            => ResultDto.Create(await _accountService.Login(model, uuid));
+            => ResultDto.Create(await _loginService.Login(model, uuid));
 
         [UUID]
         [HttpPost]
         [MyNoAutorize]
         public async Task<ResultDto> RefreshToken([FromBody] RefreshTokenDto model, [BindNever]string uuid)
-            => ResultDto.Create(await _accountService.RefreshToken(model, uuid));
+            => ResultDto.Create(await _loginService.RefreshToken(model, uuid));
 
         /*[UUID]
         [HttpPost]
         [MyNoAutorize]
         public async Task<ResultDto> Register([FromBody] RegisterDto model, [BindNever]string uuid)
-            => ResultDto.Create(await _accountService.Register(model, uuid));*/
+            => ResultDto.Create(await _loginService.Register(model, uuid));*/
 
         [HttpGet]
         [MyAutorize]
         public async Task<ResultDto> Logout()
         {
-            await _accountService.Logout(HttpContext.Request.Headers);
+            await _loginService.Logout(HttpContext.Request.Headers);
             return ResultDto.Create(null); 
         }
 
@@ -48,16 +48,16 @@ namespace GreenP.API.Controllers
         [MyAutorize]
         public async Task<ResultDto> LogoutAll()
         {
-            await _accountService.LogoutAll(HttpContext.Request.Headers);
+            await _loginService.LogoutAll(HttpContext.Request.Headers);
             return ResultDto.Create(null);
         }
 
         // basic
 
-        [HttpGet]
+        /*[HttpGet]
         [MyAutorize]
         public async Task<ResultDto> GetProfile([BindNever]User user)
-            => ResultDto.Create(await _accountService.GetProfileInfo(user));
+            => ResultDto.Create(await _accountService.GetProfileInfo(user));*/
 
         /*[HttpPost]
         [MyAutorize]

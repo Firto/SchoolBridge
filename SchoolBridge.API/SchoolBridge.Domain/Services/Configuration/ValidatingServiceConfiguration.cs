@@ -1,0 +1,12 @@
+﻿namespace SchoolBridge.Domain.Services.Configuration
+{
+    public class ValidatingServiceConfiguration
+    {
+        public short MaxCountCharsLogin { get; set; } = 25;
+        public short MaxCountCharsPassword { get; set; } = 25;
+        public short MaxCountCharsName { get; set; } = 60;
+        public short MaxCountCharsSurname { get; set; } = 255;
+        public short MaxCountCharsLastname { get; set; } = 70;
+        public short MinCountCharsPassword { get; set; } = 8;
+    }
+}

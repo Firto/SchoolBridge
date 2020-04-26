@@ -19,11 +19,6 @@ namespace SchoolBridge.Domain.Profiles
             CreateMap(typeof(Notification<>), typeof(DataBaseSourse));
 
             CreateMap(typeof(Notification<>), typeof(NotificationDto));
-
-            CreateMap<RolePanel, Panel>().ConvertUsing((x) => x.Panel);
-            CreateMap<UserPanel, Panel>().ConvertUsing((x) => x.Panel);
-            CreateMap<PanelPermission, Permission>().ConvertUsing((x) => x.Permission);
-            CreateMap<UserPermission, Permission>().ConvertUsing((x) => x.Permission);
         }
     }
 }

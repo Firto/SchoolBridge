@@ -7,6 +7,7 @@ using SchoolBridge.Helpers.Managers.CClientErrorManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Implementation
@@ -18,14 +19,12 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly IPanelService _panelService;
         private readonly IRoleService _roleService;
 
-        private readonly IGenericRepository<PanelPermission> _panelPermissionGR;
         private readonly IGenericRepository<RolePanel> _rolePanelGR;
 
         public UserService(IGenericRepository<User> userGR,
                             IPermissionService permissionService,
                             IPanelService panelService,
                             IRoleService roleService,
-                            IGenericRepository<PanelPermission> panelPermissionGR,
                             IGenericRepository<RolePanel> rolePanelGR,
                             ClientErrorManager clientErrorManager)
         {
@@ -33,7 +32,6 @@ namespace SchoolBridge.Domain.Services.Implementation
             _permissionService = permissionService;
             _panelService = panelService;
             _roleService = roleService;
-            _panelPermissionGR = panelPermissionGR;
             _rolePanelGR = rolePanelGR;
 
             if (!clientErrorManager.IsIssetErrors("User"))
@@ -44,16 +42,13 @@ namespace SchoolBridge.Domain.Services.Implementation
         }
         public async Task<User> Add(User user, IEnumerable<Panel> noPanels = null, IEnumerable<Permission> noPermissions = null)
         {
-            user.RoleId = user.Role.Id;
-            user.Role = null;
             user = await _userGR.CreateAsync(user);
-
-            var panels = _rolePanelGR.GetDbSet().Where(x => x.RoleId == user.RoleId).Include(x => x.Panel.Permissions).Select(x => x.Panel).ToArray();
+            var panels = _rolePanelGR.GetDbSet().Where(x => x.RoleId == user.RoleId).Include(x => x.Panel.Permissions).ThenInclude(x => x.Permission).Include(x => x.Panel).Select(x => x.Panel).ToArray();
             var permissions = new List<Permission>();
 
             panels = panels.Where(x => {
                 if (noPanels.FirstOrDefault(s => s.Id == x.Id) == null) {
-                    permissions.AddRange(x.Permissions.Where(s => noPermissions.FirstOrDefault(z => z.Id == s.PermissionId) == null).Select(s => new Permission { Id = s.PermissionId }));
+                    permissions.AddRange(x.Permissions.Where(s => noPermissions.FirstOrDefault(z => z.Id == s.PermissionId) == null).Select(s => s.Permission));
                     return true;
                 }
                 return false;
@@ -75,14 +70,64 @@ namespace SchoolBridge.Domain.Services.Implementation
             throw new NotImplementedException();
         }
 
-        public async Task<User> Get(string Id)
+        public async Task<User> GetByEmailAsync(string email)
+        {
+            return (await _userGR.GetAllAsync(x => x.Email == email)).FirstOrDefault();
+        }
+
+        public async Task<bool> IsIssetByEmailAsync(string email)
+        {
+            return (await _userGR.CountWhereAsync(x => x.Email == email)) > 0;
+        }
+
+        public async Task<User> GetByLoginAsync(string login)
+        {
+            return (await _userGR.GetAllAsync(x => x.Login == login)).FirstOrDefault();
+        }
+
+        public async Task<bool> IsIssetByLoginAsync(string login)
+        {
+            return (await _userGR.CountWhereAsync(x => x.Login == login)) > 0;
+        }
+
+        public async Task<User> GetAsync(string Id)
         {
             return await _userGR.FindAsync(Id);
         }
 
-        public async Task<bool> IsIsset(string Id)
+        public async Task<bool> IsIssetAsync(string Id)
         {
-            return (await Get(Id)) != null;
+            return (await GetAsync(Id)) != null;
+        }
+
+        public User GetByEmail(string email)
+        {
+            return _userGR.GetAll(x => x.Email == email).FirstOrDefault();
+        }
+
+        public bool IsIssetByEmail(string email)
+        {
+            return _userGR.CountWhere(x => x.Email == email) > 0;
+        }
+
+        public User GetByLogin(string login)
+        {
+            return _userGR.GetAll(x => x.Login == login).FirstOrDefault();
+        }
+
+        public bool IsIssetByLogin(string login)
+        {
+            return _userGR.CountWhere(x => x.Login == login) > 0;
+        }
+
+        public User Get(string Id)
+        {
+            return _userGR.Find(Id);
+        }
+
+        public bool IsIsset(string Id)
+        {
+            return Get(Id) != null;
         }
 
         public async Task Remove(User user)
@@ -93,6 +138,36 @@ namespace SchoolBridge.Domain.Services.Implementation
         public Task Unblock(User ovner, User user, string comment, DateTime unblockDate)
         {
             throw new NotImplementedException();
+        }
+
+        public User GetAll(string Id)
+        {
+            return _userGR.GetDbSet().Where(x => x.Id == Id).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).Include(x => x.Notifications).ToArray().FirstOrDefault();
+        }
+
+        public User GetAllByEmail(string email)
+        {
+            return _userGR.GetDbSet().Where(x => x.Email == email).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArray().FirstOrDefault();
+        }
+
+        public User GetAllByLogin(string login)
+        {
+            return _userGR.GetDbSet().Where(x => x.Login == login).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArray().FirstOrDefault();
+        }
+
+        public async Task<User> GetAllAsync(string Id)
+        {
+            return (await _userGR.GetDbSet().Where(x => x.Id == Id).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArrayAsync()).FirstOrDefault();
+        }
+
+        public async Task<User> GetAllByEmailAsync(string email)
+        {
+            return (await _userGR.GetDbSet().Where(x => x.Email == email).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArrayAsync()).FirstOrDefault();
+        }
+
+        public async Task<User> GetAllByLoginAsync(string login)
+        {
+            return (await _userGR.GetDbSet().Where(x => x.Login == login).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArrayAsync()).FirstOrDefault();
         }
     }
 }

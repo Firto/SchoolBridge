@@ -117,6 +117,9 @@ namespace SchoolBridge.API
                 },
                 RegistrationTokenExpires = TimeSpan.FromDays(int.Parse(_registrationServiceConfiguration["RegistrationExpireDays"]))
             });
+
+            services.AddSingleton(new ValidatingServiceConfiguration { });
+
             services.AddSingleton(new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new DomainMapperProfile());
@@ -128,9 +131,10 @@ namespace SchoolBridge.API
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IPanelService, PanelService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IValidatingService, ValidatingService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
 
-            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<ILoginService, LoginService>();
 
             //SignalR
             services.AddSignalR();

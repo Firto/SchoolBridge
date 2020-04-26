@@ -87,13 +87,14 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Type = type
             };
             var outTemplate = _mapper.Map<Notification<AUser>, DataBaseSourse>(template);
-            var notifications = new Notification<AUser>[usrs.Length];
-            for (int i = 0; i < usrs.Length; i++)
+            Notification<AUser> temp;
+            var notifications = usrs.Select(x =>
             {
-                notifications[i] = (Notification<AUser>)template.Clone();
-                notifications[i].User = usrs[i];
-                notifications[i].UserId = usrs[i].Id;
-            }
+                temp = (Notification<AUser>)template.Clone();
+                temp.User = x;
+                temp.UserId = x.Id;
+                return temp;
+            });
             (await _notificationGR.CreateAsync(notifications)).ForEach(async (x) =>
                     await _notificationService.Notify(x.User, "dataBase", outTemplate)
             );

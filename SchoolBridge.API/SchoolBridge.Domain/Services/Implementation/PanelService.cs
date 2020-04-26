@@ -14,7 +14,6 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly IGenericRepository<Panel> _panelGR;
         private readonly IGenericRepository<UserPanel> _userPanelGR;
         private readonly IGenericRepository<RolePanel> _rolePanelGR;
-        private readonly IMapper _mapper;
         private readonly IRoleService _roleService;
         public PanelService(IGenericRepository<Panel> panelGR,
                             IGenericRepository<UserPanel> userPanelGR,
@@ -24,7 +23,6 @@ namespace SchoolBridge.Domain.Services.Implementation
                             ClientErrorManager clientErrorManager)
         {
             _panelGR = panelGR;
-            _mapper = mapper;
             _userPanelGR = userPanelGR;
             _rolePanelGR = rolePanelGR;
             _roleService = roleService;
@@ -72,18 +70,18 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task<IEnumerable<Panel>> GetDefaultPanels(Role role)
         {
-            return _mapper.Map<IEnumerable<RolePanel>, IEnumerable<Panel>>(await _rolePanelGR.GetAllIncludeAsync((x) => x.RoleId == role.Id, (s) => s.Panel));
+            return (await _rolePanelGR.GetAllIncludeAsync((x) => x.RoleId == role.Id, (s) => s.Panel)).Select(x => new Panel { Id = x.PanelId});
         }
 
         public async Task<IEnumerable<Panel>> GetDefaultPanels(string role)
         {
             var ro = await _roleService.Get(role);
-            return _mapper.Map<IEnumerable<RolePanel>, IEnumerable<Panel>>(await _rolePanelGR.GetAllIncludeAsync((x) => x.RoleId == ro.Id, (s) => s.Panel));
+            return await GetDefaultPanels(ro);
         }
 
         public async Task<IEnumerable<Panel>> GetPanels(User user)
         {
-            return _mapper.Map<IEnumerable<UserPanel>, IEnumerable<Panel>>(await _userPanelGR.GetAllIncludeAsync((x) => x.UserId == user.Id, (s) => s.Panel));
+            return (await _userPanelGR.GetAllIncludeAsync((x) => x.UserId == user.Id, (s) => s.Panel)).Select(x => new Panel { Id = x.PanelId });
         }
 
         public async Task RemovePanel(User user, Panel panel)

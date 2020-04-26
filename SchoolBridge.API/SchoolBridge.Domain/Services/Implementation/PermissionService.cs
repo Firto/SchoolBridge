@@ -15,17 +15,14 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly IGenericRepository<UserPermission> _userPermissionGR;
         private readonly IGenericRepository<PanelPermission> _panelPermissionGR;
         private readonly IGenericRepository<Permission> _permissionGR;
-        private readonly IMapper _mapper;
         public PermissionService(IGenericRepository<UserPermission> userPermissionGR,
                                 IGenericRepository<PanelPermission> panelPermissionGR,
                                 IGenericRepository<Permission> permissionGR,
-                                IMapper mapper,
                                 ClientErrorManager clientErrorManager)
         {
             _userPermissionGR = userPermissionGR;
             _panelPermissionGR = panelPermissionGR;
             _permissionGR = permissionGR;
-            _mapper = mapper;
 
             if (!clientErrorManager.IsIssetErrors("Permission"))
                 clientErrorManager.AddErrors(new ClientErrors("Permission", new Dictionary<string, ClientError>
@@ -62,17 +59,17 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task<IEnumerable<Permission>> GetDefaultPermissions(Panel panel)
         {
-            return _mapper.Map<IEnumerable<PanelPermission>, IEnumerable<Permission>>(await _panelPermissionGR.GetAllIncludeAsync((x) => x.PanelId == panel.Id, (x) => x.Permission));
+            return (await _panelPermissionGR.GetAllIncludeAsync((x) => x.PanelId == panel.Id, (x) => x.Permission)).Select(x => new Permission {Id = x.PermissionId });
         }
 
         public async Task<IEnumerable<Permission>> GetDefaultPermissions(IEnumerable<Panel> panels)
         {
-            return _mapper.Map<IEnumerable<PanelPermission>, IEnumerable<Permission>>(await _panelPermissionGR.GetAllIncludeAsync((x) => panels.Select(s => s.Id).Contains(x.PanelId), (x) => x.Permission));
+            return (await _panelPermissionGR.GetAllIncludeAsync((x) => panels.Select(s => s.Id).Contains(x.PanelId), (x) => x.Permission)).Select(x => new Permission { Id = x.PermissionId });
         }
 
         public async Task<IEnumerable<Permission>> GetPermissions(User user)
         {
-            return _mapper.Map<IEnumerable<UserPermission>, IEnumerable<Permission>>(await _userPermissionGR.GetAllIncludeAsync((x) => x.UserId == user.Id, (x) => x.Permission));
+            return (await _userPermissionGR.GetAllIncludeAsync((x) => x.UserId == user.Id, (x) => x.Permission)).Select(x => new Permission { Id = x.PermissionId });
         }
 
         public async Task RemoveDefaultPermission(Panel panel, Permission permission)
