@@ -48,7 +48,7 @@ namespace SchoolBridge.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DbContext, ApplicationContext>(opt =>
-                opt.UseNpgsql(_configuration.GetSection("ConnectionStrings")["mypostgres"]), optionsLifetime: ServiceLifetime.Singleton);
+                opt.UseSqlServer(_configuration.GetSection("ConnectionStrings")["mymssql"]), optionsLifetime: ServiceLifetime.Singleton);
 
             services.UseClientErrorManager();
             services.UseJwtTokenService<User>(new TokenServiceConfiguration
