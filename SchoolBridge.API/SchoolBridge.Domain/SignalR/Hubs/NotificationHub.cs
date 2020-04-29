@@ -21,7 +21,7 @@ namespace SchoolBridge.Domain.SignalR.Hubs
 
         public void PermanentSubscribe(string token)
         {
-            _notificationService.OnConnected(Context, token);
+            _notificationService.OnPermanentConnected(Context, token);
         }
 
         public void UnSubscribe()

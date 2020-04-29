@@ -1,24 +1,22 @@
-﻿using SchoolBridge.DataAccess.Entities.Files;
+﻿
 using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
+using SchoolBridge.Helpers.AddtionalClases;
 using SchoolBridge.Helpers.AddtionalClases.EmailService;
 using SchoolBridge.Helpers.Managers.CClientErrorManager;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Net.Mail;
 using System.Text;
 
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
-    
     public class EmailService : IEmailService
     {
         private readonly EmailServiceConfiguration _configuration;
-        private readonly ConcurrentQueue<EmailEntity> _queue = new ConcurrentQueue<EmailEntity>();
-        public ConcurrentQueue<EmailEntity> EmailQueue { get => _queue; }
+        private readonly PriorityQueue<EmailEntity> _queue = new PriorityQueue<EmailEntity>();
+        public PriorityQueue<EmailEntity> EmailQueue { get => _queue; }
 
         public EmailService(EmailServiceConfiguration configuration,
                             ClientErrorManager clientErrorManager) {
@@ -50,7 +48,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             return ComposeDraftBody(GetDraft(draft), arguments);
         }
 
-        public void Send(string toEmail, string FromEmail, string subject, string body, SendCompleatedEventHandler eventHandler, object AddtionalInfo)
+        public void Send(string toEmail, string FromEmail, string subject, string body, SendCompleatedEventHandler eventHandler, EmailEntityPriority priority, object AddtionalInfo)
         {
             MailMessage oMailMsg = new MailMessage();
             oMailMsg.To.Add(toEmail);
@@ -66,22 +64,22 @@ namespace SchoolBridge.Domain.Services.Implementation
                 StartSendingTime = DateTime.Now,
                 CompletedEventHandler = eventHandler,
                 AddtionalInfo = AddtionalInfo
-            });
+            }, (int)priority);
         }
 
-        public void SendByDraft(string toEmail, string FromEmail, string subject, string draft, SendCompleatedEventHandler eventHandler, object AddtionalInfo, params string[] arguments)
+        public void SendByDraft(string toEmail, string FromEmail, string subject, string draft, SendCompleatedEventHandler eventHandler, EmailEntityPriority priority, object AddtionalInfo, params string[] arguments)
         {
-            Send(toEmail, FromEmail, subject, ComposeDraft(draft, arguments), eventHandler, AddtionalInfo);
+            Send(toEmail, FromEmail, subject, ComposeDraft(draft, arguments), eventHandler, priority, AddtionalInfo);
         }
 
-        public void SendDefault(string toEmail, string subject, string body, SendCompleatedEventHandler eventHandler, object AddtionalInfo)
+        public void SendDefault(string toEmail, string subject, string body, SendCompleatedEventHandler eventHandler, EmailEntityPriority priority, object AddtionalInfo)
         {
-            Send(toEmail, _configuration.DefaultSendFrom, subject, body, eventHandler, AddtionalInfo);
+            Send(toEmail, _configuration.DefaultSendFrom, subject, body, eventHandler, priority, AddtionalInfo);
         }
 
-        public void SendDefaultByDraft(string toEmail, string subject, string draft, SendCompleatedEventHandler eventHandler, object AddtionalInfo, params string[] arguments)
+        public void SendDefaultByDraft(string toEmail, string subject, string draft, SendCompleatedEventHandler eventHandler, EmailEntityPriority priority, object AddtionalInfo, params string[] arguments)
         {
-            Send(toEmail, _configuration.DefaultSendFrom, subject, ComposeDraft(draft, arguments), eventHandler, AddtionalInfo);
+            Send(toEmail, _configuration.DefaultSendFrom, subject, ComposeDraft(draft, arguments), eventHandler, priority, AddtionalInfo);
         }
     }
 }

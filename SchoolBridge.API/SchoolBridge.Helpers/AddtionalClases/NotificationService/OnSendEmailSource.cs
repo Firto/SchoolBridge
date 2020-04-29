@@ -7,6 +7,5 @@ namespace SchoolBridge.Helpers.AddtionalClases.NotificationService
     public class OnSendEmailSource: INotificationSource
     {
         public string Email { get; set; }
-        public bool Ok { get; set; }
     }
 }

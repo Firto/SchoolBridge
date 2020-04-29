@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { RegisterService } from 'src/app/Services/register.service';
 
 @Component({
   selector: 'app-email-register',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EmailRegisterComponent implements OnInit {
 
-  constructor() { }
+  public email: string = "";
+  constructor(public registerService: RegisterService) { }
 
   ngOnInit(): void {
+    
+  }
+
+  public register(): void {
+      this.registerService.start(this.email).subscribe();
   }
 
 }

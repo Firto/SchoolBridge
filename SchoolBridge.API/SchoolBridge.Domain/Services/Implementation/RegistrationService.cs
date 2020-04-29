@@ -124,15 +124,15 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public void SendEmailCompleated(EmailSendCompleatedEntity entity)
         {
-            var permanent = (PermanentSubscribeDto)entity.EmailEntity.AddtionalInfo;
-            _notificationService.PermanentNotify(permanent.Token, "OnSendEmail", new OnSendEmailSource { Email = entity.EmailEntity.Message.To.FirstOrDefault()?.Address, Ok = entity.IsSended });
+            var tokenId = (string)entity.EmailEntity.AddtionalInfo;
+            _notificationService.PermanentNotify(tokenId, "onSendEmail", new OnSendEmailSource { Email = entity.EmailEntity.Message.To.FirstOrDefault()?.Address });
         }
 
         public PermanentSubscribeDto StartRegister(string email, Role role, IEnumerable<Panel> noPanels = null, IEnumerable<Permission> noPermissions = null)
         {
-            var permanent = _notificationService.CreatePermanentToken(TimeSpan.FromHours(1));
+            var permanent = _notificationService.CreatePermanentToken(TimeSpan.FromHours(1), out var permTokenId);
             var regToken = CreateRegistrationToken(_configuration.RegistrationTokenExpires, email, role, noPanels, noPermissions);
-            _emailService.SendByDraft(email, "registration@schoolbridge.com", "Registration in Schoolbridge", "email-registration", SendEmailCompleated, permanent, regToken);
+            _emailService.SendByDraft(email, "registration@schoolbridge.com", "Registration in Schoolbridge", "email-registration", SendEmailCompleated, EmailEntityPriority.High, permTokenId, regToken);
             return permanent;
         }
 

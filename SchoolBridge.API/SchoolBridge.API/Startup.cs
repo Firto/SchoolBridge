@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +49,7 @@ namespace SchoolBridge.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DbContext, ApplicationContext>(opt =>
-                opt.UseSqlServer(_configuration.GetSection("ConnectionStrings")["mymssql"]), optionsLifetime: ServiceLifetime.Singleton);
+                opt.UseNpgsql(_configuration.GetSection("ConnectionStrings")["mypostgres"]), optionsLifetime: ServiceLifetime.Singleton);
 
             services.UseClientErrorManager();
             services.UseJwtTokenService<User>(new TokenServiceConfiguration
@@ -143,7 +144,10 @@ namespace SchoolBridge.API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+            app.UseCors(x => x.WithOrigins("http://localhost:4200")
+                            .AllowAnyHeader()
+                            .WithMethods("GET", "POST")
+                            .AllowCredentials());
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto

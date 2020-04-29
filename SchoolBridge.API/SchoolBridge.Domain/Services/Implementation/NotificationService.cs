@@ -46,15 +46,15 @@ namespace SchoolBridge.Domain.Services.Implementation
                 ));
         }
 
-        public PermanentSubscribeDto CreatePermanentToken(TimeSpan ?exp = null) {
+        public PermanentSubscribeDto CreatePermanentToken(TimeSpan ?exp, out string guid) {
             DateTime expires = DateTime.Now;
             if (!exp.HasValue)
-                expires.Add(_configuration.PermanentTokenExpires);
-            else expires.Add(exp.Value);
-
+                expires = expires.Add(_configuration.PermanentTokenExpires);
+            else expires = expires.Add(exp.Value);
+            guid = Guid.NewGuid().ToString();
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, guid)
             };
 
             var creds = new SigningCredentials(_configuration.PermanentTokenValidation.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
@@ -96,12 +96,12 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         private string[] GetPermanentConns(string tokenId)
         {
-            return _users.Where((x) => x.Value.Id == tokenId && x.Value.Payload.Exp > DateTime.Now.ToUnixTimestamp()).Select((x) => x.Key).ToArray();
+            return _permanentUsers.Where((x) => x.Value.Id == tokenId && x.Value.Payload.Exp > DateTime.Now.ToUnixTimestamp()).Select((x) => x.Key).ToArray();
         }
 
         private string[] GetPermanentConns(string[] tokenIds)
         {
-            return _users.Where((x) => tokenIds.FirstOrDefault((s) => s == x.Value.Id) != null && x.Value.Payload.Exp > DateTime.Now.ToUnixTimestamp()).Select((x) => x.Key).ToArray();
+            return _permanentUsers.Where((x) => tokenIds.FirstOrDefault((s) => s == x.Value.Id) != null && x.Value.Payload.Exp > DateTime.Now.ToUnixTimestamp()).Select((x) => x.Key).ToArray();
         }
 
         public void OnConnected(HubCallerContext hubCallerContext, string token)

@@ -1,11 +1,7 @@
-<div class="body"></div>
-<div class="grad"></div>
-<div class="header">
-    <div>Green<span>Book</span><br>Sign Up</div>
-</div>
-<br>
 <div class="register">
-    <input type="text" placeholder="Email" name="Email"><br>
-    <input type="button" value="register">
-    <p class="submit-text">Already have a GreenBook account? <a routerLink="/login">Log In.</a></p>
+    <div class="inpt-span" >
+        <input class="slide-up" [(ngModel)]='email' type="text" placeholder="input email" /><label for="card">Email</label>
+    </div>
+    <button (click)="register()" class="button  email">Send registration email</button>
+    <p class="submit-text">Already have a GreenBook account? <a routerLink="/login">Log In</a></p>
 </div>

@@ -1,0 +1,25 @@
+<div class="panel panel-default float-right mr-4">
+    <div class="panel-body">
+        <!-- Single button -->
+        <div class="btn-group pull-right top-head-dropdown dropdown">
+            <label (onMutation)="onNtfMenuChange($event)" [mutationConfig]="{attributes: true}" class="ntf-toggle-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-bell"></i>
+                <sup *ngIf="(countUnredNtfs | async) > 0" ><small><small class="badge badge-pill badge-danger" >{{countUnredNtfs | async}}</small></small></sup>
+            </label>
+
+            <ul class="dropdown-menu dropdown-menu-right" (scroll)="onNtfScroll($event)">
+                <label class="hide-menu-btn position-fixed">
+                    <i class="fas fa-times"></i>
+                </label>
+                <div>
+                    <template #notificationContainer></template>
+                </div>
+                <ng-container *ngIf="loader">
+                    <li>
+                        <div class="loader-topbar"></div>
+                    </li>
+                </ng-container>
+            </ul>
+        </div>
+    </div>
+</div>

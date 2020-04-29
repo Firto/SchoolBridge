@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 using SchoolBridge.Helpers.DtoModels;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
@@ -20,7 +21,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
 
         Task Read(AUser usr, string last, int count);
 
-        PermanentSubscribeDto CreatePermanentToken(TimeSpan? exp = null);
+        PermanentSubscribeDto CreatePermanentToken(TimeSpan? exp, out string guid);
+        JwtSecurityToken ValidatePermanentToken(string token);
 
         void OnConnected(HubCallerContext hubCallerContext, string token);
         void OnPermanentConnected(HubCallerContext hubCallerContext, string token);

@@ -84,13 +84,18 @@
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "assets": [
-              "src/favicon.ico",
-              "src/assets"
+              
             ],
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.min.js",
+              "src/assets/js/bootstrap.min.js",
+              "src/assets/js/parallax.min.js",
+              "src/assets/slick/slick.min.js",
+              "src/assets/js/tooplate-script.js"
+            ]
           }
         },
         "lint": {

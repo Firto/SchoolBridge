@@ -86,7 +86,6 @@ namespace SchoolBridge.Domain.Hostings
                 else return;
             }
 
-            Console.WriteLine($"Sending emails from {((NetworkCredential)SMTPClient.Credentials).UserName}!");
             /* = new SmtpClient(oSMTPClient.Host, oSMTPClient.Port);
             SMTPClient.Credentials = oSMTPClient.Credentials;
             SMTPClient.EnableSsl = oSMTPClient.EnableSsl;
@@ -98,28 +97,27 @@ namespace SchoolBridge.Domain.Hostings
             SMTPClient.TargetName = oSMTPClient.TargetName;*/
             EmailEntity emailEntity = null;
             bool isSended = true;
-            for (int i = 0; i < _configuration.MaxSendEmailInOneThread && _emailService.EmailQueue.Count > 0; i++)
-                if (_emailService.EmailQueue.TryDequeue(out emailEntity))
+            for (int i = 0; i < _configuration.MaxSendEmailInOneThread && !_emailService.EmailQueue.IsEmpty(); i++)
+            {
+                emailEntity = _emailService.EmailQueue.Dequeue();
+                isSended = true;
+                try
                 {
-                    isSended = true;
-                    try
-                    {
-                        SMTPClient.Send(emailEntity.Message);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        isSended = false;
-                    }
-                    Console.WriteLine($"Sended from {((NetworkCredential)SMTPClient.Credentials).UserName} {isSended}!");
-                    emailEntity.CompletedEventHandler?.Invoke(new EmailSendCompleatedEntity
-                        {
-                            EmailEntity = emailEntity,
-                            EndSendingTime = DateTime.Now,
-                            IsSended = isSended
-                        }
-                    );
+                    SMTPClient.Send(emailEntity.Message);
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    isSended = false;
+                }
+                Console.WriteLine($"Sended from {((NetworkCredential)SMTPClient.Credentials).UserName} {isSended}!");
+                emailEntity.CompletedEventHandler?.Invoke(new EmailSendCompleatedEntity
+                {
+                    EmailEntity = emailEntity,
+                    EndSendingTime = DateTime.Now,
+                    IsSended = isSended
+                });
+            }
             lock (_lockObj)
             {
                 _usingSMTPClients.Remove(SMTPClient);

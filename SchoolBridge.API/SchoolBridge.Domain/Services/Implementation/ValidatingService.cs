@@ -38,6 +38,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                     {"v-lastname-too-long", new ClientError($"Too long lastname(max {_configuration.MaxCountCharsLastname} characters)!")},
                     {"v-lastname-spec-chars", new ClientError("Lastname musn't have specials chars!")},
 
+                    {"v-email-input", new ClientError("Input your email!")},
                     {"v-email-inc", new ClientError("Incorrect email!")},
                     {"v-email-alrd-reg", new ClientError("User with this email is already registered!")},
 
@@ -107,7 +108,9 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public void ValidateEmail(string email)
         {
-            if (!Regex.IsMatch(email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
+            if (string.IsNullOrEmpty(email))
+                throw new ClientException("v-email-input");
+            else if (!Regex.IsMatch(email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
                 throw new ClientException("v-email-inc");
             else if (_userService.IsIssetByEmail(email))
                 throw new ClientException("v-email-alrd-reg");
