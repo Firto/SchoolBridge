@@ -9,7 +9,9 @@ import { LoginnedGuard } from './Helpers/loginned.guard';
 
 
 const routes: Routes = [
-  { path: 'home', component: HomeComponent,  canActivate: [LoginRegisterGuard] },
+  { path: 'home',
+    component: HomeComponent 
+  },
   { path: 'login', component: LoginComponent, canActivate: [LoginRegisterGuard] },
   { path: 'register', component: EmailRegisterComponent, canActivate: [LoginRegisterGuard] },
   { path: 'endregister', component: RegisterComponent, canActivate: [LoginRegisterGuard] },

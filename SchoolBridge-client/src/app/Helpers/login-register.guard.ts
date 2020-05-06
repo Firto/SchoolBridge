@@ -10,7 +10,7 @@ export class LoginRegisterGuard implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         if (!this.userService.user.value) 
             return true;
-        this.router.navigate(['/news']);
+        this.router.navigate(['/home']);
         return false;
     }
 }

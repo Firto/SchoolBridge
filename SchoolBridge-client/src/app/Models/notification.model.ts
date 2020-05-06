@@ -1,4 +1,4 @@
-import { INotificationSource } from '../Modules/db-notification/Sources/notification-source.interface';
+import { INotificationSource } from './notification-source.interface';
 
 export class Notification {
     public type:string;

@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using SchoolBridge.DataAccess.Entities;
 using SchoolBridge.DataAccess.Interfaces;
 using SchoolBridge.Domain.Services.Abstraction;
@@ -7,6 +8,7 @@ using SchoolBridge.Helpers.AddtionalClases.EmailService;
 using SchoolBridge.Helpers.AddtionalClases.NotificationService;
 using SchoolBridge.Helpers.DtoModels;
 using SchoolBridge.Helpers.DtoModels.Authefication;
+using SchoolBridge.Helpers.Extentions;
 using SchoolBridge.Helpers.Managers;
 using SchoolBridge.Helpers.Managers.CClientErrorManager;
 using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
@@ -16,6 +18,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
@@ -27,6 +30,7 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly IUserService _userService;
         private readonly IValidatingService _validatingService;
         private readonly ILoginService _loginService;
+        private readonly HttpContext _httpContext;
         private readonly RegistrationServiceConfiguration _configuration;
         public RegistrationService(IRoleService roleService,
                                     IEmailService emailService,
@@ -34,6 +38,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                                     IUserService userService,
                                     IValidatingService validatingService,
                                     ILoginService loginService,
+                                    ScopedHttpContext httpContext,
                                     RegistrationServiceConfiguration configuration,
                                     ClientErrorManager clientErrorManager)
         {
@@ -43,6 +48,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             _userService = userService;
             _validatingService = validatingService;
             _loginService = loginService;
+            _httpContext = httpContext.HttpContext;
             _configuration = configuration;
 
             if (!clientErrorManager.IsIssetErrors("Registration"))
@@ -52,7 +58,6 @@ namespace SchoolBridge.Domain.Services.Implementation
                     {"r-token-already-used", new ClientError("User with this registration token is already registered!")},
                 }));
         }
-
         public string CreateRegistrationToken(TimeSpan exp, string email, Role role, IEnumerable<Panel> noPanels = null, IEnumerable<Permission> noPermissions = null)
         {
             _validatingService.ValidateEmail(email);
@@ -96,17 +101,14 @@ namespace SchoolBridge.Domain.Services.Implementation
 
             return _configuration.TokenHandler.WriteToken(token);
         }
-
         public string CreateRegistrationToken(TimeSpan exp, string email, Role role)
         {
             return CreateRegistrationToken(exp, email, role, null);
         }
-
         public async Task<string> CreateRegistrationToken(TimeSpan exp, string email, string role)
         {
             return CreateRegistrationToken(exp, email, await _roleService.Get(role));
         }
-
         public JwtSecurityToken ValidateRegistrationToken(string token)
         {
             SecurityToken validatedToken = null;
@@ -121,18 +123,23 @@ namespace SchoolBridge.Domain.Services.Implementation
 
             return validatedToken as JwtSecurityToken;
         }
-
         public void SendEmailCompleated(EmailSendCompleatedEntity entity)
         {
             var tokenId = (string)entity.EmailEntity.AddtionalInfo;
-            _notificationService.PermanentNotify(tokenId, "onSendEmail", new OnSendEmailSource { Email = entity.EmailEntity.Message.To.FirstOrDefault()?.Address });
+            _notificationService.PermanentNotify(tokenId, "onSendEmail", new OnSendEmailSource { Ok = entity.IsSended, Email = entity.EmailEntity.Message.To.FirstOrDefault()?.Address });
         }
-
         public PermanentSubscribeDto StartRegister(string email, Role role, IEnumerable<Panel> noPanels = null, IEnumerable<Permission> noPermissions = null)
         {
             var permanent = _notificationService.CreatePermanentToken(TimeSpan.FromHours(1), out var permTokenId);
             var regToken = CreateRegistrationToken(_configuration.RegistrationTokenExpires, email, role, noPanels, noPermissions);
-            _emailService.SendByDraft(email, "registration@schoolbridge.com", "Registration in Schoolbridge", "email-registration", SendEmailCompleated, EmailEntityPriority.High, permTokenId, regToken);
+            _emailService.SendByDraft(email, 
+                                        "registration@schoolbridge.com", 
+                                        "Registration in Schoolbridge", 
+                                        "email-registration", 
+                                        SendEmailCompleated, 
+                                        EmailEntityPriority.High, 
+                                        permTokenId,
+                                        string.Format("{0}/endregister?token={1}", _httpContext.Request.Headers["Origin"].FirstOrDefault(), HttpUtility.UrlEncode(regToken)));
             return permanent;
         }
 
@@ -154,11 +161,11 @@ namespace SchoolBridge.Domain.Services.Implementation
                 throw new ClientException("r-token-already-used");
 
             _validatingService.ValidateLogin(entity.Login);
-            _validatingService.ValidatePassword(entity.Password);
-            _validatingService.ValidateRepeatPassword(entity.Password, entity.ConfirmPassword);
             _validatingService.ValidateName(entity.Name);
             _validatingService.ValidateSurname(entity.Surname);
             _validatingService.ValidateLastname(entity.Lastname);
+            _validatingService.ValidatePassword(entity.Password);
+            _validatingService.ValidateRepeatPassword(entity.Password, entity.ConfirmPassword);
 
             var user = new User
             {

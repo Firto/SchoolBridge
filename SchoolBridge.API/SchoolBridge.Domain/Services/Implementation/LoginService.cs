@@ -43,7 +43,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             if (!clientErrorManager.IsIssetErrors("Login"))
                 clientErrorManager.AddErrors(new ClientErrors("Login", new Dictionary<string, ClientError>(){
                     {"l-login-input", new ClientError("Please input login!")},
-                    {"l-pass-input", new ClientError("You are already logged in!")},
+                    {"l-pass-input", new ClientError("Please input password!")},
                     {"l-pass-log-inc", new ClientError("Incorrect login or password!")},
                     {"l-too-many-devices", new ClientError("Too many devices logged!")}
                 }));

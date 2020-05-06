@@ -121,7 +121,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             if (tkn == null)
                 throw new ClientException("inc-token");
 
-            _activeRefreshTokensGR.DeleteAsync((x) => x.UserId == tkn.UserId);
+            await _activeRefreshTokensGR.DeleteAsync((x) => x.UserId == tkn.UserId);
         }
 
         public async Task DeactivateAllTokens(IHeaderDictionary headers)

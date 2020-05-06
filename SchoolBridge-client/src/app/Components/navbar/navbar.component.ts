@@ -1,15 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
+import { UserService } from 'src/app/Services/user.service';
+import { LoginService } from 'src/app/Services/login.service';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements AfterViewInit{
+  private checkbox: HTMLInputElement;
 
-  constructor() { }
+  constructor(public userService: UserService,
+              private loginService: LoginService) { }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
+    this.checkbox = <HTMLInputElement> document.getElementById("chk");
+  }
+
+  onClickMenuItem(): void {
+    if (this.checkbox.checked)
+        this.checkbox.checked = false;
+  }
+
+  logout(): void {
+    this.loginService.logout().subscribe();
   }
 
 }

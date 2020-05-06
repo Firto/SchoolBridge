@@ -6,6 +6,7 @@ import { ActivatedRoute, RouterStateSnapshot } from '@angular/router';
 import { CryptService } from '../Helpers/crypt.service';
 import { NotificationService } from './notification.service';
 import { Loginned } from '../Models/loginned.model';
+import { LoginnedTokens } from '../Models/loginned-tokens';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -20,6 +21,15 @@ export class UserService {
                 private notificationService: NotificationService) {
         this.uuid = uuidService.get(); 
 
+        if (localStorage.getItem('user')){
+            try {
+                this.user.next(JSON.parse(this.crypt.decode(localStorage.getItem('user'), this.uuid)));
+                this.notificationService.subscribe(this.user.value.login.tokens.token);
+            }
+            catch{
+                this.localLogout();
+            }
+        }
     }
 
     forceRunAuthGuard(): void {
@@ -37,7 +47,7 @@ export class UserService {
     localLogout(): void {
         localStorage.removeItem('user');
         this.user.next(null);
-        this.notificationService.unSubscribe();
+        this.notificationService.unsubscribe();
         this.forceRunAuthGuard();
     }
 
@@ -47,5 +57,13 @@ export class UserService {
         this.user.next(user);
         localStorage.setItem('user', this.crypt.encode(JSON.stringify(this.user.value), this.uuid));
         this.notificationService.subscribe(login.tokens.token);
+    }
+
+    localSetLoginTokens(tokens: LoginnedTokens): void {
+        const user = this.user.value;
+        user.login.tokens = tokens;
+        this.user.next(user);
+        localStorage.setItem('user', this.crypt.encode(JSON.stringify(this.user.value), this.uuid));
+        this.notificationService.subscribe(user.login.tokens.token);
     }
 }

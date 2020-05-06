@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';  
-import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';  
+import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@aspnet/signalr';  
 import { environment } from 'src/environments/environment';
 import { Subject } from 'rxjs';
 import { Notification } from 'src/app/Models/notification.model'
@@ -22,7 +22,6 @@ export class NotificationService {
     
     this.createConnection();  
     this.registerOnServerEvents();
-    this.startConnection();
   }  
   
   private createConnection() {  
@@ -38,48 +37,71 @@ export class NotificationService {
     setTimeout(t_func, msec);
   }
 
-  private startConnection(): void {  
+  private startConnection(f: () => void = null): void {  
+    try{
     this._hubConnection  
       .start()  
       .then(() => {   
         console.log('Hub connection started');  
-        this.connectionEstablished.next(true);  
-      })  
+        this.connectionEstablished.next(true);
+        if (f != null) f(); 
+      })
       .catch(err => { 
-         this.reconnect(10000)
+        this.reconnect(10000) 
       });
-    this._hubConnection.onclose(() => {
-      this.reconnect(10000) 
-    });
+    }catch{
+
+    }
   } 
 
   private registerOnServerEvents(): void {  
     this._hubConnection.on('Notification', (data: any) => {
       console.log(data);
-      //this.reciveNotification.next(data);
+      this.reciveNotification.next(data);
     }); 
   } 
 
   public subscribe(token:string): void{
-    try{
+    let f = () => {
+      try{
       console.log("subscribed");
       this._hubConnection.invoke('subscribe', token); // https://codepen.io/sabeelmuttil/pen/yWBrxw
-    }catch{
+      }catch{
 
-    }
+      }
+    };
+    if (this._hubConnection.state == HubConnectionState.Connected)
+      f();
+    else this.startConnection(f);
   } 
 
   public permanentSubscribe(token:string): void{
-    try{
-      console.log("permanentsubscribe");
-      this._hubConnection.invoke('permanentSubscribe', token); // https://codepen.io/sabeelmuttil/pen/yWBrxw
-    }catch{
-
-    }
+    let f = () => {
+      try{
+        console.log("permanentsubscribe");
+        this._hubConnection.invoke('permanentSubscribe', token); // https://codepen.io/sabeelmuttil/pen/yWBrxw
+      }catch{
+  
+      }
+    };
+    if (this._hubConnection.state == HubConnectionState.Connected)
+      f();
+    else this.startConnection(f);
   } 
 
-  public unSubscribe(): void{
-    console.log("unsubscribed");
-    this._hubConnection.invoke('unsubscribe');
+  public unsubscribe(): void{
+    let f = () => {
+      try{
+        console.log("unsubscribed");
+        this._hubConnection.invoke('unsubscribe').then(() => this._hubConnection.stop());
+        
+      }catch{
+  
+      }
+    };
+    if (this._hubConnection.state == HubConnectionState.Connected)
+      f();
+    else this.startConnection(f);
+    
   }
 }    

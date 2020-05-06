@@ -13,14 +13,14 @@ export class LoaderInterceptor implements HttpInterceptor {
     constructor(public loaderService: LoaderService) { }
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         let show:Boolean = true;
-        const match: RegExpMatchArray = req.url.match(new RegExp(`^(${environment.apiUrl})(.+\\/)(.+\\/?)$`));
+        const match: RegExpMatchArray = req.url.match(new RegExp(`^(${environment.apiUrl})(.+\\/)(.+\\/?)?$`));
         for (const [key, value] of Object.entries(apiConfig)) {
             const ser: Service = <Service>value;
             if (ser.url == match[2])
             {
                 for (const [key, value] of Object.entries(ser.methods)) {
                     const met: Method = <Method>value;
-                    if (met.url == match[3])
+                    if (met.url == "" || met.url == match[3])
                     {
 						if ('loader' in met)
 							show = met.loader;

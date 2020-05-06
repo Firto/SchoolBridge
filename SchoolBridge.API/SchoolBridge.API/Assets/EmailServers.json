@@ -1,5 +1,19 @@
 [
   {
+    "Name": "sendinblue",
+    "Host": "smtp-relay.sendinblue.com",
+    "Port": 587,
+    "EnableSsl": true,
+    "DeliveryMethod": 0,
+    "Timeout": 0,
+    "Accounts": [
+      {
+        "UserName": "prochliste@gmail.com",
+        "Password": "ahFGE7zLj0rOgyB9"
+      }
+    ]
+  },
+  {
     "Name": "Gmail",
     "Host": "smtp.gmail.com",
     "Port": 587,
@@ -25,4 +39,5 @@
       }
     ]
   }
+
 ]

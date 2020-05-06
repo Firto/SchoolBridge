@@ -9,7 +9,7 @@ import { RegisterService } from 'src/app/Services/register.service';
 export class EmailRegisterComponent implements OnInit {
 
   public email: string = "";
-  constructor(public registerService: RegisterService) { }
+  constructor(private registerService: RegisterService) { }
 
   ngOnInit(): void {
     

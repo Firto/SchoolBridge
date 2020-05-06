@@ -1,40 +1,25 @@
-.register {
-	margin: 0 auto;
-	margin-top: 20px;
-	max-width: 500px;
-	border-radius: 5px;
-	background-color: darkgray;
-	padding: 10px 20px 20px 20px;
+.login-form a:hover{
+	color:#9e09e3;
+  }
+  .form-control:focus{
+	border-color:#9e09e3;
+	box-shadow: 0 0 0 0.2rem #9e09e3;
+  }
+  .btn-reg {
+	background: #e874ff;
+	border-color:#e874ff;
+  }
+  .btn-reg:focus,
+  .btn-reg:hover,
+  .btn-reg:active,
+  .btn-reg:active:focus {
+	background: #9e09e3;
+	border-color: #9e09e3;
 }
-.register > *{
-	margin-top: 10px;
-}
-.email {
-	background: #C673B3;
-	margin: 0 auto;
+  .btn-reg:focus{
+	box-shadow: 0 0 0 0.2rem #9e09e3;
   }
-  .email:hover {
-	background: #b74f9f;
+  .login-form a:hover{
+	color:#9e09e3;
   }
-  .email:active,
-  .email:focus {
-	background: #963d82;
-  }
-  .email:after {
-	content: "\F0E0";
-  }
-  .email:hover:after {
-	-webkit-animation: none;
-	-webkit-transform: skew(-20deg);
-	animation: none;
-	transform: skew(-20deg);
-	text-indent: .1em;
-  }
-
-.inpt-span .slide-up {
-    text-indent: 60px;
-}
-
-.inpt-span .slide-up:focus, .inpt-span .slide-up:active{
-	text-indent: 0px;
-}
+  

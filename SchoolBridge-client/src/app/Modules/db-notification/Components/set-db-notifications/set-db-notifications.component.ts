@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { KeyedCollection } from 'src/app/Collections/keyed-collection';
 import { DbNtfComponent } from '../db-notifications/db-ntf-component.iterface';
 import { DbNotificationService } from '../../Services/db-notification.service';
-import { DataBaseSource } from '../../Sources/database-source';
+import { DataBaseSource } from '../../../../Models/NotificationSources/database-source';
 import { DbNotificationsMapper } from '../../Mappers/db-notification.mapper';
 
 @Component({
@@ -35,7 +35,6 @@ export class SetDbNotificationsComponent implements AfterViewInit {
     ngAfterViewInit(): void {
         this.getCountNtfs();
     }
-
     
     public clear() {
         if (this.notifications != null)

@@ -30,7 +30,6 @@ export class LoginComponent implements OnInit {
       result => {
         if (result.ok == true)
           this.router.navigate([this.returnUrl]);
-        else this.errorMessage = result.result.message;
       }
     )
   }

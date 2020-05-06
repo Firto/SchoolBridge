@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { DBNMessageSource } from 'src/app/Modules/db-notification/Sources/DataBaseSources/DBN-message-source';
 import { DbNtfComponent } from '../db-ntf-component.iterface';
-import { DataBaseSource } from 'src/app/Modules/db-notification/Sources/database-source';
+import { DataBaseSource } from 'src/app/Models/NotificationSources/database-source';
 
 @Component({
     selector: "db-ntf-message",

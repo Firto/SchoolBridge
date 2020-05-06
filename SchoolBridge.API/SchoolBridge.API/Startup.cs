@@ -2,6 +2,8 @@ using System;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -11,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using SchoolBridge.DataAccess;
 using SchoolBridge.DataAccess.Entities;
 using SchoolBridge.DataAccess.Interfaces;
@@ -21,6 +24,7 @@ using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Domain.Services.Implementation;
 using SchoolBridge.Domain.Services.ServiceProviderExtentions;
 using SchoolBridge.Domain.SignalR.Hubs;
+using SchoolBridge.Helpers.Extentions;
 using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
 
 namespace SchoolBridge.API
@@ -127,6 +131,8 @@ namespace SchoolBridge.API
             }).CreateMapper());
 
             // Scoped Services
+            services.AddScoped<ScopedHttpContext>();
+
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IPermissionService, PermissionService>();
@@ -138,7 +144,7 @@ namespace SchoolBridge.API
             services.AddScoped<ILoginService, LoginService>();
 
             //SignalR
-            services.AddSignalR();
+            services.AddSignalR().AddNewtonsoftJsonProtocol();
             services.AddControllers();
         }
 
@@ -154,6 +160,7 @@ namespace SchoolBridge.API
             });
 
             app.UseDeveloperExceptionPage();
+            app.UseMiddleware<ScopedHttpContextMiddleware>();
             app.UseMiddleware<ClientErrorsMiddleware>();
 
             app.UseRouting();

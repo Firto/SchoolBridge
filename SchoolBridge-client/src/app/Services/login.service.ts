@@ -12,6 +12,7 @@ import { NotificationService } from './notification.service';
 import { Service } from 'src/app/Interfaces/Service/service.interface';
 import { UserService } from './user.service';
 import { SyncRequestHeader } from 'ts-sync-request';
+import { LoginnedTokens } from '../Models/loginned-tokens';
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
@@ -31,20 +32,6 @@ export class LoginService {
                 this.timerRefreshToken = window.setTimeout(() => this.refreshTokenA().subscribe(), (user.login.tokens.expires - Math.round(new Date().getTime()/1000) - 60)* 1000)
 
         });
-
-        this.notificationService.connectionEstablished.subscribe((x) => {
-            if (x && this.userService.user.value != null)
-                this.notificationService.subscribe(this.userService.user.value.login.tokens.token); 
-        });
-
-        if (localStorage.getItem('user')){
-            try {
-                this.userService.user.next(JSON.parse(this.crypt.decode(localStorage.getItem('user'), this.userService.uuid)));
-            }
-            catch{
-                this.userService.localLogout();
-            }
-        }
     }
 
     private removeRefreshTokenTimer() {
@@ -67,7 +54,7 @@ export class LoginService {
     refreshTokenA(): Observable<APIResult> {
         return this.baseService.send(this.ser, "refreshtoken", {refreshToken: this.userService.user.value.login.tokens.refreshToken}, {headers: {'UUID':this.userService.uuid}}).pipe(map(res => {
             if (res.ok == true)
-                this.userService.localLogin(<Loginned>res.result);
+                this.userService.localSetLoginTokens(<LoginnedTokens>res.result);
             else this.userService.localLogout();
             return res;
         }));
@@ -76,7 +63,7 @@ export class LoginService {
     refreshToken(): APIResult {
         const res = this.baseService.sendSync(this.ser, "refreshtoken", {refreshToken: this.userService.user.value.login.tokens.refreshToken}, [new SyncRequestHeader("UUID", this.userService.uuid)]);
         if (res.ok == true){
-            this.userService.localLogin(<Loginned>res.result);
+            this.userService.localSetLoginTokens(<LoginnedTokens>res.result);
         }
         else this.userService.localLogout();
         return res;

@@ -20,7 +20,7 @@ import { SyncRequestService } from 'ts-sync-request/dist'
 import { ErrorInterceptor } from './Helpers/user-error.interceptor';
 import { CryptService } from './Helpers/crypt.service';
 import { NotificationService } from './Services/notification.service';
-import { ToastrModule } from 'ngx-toastr';
+import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { DbNotificationModule } from './Modules/db-notification/db-notification.module';
 import { UserService } from './Services/user.service';
 import { EmailRegisterComponent } from './Components/email-register/email-register.component';
@@ -43,7 +43,8 @@ import { RegisterService } from './Services/register.service';
     ReactiveFormsModule,
     BrowserAnimationsModule,
     FormsModule,
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot({ preventDuplicates: true, countDuplicates: true, resetTimeoutOnDuplicate: true }),
+    ToastContainerModule,
     DbNotificationModule
   ],
   providers: [

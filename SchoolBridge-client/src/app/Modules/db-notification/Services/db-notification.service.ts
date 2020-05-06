@@ -5,8 +5,8 @@ import { apiConfig } from 'src/app/Const/api.config';
 import { Observable, Subject } from 'rxjs';
 import { APIResult } from 'src/app/Models/api.result.model';
 import { NotificationService } from 'src/app/Services/notification.service';
-import { DataBaseSource } from '../Sources/database-source';
-import { OnReadNtfSource } from '../Sources/onreadntf-source';
+import { DataBaseSource } from '../../../Models/NotificationSources/database-source';
+import { OnReadNtfSource } from '../../../Models/NotificationSources/onreadntf-source';
 
 @Injectable()
 export class DbNotificationService {

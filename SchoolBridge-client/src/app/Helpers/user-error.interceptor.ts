@@ -6,10 +6,12 @@ import { Observable } from 'rxjs';
 import { APIResult } from 'src/app/Models/api.result.model';
 import { tap } from 'rxjs/operators';
 import { UserService } from '../Services/user.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-    constructor(private userService: UserService) { }
+    constructor(private userService: UserService,
+                private toastrService: ToastrService) { }
 
     intercept(request: HttpRequest<APIResult>, next: HttpHandler): Observable<HttpEvent<APIResult>> {
         return next.handle(request).pipe(tap((event: HttpEvent<APIResult>) => {
@@ -27,6 +29,8 @@ export class ErrorInterceptor implements HttpInterceptor {
                             this.userService.localLogout();
                         break;
                 }
+
+                this.toastrService.error(event.body.result.message, null, {timeOut: 10000});
             }
         }));
     }

@@ -1,35 +1,19 @@
-<div class="tm-container">
-    <div class="tm-site-header"></div>
-    <div class="tm-site-header-overlay">
-        <div class="tm-header-stripe ml-auto"></div>
-        <div class="tm-header-stripe tm-header-stripe-short ml-auto"></div>
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-4 tm-site-header-left">
-                    <h1 class="text-uppercase tm-site-name">GreenBook</h1>
-                    <p class="text-white mb-0 tm-site-desc">Do all yourself!</p>
-                </div>
-                <div class="col-lg-8 tm-site-header-right">
-                    <nav class="navbar navbar-expand-lg">
-                        <button class="navbar-toggler toggler-example" type="button" data-toggle="collapse"
-                            data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-                            aria-label="Toggle navigation"><span class="dark-blue-text"><i
-                                    class="fas fa-bars text-white"></i></span></button>
-                        <div class="collapse navbar-collapse tm-nav" id="navbarNav">
-                            <ul class="navbar-nav ml-auto">
-                                <li class="nav-item active">
-                                    <a class="nav-link tm-nav-link" routerLink="/home">Home <span
-                                            class="sr-only">(current)</span></a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link tm-nav-link" routerLink="/login">Login</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="tm-header-stripe w-100"></div>
-</div>
+<nav class="navBar">
+    <input type="checkbox" id="chk">
+    <label for="chk" class="show-menu-btn">
+        <img src="./../../../assets/img/menu.png" class="nav-img" alt="menu" />
+    </label>
+    <ul class="menu align-middle" (click)="onClickMenuItem()">
+        <a routerLink="/home">home</a>
+        <ng-template [ngIf]="(userService.user | async) != null">
+            <a (click)="logout()">logout</a>
+        </ng-template>
+        <a *ngIf="(userService.user | async) == null" routerLink="/login">sign In</a>
+        <label for="chk" class="hide-menu-btn">
+            <i class="fas fa-times"></i>
+        </label>
+    </ul>
+    <ng-template [ngIf]="(userService.user | async) != null">
+        <set-db-notifications dbNotifications></set-db-notifications>
+    </ng-template>
+</nav>

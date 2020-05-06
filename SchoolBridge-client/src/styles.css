@@ -1,140 +1,62 @@
-@import "https://fonts.googleapis.com/css?family=Lato:400";
-@import "https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css";
-@import "assets/css/magnific-popup.min.css";
-@import "assets/css/main.css";
-@import "assets/css/templatemo-real-dynamic.css";
-@import "assets/css/util.css";
-@import "assets/slick/slick.css";
-@import "assets/slick/slick-theme.css";
-@import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-@import "../node_modules/ngx-toastr/toastr.css";
-
-html, body {
-    overflow-x: hidden;
-    font-family: "Open Sans", sans-serif;
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+@import url("https://use.fontawesome.com/releases/v5.6.1/css/all.css");
+body {
+    background: #151515;
+    max-width: 81.25rem;
+    min-height: 100vh;
+    margin: 0 auto;
+    position: static;
+    scroll-behavior: smooth;
 }
 
-.button {
-    display: block;
-    font-family: "Montserrat", "Trebuchet MS", Helvetica, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    position: relative;
-    padding: .8em 1.4em;
-    padding-right: 4.7em;
-    background: #009ed8;
-    border: none;
-    color: white;
-    transition: .2s;
+.login-container{
+	height: 65vh;
+	width: 100%;
+	color: #fff;
   }
-  .button:before,
-  .button:after {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    padding-top: inherit;
-    padding-bottom: inherit;
-    width: 2.8em;
-    content: "\00a0";
-    font-family: 'FontAwesome', sans-serif;
-    font-size: 1.2em;
-    text-align: center;
-    transition: .2s;
-    transform-origin: 50% 60%;
+  .login-form{
+	margin: auto;
+	width: 370px;
+	padding: 15px;
+	max-width: 100%;
   }
-  .button:before {
-    background: rgba(0, 0, 0, 0.09999999999999998);
+  .login-form .form-control{
+	font-size: 15px;
+	min-height: 48px;
+	font-weight: 500;
   }
-  .button:hover {
-    background: #0079a5;
+  .login-form a{
+	text-decoration: none;
+	color:#666;
   }
-  .button:active,
-  .button:focus {
-    background: #002e3f;
-    outline: none;
+  .login-form a:hover{
+	color:#0984e3;
   }
-  .button {
-    min-width: 15em;
+  .forgot-link{
+	font-size: 13px;
+  }
+  
+  .form-control:focus{
+	border-color:#0984e3;
+	box-shadow: 0 0 0 0.2rem #0984e3;
+  }
+  .btn-custom{
+	background: #74b9ff;
+	border-color:#74b9ff;
+	color:#fff;
+	font-size: 15px;
+	font-weight: 600;
+	min-height: 48px;
+  }
+  .btn-custom:focus,
+  .btn-custom:hover,
+  .btn-custom:active,
+  .btn-custom:active:focus{
+	background: #0984e3;
+	border-color: #0984e3;
+	color:#fff;
   }
 
-.inpt-span {
-    position: relative;
-    display: block;
-    font-weight: 300;
-}
-.inpt-span .slide-up {
-    text-indent: 105px;
-}
-.inpt-span .slide-up:focus, .inpt-span .slide-up:active {
-    text-indent: 0;
-}
-.slide-up:focus, .slide-up:active {
-    color: #377d6a;
-    text-indent: 0;
-    background: #fff;
-}
-.slide-up:focus::-webkit-input-placeholder, .slide-up:active::-webkit-input-placeholder {
-    color: #aaa;
-}
-.slide-up:focus + label, .slide-up:active + label {
-    transform: translateY(-100%);
-}
-.slide-up:focus + label:before, .slide-up:active + label:before {
-    border-radius: 5px;
-}
-.slide-up:focus + label:after, .slide-up:active + label:after {
-    transform: translateY(100%);
-}
-.slide-up {
-    display: block;
-    width: 100%;
-    padding: 10px 0 10px 15px;
-    font-family: "Open Sans", sans-serif;
-    font-weight: 400;
-    color: #377d6a;
-    background: #efefef;
-    border: 0;
-    border-radius: 3px;
-    outline: 0;
-    text-indent: 80px;
-    transition: all 0.3s ease-in-out;
-}
-.slide-up::-webkit-input-placeholder {
-    color: #efefef;
-    text-indent: 0;
-    font-weight: 300;
-}
-.slide-up + label {
-    display: inline-block;
-    position: absolute;
-    transform: translateX(0);
-    top: 0;
-    left: 0;
-    padding: 10px 15px;
-    text-shadow: 0 1px 0 rgba(19, 74, 70, .4);
-    transition: all 0.3s ease-in-out;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
-    overflow: hidden;
-    color: #ffffff;
-}
-.slide-up + label:before, .slide-up + label:after {
-    content: "";
-    position: absolute;
-    right: 0;
-    left: 0;
-    z-index: -1;
-    transition: all 0.3s ease-in-out;
-}
-.slide-up + label:before {
-    top: 6px;
-    left: 5px;
-    right: 5px;
-    bottom: 6px;
-    background: #377d6a;
-}
-.slide-up + label:after {
-    top: 0;
-    bottom: 0;
-    background: #377d6a;
-}
+  .btn-custom:focus{
+	box-shadow: 0 0 0 0.2rem #0984e3;
+  }
