@@ -2,125 +2,121 @@
 using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Helpers.Managers.CClientErrorManager;
 using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
+    public delegate IDictionary<string, string> ValidateFunc(IValidatingService ser, object dto);
     public class ValidatingService: IValidatingService
     {
         private readonly IUserService _userService;
         private readonly ValidatingServiceConfiguration _configuration;
-
+        
         public ValidatingService(IUserService userService,
                                 ValidatingServiceConfiguration configuration,
                                 ClientErrorManager clientErrorManager) {
             _userService = userService;
             _configuration = configuration;
 
-            if (!clientErrorManager.IsIssetErrors("Registration"))
+            if (!clientErrorManager.IsIssetErrors("Validating"))
                 clientErrorManager.AddErrors(new ClientErrors("Validating", new Dictionary<string, ClientError>{
-                    {"v-login-input", new ClientError("Input your login!")},
-                    {"v-login-too-long", new ClientError($"Too long login(max {_configuration.MaxCountCharsLogin} characters)!")},
-                    {"v-login-spec-chars", new ClientError("Name musn't have specials chars!")},
-                    {"v-login-alrd-reg", new ClientError("User with this login is already registered!")},
-
-                    {"v-name-input", new ClientError("Input your name!")},
-                    {"v-name-too-long", new ClientError($"Too long name(max {_configuration.MaxCountCharsName} characters)!")},
-                    {"v-name-spec-chars", new ClientError("Name musn't have specials chars!")},
-
-                    {"v-surname-input", new ClientError("Input your surname!")},
-                    {"v-surname-too-long", new ClientError($"Too long surname(max {_configuration.MaxCountCharsSurname} characters)!")},
-                    {"v-surname-spec-chars", new ClientError("Surname musn't have specials chars!")},
-
-                    {"v-lastname-input", new ClientError("Input your lastname!")},
-                    {"v-lastname-too-long", new ClientError($"Too long lastname(max {_configuration.MaxCountCharsLastname} characters)!")},
-                    {"v-lastname-spec-chars", new ClientError("Lastname musn't have specials chars!")},
-
-                    {"v-email-input", new ClientError("Input your email!")},
-                    {"v-email-inc", new ClientError("Incorrect email!")},
-                    {"v-email-alrd-reg", new ClientError("User with this email is already registered!")},
-
-                    {"v-pass-input", new ClientError("Input your password!")},
-                    {"v-pass-cou-chars", new ClientError($"Password must have {_configuration.MinCountCharsPassword} and more chars!")},
-                    {"v-pass-cou-digit", new ClientError("Password must have minimum one digit!")},
-                    {"v-pass-too-long", new ClientError($"Too long password(max {_configuration.MaxCountCharsPassword} characters)!")},
-
-                    {"v-pass-repeat-input", new ClientError("Input repeat your password!")},
-                    {"v-pass-repeat-inc", new ClientError("Passwords do not match!")}
+                    {"v-func-no", new ClientError("No validation function to dto!")},
+                    {"v-dto-invalid", new ClientError("Invalid dto!")}
                 }));
         }
 
-        public void ValidateLogin(string login)
+        public void Validate<T>(T dto) {
+            Validate(typeof(T), dto);
+        }
+
+        public void Validate(Type type, object dto) {
+            if (!_configuration.ValidateFunctions.ContainsKey(type))
+                throw new ClientException("v-func-no");
+
+            IDictionary<string, string> valid = _configuration.ValidateFunctions[type](this, dto);
+
+            if (valid.Count > 0)
+                throw new ClientException("v-dto-invalid", valid);
+        }
+
+        public bool IsIssetValidateFunc<T>()
+            => _configuration.ValidateFunctions.ContainsKey(typeof(T));
+
+        public void AddValidateFunc<T>(ValidateFunc func)
+            => _configuration.ValidateFunctions.Add(typeof(T), func);
+
+        public void ValidateLogin(string login, string propName, ref IDictionary<string, string> valid)
         {
             if (string.IsNullOrEmpty(login))
-                throw new ClientException("v-login-input");
+                valid.Add(propName, "Input your login!");
             else if (login.Length > _configuration.MaxCountCharsLogin)
-                throw new ClientException("v-login-too-long");
+                valid.Add(propName, $"Too long login(max {_configuration.MaxCountCharsLogin} characters)!");
             else if (!Regex.Match(login, "^[a-zA-Z_0-9]*$").Success)
-                throw new ClientException("v-login-spec-chars");
+                valid.Add(propName, "Name musn't have specials chars!");
             else if (_userService.IsIssetByLogin(login))
-                throw new ClientException("v-login-alrd-reg");
+                valid.Add(propName, "User with this login is already registered!");
         }
 
-        public void ValidateName(string name)
+        public void ValidateName(string name, string propName, ref IDictionary<string, string> valid)
         {
             if (string.IsNullOrEmpty(name))
-                throw new ClientException("v-name-input");
+                valid.Add(propName, "Input your name!");
             else if (name.Length > _configuration.MaxCountCharsName)
-                throw new ClientException("v-name-too-long");
+                valid.Add(propName, $"Too long name(max {_configuration.MaxCountCharsName} characters)!");
             else if (!Regex.Match(name, "^[а-яА-ЯҐґЄєІіЇї]+$").Success)
-                throw new ClientException("v-name-spec-chars");
+                valid.Add(propName, "Name musn't have specials chars!");
         }
 
-        public void ValidateSurname(string surname)
+        public void ValidateSurname(string surname, string propName, ref IDictionary<string, string> valid)
         {
             if (string.IsNullOrEmpty(surname))
-                throw new ClientException("v-surname-input");
+                valid.Add(propName, "Input your surname!");
             else if (surname.Length > _configuration.MaxCountCharsSurname)
-                throw new ClientException("v-surname-too-long");
+                valid.Add(propName, $"Too long surname(max {_configuration.MaxCountCharsSurname} characters)!");
             else if (!Regex.Match(surname, "^[а-яА-ЯҐґЄєІіЇї]+$").Success)
-                throw new ClientException("v-surname-spec-chars");
+                valid.Add(propName, "Surname musn't have specials chars!");
         }
 
-        public void ValidateLastname(string lastname)
+        public void ValidateLastname(string lastname, string propName, ref IDictionary<string, string> valid)
         {
             if (string.IsNullOrEmpty(lastname))
-                throw new ClientException("v-lastname-input");
+                valid.Add(propName, "Input your lastname!");
             else if (lastname.Length > _configuration.MaxCountCharsLastname)
-                throw new ClientException("v-lastname-too-long");
+                valid.Add(propName, $"Too long lastname(max {_configuration.MaxCountCharsLastname} characters)!");
             else if (!Regex.Match(lastname, "^[а-яА-ЯҐґЄєІіЇї]+$").Success)
-                throw new ClientException("v-lastname-spec-chars");
+                valid.Add(propName, "Lastname musn't have specials chars!");
         }
 
-        public void ValidatePassword(string password)
+        public void ValidatePassword(string password, string propName, ref IDictionary<string, string> valid)
         {
             if (string.IsNullOrEmpty(password))
-                throw new ClientException("v-pass-input");
+                valid.Add(propName, "Input your password!");
             else if (password.Length > _configuration.MaxCountCharsPassword)
-                throw new ClientException("v-pass-too-long");
+                valid.Add(propName, $"Too long password(max{_configuration.MaxCountCharsPassword} characters)!");
             else if (password.Length < _configuration.MinCountCharsPassword)
-                throw new ClientException("v-pass-cou-chars");
+                valid.Add(propName, $"Password must have {_configuration.MinCountCharsPassword} and more chars!");
             else if (!password.Any(c => char.IsDigit(c)))
-                throw new ClientException("v-pass-cou-digit");
+                valid.Add(propName, "Password must have minimum one digit!");
         }
 
-        public void ValidateEmail(string email)
+        public void ValidateEmail(string email, string propName, ref IDictionary<string, string> valid)
         {
             if (string.IsNullOrEmpty(email))
-                throw new ClientException("v-email-input");
+                valid.Add(propName, "Input your email!");
             else if (!Regex.IsMatch(email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
-                throw new ClientException("v-email-inc");
+                valid.Add(propName, "Incorrect email!");
             else if (_userService.IsIssetByEmail(email))
-                throw new ClientException("v-email-alrd-reg");
+                valid.Add(propName, "User with this email is already registered!");
         }
 
-        public void ValidateRepeatPassword(string password, string repeat) {
+        public void ValidateRepeatPassword(string password, string repeat, string propName, ref IDictionary<string, string> valid) {
             if (string.IsNullOrEmpty(repeat))
-                throw new ClientException("v-pass-repeat-input");
+                valid.Add(propName, "Input repeat your password!");
             else if (repeat != password)
-                throw new ClientException("v-pass-repeat-inc");
+                valid.Add(propName, "Incorrect repeat password!");
         }
 
     }

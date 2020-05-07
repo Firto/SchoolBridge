@@ -52,15 +52,39 @@ namespace SchoolBridge.Domain.Services.Implementation
             _configuration = configuration;
 
             if (!clientErrorManager.IsIssetErrors("Registration"))
+            {
                 clientErrorManager.AddErrors(new ClientErrors("Registration", new Dictionary<string, ClientError>
                 {
                     {"r-token-inc", new ClientError("Incorrect registration token!")},
                     {"r-token-already-used", new ClientError("User with this registration token is already registered!")},
                 }));
+
+                validatingService.AddValidateFunc<EndRegisterDto>((IValidatingService ser, object obj) => {
+                    IDictionary<string, string> valid = new Dictionary<string, string>();
+                    EndRegisterDto entity = (EndRegisterDto)obj;
+
+                    ser.ValidateLogin(entity.Login, nameof(entity.Login), ref valid);
+                    ser.ValidateName(entity.Name, nameof(entity.Name), ref valid);
+                    ser.ValidateSurname(entity.Surname, nameof(entity.Surname), ref valid);
+                    ser.ValidateLastname(entity.Lastname, nameof(entity.Lastname), ref valid);
+                    ser.ValidatePassword(entity.Password, nameof(entity.Password), ref valid);
+                    ser.ValidateRepeatPassword(entity.Password, entity.ConfirmPassword, nameof(entity.ConfirmPassword), ref valid);
+
+                    return valid;
+                });
+
+                validatingService.AddValidateFunc<StartRegisterDto>((IValidatingService ser, object obj) => {
+                    IDictionary<string, string> valid = new Dictionary<string, string>();
+                    StartRegisterDto entity = (StartRegisterDto)obj;
+
+                    ser.ValidateEmail(entity.Email, nameof(entity.Email), ref valid);
+
+                    return valid;
+                });
+            }
         }
         public string CreateRegistrationToken(TimeSpan exp, string email, Role role, IEnumerable<Panel> noPanels = null, IEnumerable<Permission> noPermissions = null)
         {
-            _validatingService.ValidateEmail(email);
             DateTime expires = DateTime.Now.Add(exp);
 
             string nPanels = "";
@@ -159,13 +183,6 @@ namespace SchoolBridge.Domain.Services.Implementation
 
             if (await _userService.IsIssetAsync(token.Id))
                 throw new ClientException("r-token-already-used");
-
-            _validatingService.ValidateLogin(entity.Login);
-            _validatingService.ValidateName(entity.Name);
-            _validatingService.ValidateSurname(entity.Surname);
-            _validatingService.ValidateLastname(entity.Lastname);
-            _validatingService.ValidatePassword(entity.Password);
-            _validatingService.ValidateRepeatPassword(entity.Password, entity.ConfirmPassword);
 
             var user = new User
             {

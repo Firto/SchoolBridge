@@ -32,6 +32,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                                 ITokenService<User> tokenService,
                                 IDataBaseNotificationService<User> dataBaseNotificationService,
                                 IImageService imageService,
+                                IValidatingService validatingService,
                                 IMapper mapper)
         {
             _userService = userService;
@@ -41,12 +42,24 @@ namespace SchoolBridge.Domain.Services.Implementation
             _mapper = mapper;
 
             if (!clientErrorManager.IsIssetErrors("Login"))
+            {
                 clientErrorManager.AddErrors(new ClientErrors("Login", new Dictionary<string, ClientError>(){
-                    {"l-login-input", new ClientError("Please input login!")},
-                    {"l-pass-input", new ClientError("Please input password!")},
                     {"l-pass-log-inc", new ClientError("Incorrect login or password!")},
                     {"l-too-many-devices", new ClientError("Too many devices logged!")}
                 }));
+
+                validatingService.AddValidateFunc<LoginDto>((IValidatingService ser, object obj) => {
+                    IDictionary<string, string> valid = new Dictionary<string, string>();
+                    LoginDto entity = (LoginDto)obj;
+
+                    if (string.IsNullOrEmpty(entity.Login))
+                        valid.Add(nameof(entity.Login), "Please input login!");
+                    if (string.IsNullOrEmpty(entity.Password))
+                        valid.Add(nameof(entity.Password), "Please input password!");
+
+                    return valid;
+                });
+            }
         }
 
         public async Task<LoggedDto> Login(User user, string uuid) {
@@ -66,16 +79,10 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task<LoggedDto> Login(LoginDto entity, string uuid)
         {
-            if (string.IsNullOrEmpty(entity.Login))
-                throw new ClientException("l-login-input");
-            else if (string.IsNullOrEmpty(entity.Password))
-                throw new ClientException("l-pass-input");
-
-            var user = await _userService.GetAllByLoginAsync(entity.Login);
+            var user = _userService.GetAllByLogin(entity.Login);
             if (user == null || !PasswordHandler.Validate(entity.Password, user.PasswordHash))
                 throw new ClientException("l-pass-log-inc");
-
-            if (_tokenService.CountLoggedDevices(user) > 10)
+            else if (_tokenService.CountLoggedDevices(user) > 10)
                 throw new ClientException("l-too-many-devices");
 
             return await Login(user, uuid);

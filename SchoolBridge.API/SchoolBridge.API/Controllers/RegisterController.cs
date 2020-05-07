@@ -21,15 +21,15 @@ namespace SchoolBridge.API.Controllers
 
         [HttpGet]
         [MyNoAutorize]
-        public async Task<ResultDto> Start(string email)
+        public async Task<ResultDto> Start([FromQuery, MyValidation] StartRegisterDto entity)
         {
-            return ResultDto.Create(_registrationService.StartRegister(email, new Role { Id = 9 }));
+            return ResultDto.Create(_registrationService.StartRegister(entity.Email, new Role { Id = 9 }));
         }
 
         [UUID]
         [HttpPost]
         [MyNoAutorize]
-        public async Task<ResultDto> End([FromBody]EndRegisterDto entity, [BindNever]string uuid)
+        public async Task<ResultDto> End([FromBody, MyValidation]EndRegisterDto entity, [BindNever]string uuid)
         {
             return ResultDto.Create(await _registrationService.EndRegister(entity, uuid));
         }

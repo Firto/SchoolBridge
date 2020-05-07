@@ -40,6 +40,12 @@ body {
 	border-color:#0984e3;
 	box-shadow: 0 0 0 0.2rem #0984e3;
   }
+
+  .form-control.ng-invalid{
+    border-color:#e33c09;
+	  box-shadow: 0 0 0 0.2rem #e33c09;
+  }
+
   .btn-custom{
 	background: #74b9ff;
 	border-color:#74b9ff;

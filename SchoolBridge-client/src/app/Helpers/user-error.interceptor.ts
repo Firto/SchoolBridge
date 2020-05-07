@@ -28,8 +28,10 @@ export class ErrorInterceptor implements HttpInterceptor {
                         if (this.userService.user.value != null)
                             this.userService.localLogout();
                         break;
+                    case "v-dto-invalid":
+                        return;
                 }
-
+                
                 this.toastrService.error(event.body.result.message, null, {timeOut: 10000});
             }
         }));

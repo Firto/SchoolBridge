@@ -21,7 +21,7 @@ namespace GreenP.API.Controllers
         [HttpPost]
         [MyNoAutorize]
         [ActionName("")]
-        public async Task<ResultDto> Login([FromBody] LoginDto model, [BindNever]string uuid)
+        public async Task<ResultDto> Login([FromBody, MyValidation] LoginDto model, [BindNever]string uuid)
             => ResultDto.Create(await _loginService.Login(model, uuid));
 
         [UUID]

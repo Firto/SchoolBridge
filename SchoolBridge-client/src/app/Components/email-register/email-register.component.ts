@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RegisterService } from 'src/app/Services/register.service';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-email-register',
@@ -7,16 +8,27 @@ import { RegisterService } from 'src/app/Services/register.service';
   styleUrls: ['./email-register.component.css']
 })
 export class EmailRegisterComponent implements OnInit {
-
-  public email: string = "";
-  constructor(private registerService: RegisterService) { }
-
-  ngOnInit(): void {
+  registerForm: FormGroup;
+  
+  constructor(private registerService: RegisterService,
+              private fb: FormBuilder) { 
     
   }
 
+  ngOnInit(): void {
+    this.registerForm = this.fb.group({
+      email: ['']
+    });
+  }
+              
+
   public register(): void {
-      this.registerService.start(this.email).subscribe();
+    this.registerService.start(this.registerForm.controls.email.value).subscribe(res => {
+      if (res.ok != true && res.result.id == "v-dto-invalid"){
+        for (const [key, value] of Object.entries(res.result.additionalInfo)) 
+          this.registerForm.controls[key].setErrors({"err":value});
+      }
+    });
   }
 
 }
