@@ -3,6 +3,7 @@ using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Helpers.AddtionalClases;
 using SchoolBridge.Helpers.AddtionalClases.EmailService;
+using SchoolBridge.Helpers.Extentions;
 using SchoolBridge.Helpers.Managers.CClientErrorManager;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace SchoolBridge.Domain.Services.Implementation
         private string ComposeDraftBody(string draftBody, params string[] arguments)
         {
             foreach (var item in arguments)
-                draftBody = draftBody.Replace("$arg$", item);
+                draftBody = draftBody.ReplaceFirstOccurrance("$arg$", item);
             return draftBody;
         }
 

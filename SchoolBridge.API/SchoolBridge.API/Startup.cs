@@ -123,22 +123,23 @@ namespace SchoolBridge.API
                 RegistrationTokenExpires = TimeSpan.FromDays(int.Parse(_registrationServiceConfiguration["RegistrationExpireDays"]))
             });
 
-            services.AddSingleton(new ValidatingServiceConfiguration { });
-
             services.AddSingleton(new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new DomainMapperProfile());
             }).CreateMapper());
 
+            services.AddSingleton(new LanguageStringServiceConfiguration { DefaultLanguage = "en" });
+
+            services.AddScoped<IValidatingService, ValidatingService>();
+
             // Scoped Services
             services.AddScoped<ScopedHttpContext>();
+            services.AddScoped<ILanguageStringService, LanguageStringService>();
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IPermissionService, PermissionService>();
-            services.AddScoped<IPanelService, PanelService>();
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IValidatingService, ValidatingService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
 
             services.AddScoped<ILoginService, LoginService>();
@@ -150,7 +151,7 @@ namespace SchoolBridge.API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors(x => x.WithOrigins("http://localhost:4200")
+            app.UseCors(x => x.SetIsOriginAllowed(_ => true)
                             .AllowAnyHeader()
                             .WithMethods("GET", "POST")
                             .AllowCredentials());

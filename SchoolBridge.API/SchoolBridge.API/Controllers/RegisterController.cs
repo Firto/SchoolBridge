@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SchoolBridge.API.Controllers.Attributes;
+using SchoolBridge.API.Controllers.Attributes.Validation;
 using SchoolBridge.DataAccess.Entities;
 using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Helpers.DtoModels;

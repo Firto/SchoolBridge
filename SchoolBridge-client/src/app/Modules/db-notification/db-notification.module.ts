@@ -7,7 +7,6 @@ import { SetDbNotificationsComponent } from './Components/set-db-notifications/s
 import { DbNotificationService } from './Services/db-notification.service';
 import { DbNotificationsMapper } from './Mappers/db-notification.mapper';
 import { DbNtfOnLoginComponent } from './Components/db-notifications/db-ntf-on-login/db-ntf-on-login.component';
-import { AppRoutingModule } from 'src/app/app-routing.module';
 
 @NgModule({
     declarations: [
@@ -18,8 +17,7 @@ import { AppRoutingModule } from 'src/app/app-routing.module';
         TimeAgoPipe
     ],
     imports: [
-        CommonModule,
-        AppRoutingModule
+        CommonModule
     ],
     providers: [
         DbNotificationService,

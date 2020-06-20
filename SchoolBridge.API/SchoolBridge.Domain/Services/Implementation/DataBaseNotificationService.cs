@@ -100,6 +100,41 @@ namespace SchoolBridge.Domain.Services.Implementation
             );
         }
 
+        public async Task NotifyNoBase(AUser usr, string type, IDataBaseNotificationSourse sourse)
+        {
+            await _notificationService.Notify(usr, "dataBase",
+                new DataBaseSourse
+                {
+                    Date = DateTime.Now,
+                    Base64Sourse = ObjectToBase64String(sourse),
+                    Type = type
+                }
+            );
+        }
+
+        public async Task NotifyNoBase(AUser usr, string tokenId, string type, IDataBaseNotificationSourse sourse)
+        {
+            await _notificationService.Notify(usr, tokenId, "dataBase", 
+                new DataBaseSourse
+                {
+                    Date = DateTime.Now,
+                    Base64Sourse = ObjectToBase64String(sourse),
+                    Type = type
+                }
+            );
+        }
+
+        public async Task NotifyNoBase(AUser[] usrs, string type, IDataBaseNotificationSourse sourse)
+        {
+            var template = new DataBaseSourse
+            {
+                Date = DateTime.Now,
+                Base64Sourse = ObjectToBase64String(sourse),
+                Type = type
+            };
+            await _notificationService.Notify(usrs, "dataBase", template);
+        }
+
         public async Task<IEnumerable<DataBaseSourse>> Get(AUser usr, string last, int count = 20)
         {
             Notification<AUser> notification = last != null ? await _notificationGR.FindAsync(last) : null;

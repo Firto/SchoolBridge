@@ -49,6 +49,11 @@ nav a img {
 
 .menu {
     float: left;
+    margin: 0;
+}
+
+.menu > li {
+    display: inline;
 }
 
 .menu a {
@@ -130,7 +135,7 @@ small small.badge-pill {
         text-decoration: none;
         z-index: 120;
     }
-    .menu a {
+    .menu li a {
         display: block;
         padding: 20px;
     }

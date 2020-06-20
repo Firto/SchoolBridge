@@ -1,12 +1,12 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { User } from '../Models/user.model';
 import { Injectable, Injector } from '@angular/core';
-import { DeviceUUIDService } from '../Helpers/device-uuid.service';
 import { ActivatedRoute, RouterStateSnapshot } from '@angular/router';
-import { CryptService } from '../Helpers/crypt.service';
-import { NotificationService } from './notification.service';
+import { NotificationService } from '../Modules/notification/Services/notification.service';
 import { Loginned } from '../Models/loginned.model';
 import { LoginnedTokens } from '../Models/loginned-tokens';
+import { CryptService } from './crypt.service';
+import { DeviceUUIDService } from './device-uuid.service';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -17,8 +17,8 @@ export class UserService {
     constructor(private crypt: CryptService,
                 private route: ActivatedRoute,
                 private injector: Injector,
-                private uuidService: DeviceUUIDService,
-                private notificationService: NotificationService) {
+                private notificationService: NotificationService,
+                uuidService: DeviceUUIDService) {
         this.uuid = uuidService.get(); 
 
         if (localStorage.getItem('user')){
@@ -34,11 +34,11 @@ export class UserService {
 
     forceRunAuthGuard(): void {
         if (this.route.root.children.length && this.route.root.children['0'].snapshot.routeConfig.canActivate) {
-          const curr_route = this.route.root.children[ '0' ];
-          const AuthGuard = curr_route.snapshot.routeConfig.canActivate[ '0' ];
-          const authGuard = this.injector.get(AuthGuard);
-          const routerStateSnapshot: RouterStateSnapshot = Object.assign({}, curr_route.snapshot, {url: "/"+curr_route.snapshot.url[0]});
-          authGuard.canActivate(curr_route.snapshot, routerStateSnapshot);
+            const curr_route = this.route.root.children[ '0' ];
+            const AuthGuard = curr_route.snapshot.routeConfig.canActivate[ '0' ];
+            const authGuard = this.injector.get(AuthGuard);
+            const routerStateSnapshot: RouterStateSnapshot = Object.assign({}, curr_route.snapshot, {url: "/"+curr_route.snapshot.url[0]});
+            authGuard.canActivate(curr_route.snapshot, routerStateSnapshot);
         }
     }
 

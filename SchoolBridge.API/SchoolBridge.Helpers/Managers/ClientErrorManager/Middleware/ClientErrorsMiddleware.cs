@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System;
 using System.Threading.Tasks;
 
 namespace SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware
@@ -29,6 +30,10 @@ namespace SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware
             {
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(JsonConvert.SerializeObject(_clientErrorManager.MapClientErrorDtoToResultDto(ex.Id, ex.AdditionalInfo), _jsonSerializerSettings));
+            }
+            catch (NullReferenceException) {
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(_clientErrorManager.MapClientErrorDtoToResultDto("v-dto-invalid"), _jsonSerializerSettings));
             }
         }
     }

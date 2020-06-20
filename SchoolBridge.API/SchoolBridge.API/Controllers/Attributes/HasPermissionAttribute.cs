@@ -8,12 +8,7 @@ namespace SchoolBridge.API.Controllers.Attributes
 {
     public class HasPermissionAttribute: MyAutorizeAttribute
     {
-        private readonly string name = null;
         private readonly string[] names = null;
-        public HasPermissionAttribute(string name) 
-        {
-            this.name = name;
-        }
 
         public HasPermissionAttribute(params string[] names)
         {
@@ -24,8 +19,12 @@ namespace SchoolBridge.API.Controllers.Attributes
         {
             base.OnActionExecuting(context);
 
-            if ((name != null && !context.HttpContext.RequestServices.GetService<IPermissionService>().HasPermission((User)context.ActionArguments["user"], name)) || 
-                (names != null && names.Length > 0 && !context.HttpContext.RequestServices.GetService<IPermissionService>().HasAllPermissions((User)context.ActionArguments["user"], names)))
+            if (names != null && 
+                (
+                    (names.Length == 1 && !context.HttpContext.RequestServices.GetService<IPermissionService>().HasPermission((User)context.ActionArguments["user"], names[0])) || 
+                    (names.Length > 1 && !context.HttpContext.RequestServices.GetService<IPermissionService>().HasAllPermissions((User)context.ActionArguments["user"], names))
+                )
+            )
                 throw new ClientException("no-access");
         }
     }

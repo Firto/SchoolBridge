@@ -3,7 +3,9 @@ using SchoolBridge.DataAccess.Entities;
 using SchoolBridge.DataAccess.Interfaces;
 using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Helpers.Extentions;
+using SchoolBridge.Helpers.Managers;
 using SchoolBridge.Helpers.Managers.CClientErrorManager;
+using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,56 +18,48 @@ namespace SchoolBridge.Domain.Services.Implementation
     {
         private readonly IGenericRepository<User> _userGR;
         private readonly IPermissionService _permissionService;
-        private readonly IPanelService _panelService;
         private readonly IRoleService _roleService;
 
-        private readonly IGenericRepository<RolePanel> _rolePanelGR;
+        private readonly IGenericRepository<DefaultRolePermission> _defaultRolePermissionGR;
 
         public UserService(IGenericRepository<User> userGR,
                             IPermissionService permissionService,
-                            IPanelService panelService,
                             IRoleService roleService,
-                            IGenericRepository<RolePanel> rolePanelGR,
+                            IGenericRepository<DefaultRolePermission> defaultRolePermissionGR,
                             ClientErrorManager clientErrorManager)
         {
             _userGR = userGR;
             _permissionService = permissionService;
-            _panelService = panelService;
             _roleService = roleService;
-            _rolePanelGR = rolePanelGR;
+            _defaultRolePermissionGR = defaultRolePermissionGR;
 
             if (!clientErrorManager.IsIssetErrors("User"))
                 clientErrorManager.AddErrors(new ClientErrors("User", new Dictionary<string, ClientError>
                 {
-                    
+                    { "u-inc-user-id" , new ClientError ("Incorrect user id!")}
                 }));
         }
-        public async Task<User> Add(User user, IEnumerable<Panel> noPanels = null, IEnumerable<Permission> noPermissions = null)
+        public async Task<User> AddAsync(User user, IEnumerable<Permission> noPermissions = null)
         {
             user = await _userGR.CreateAsync(user);
-            var panels = _rolePanelGR.GetDbSet().Where(x => x.RoleId == user.RoleId).Include(x => x.Panel.Permissions).ThenInclude(x => x.Permission).Include(x => x.Panel).Select(x => x.Panel).ToArray();
-            var permissions = new List<Permission>();
-
-            panels = panels.Where(x => {
-                if (noPanels.FirstOrDefault(s => s.Id == x.Id) == null) {
-                    permissions.AddRange(x.Permissions.Where(s => noPermissions.FirstOrDefault(z => z.Id == s.PermissionId) == null).Select(s => s.Permission));
-                    return true;
-                }
-                return false;
-            }).ToArray();
+            var permissions = _defaultRolePermissionGR.GetDbSet()
+                .Where(x => x.RoleId == user.RoleId)
+                .Include(x => x.Permission)
+                .ToArray()
+                .TakeWhile(x => noPermissions.FirstOrDefault(z => z.Id == x.PermissionId) == null)
+                .Select(x => x.Permission);
          
-            user.Panels = await _panelService.AddPanels(user, panels);
             user.Permissions = await _permissionService.AddPermissions(user, permissions);
             return user;
         }
 
-        public async Task<User> Add(User user, string role, IEnumerable<Panel> noPanels = null, IEnumerable<Permission> noPermissions = null)
+        public async Task<User> AddAsync(User user, string role, IEnumerable<Permission> noPermissions = null)
         {
             user.Role = await _roleService.Get(role);
-            return await Add(user, noPanels, noPermissions);
+            return await AddAsync(user, noPermissions);
         }
 
-        public Task Block(User ovner, User user, string comment, DateTime unblockDate)
+        public Task BlockAsync(User ovner, User user, string comment, DateTime unblockDate)
         {
             throw new NotImplementedException();
         }
@@ -130,7 +124,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             return Get(Id) != null;
         }
 
-        public async Task Remove(User user)
+        public async Task RemoveAsync(User user)
         {
             await _userGR.DeleteAsync(user);
         }
@@ -142,32 +136,89 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public User GetAll(string Id)
         {
-            return _userGR.GetDbSet().Where(x => x.Id == Id).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).Include(x => x.Notifications).ToArray().FirstOrDefault();
+            return _userGR.GetDbSet()
+                          .Where(x => x.Id == Id)
+                          .Include(x => x.Role)
+                          .Include(x => x.Permissions)
+                          .ThenInclude(x => x.Permission)
+                          .Include(x => x.Notifications)
+                          .ToArray()
+                          .FirstOrDefault();
         }
 
         public User GetAllByEmail(string email)
         {
-            return _userGR.GetDbSet().Where(x => x.Email == email).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArray().FirstOrDefault();
+            return _userGR.GetDbSet()
+                          .Where(x => x.Email == email)
+                          .Include(x => x.Role)
+                          .Include(x => x.Permissions)
+                          .ThenInclude(x => x.Permission)
+                          .Include(x => x.Notifications)
+                          .ToArray()
+                          .FirstOrDefault();
         }
 
         public User GetAllByLogin(string login)
         {
-            return _userGR.GetDbSet().Where(x => x.Login == login).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArray().FirstOrDefault();
+            return _userGR.GetDbSet()
+                          .Where(x => x.Login == login)
+                          .Include(x => x.Role)
+                          .Include(x => x.Permissions)
+                          .ThenInclude(x => x.Permission)
+                          .Include(x => x.Notifications)
+                          .ToArray()
+                          .FirstOrDefault();
         }
 
         public async Task<User> GetAllAsync(string Id)
         {
-            return (await _userGR.GetDbSet().Where(x => x.Id == Id).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArrayAsync()).FirstOrDefault();
+            return (await _userGR.GetDbSet()
+                                 .Where(x => x.Id == Id)
+                                 .Include(x => x.Role)
+                                 .Include(x => x.Permissions)
+                                 .ThenInclude(x => x.Permission)
+                                 .Include(x => x.Notifications)
+                                 .ToArrayAsync()).FirstOrDefault();
         }
 
         public async Task<User> GetAllByEmailAsync(string email)
         {
-            return (await _userGR.GetDbSet().Where(x => x.Email == email).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArrayAsync()).FirstOrDefault();
+            return (await _userGR.GetDbSet()
+                                 .Where(x => x.Email == email)
+                                 .Include(x => x.Role)
+                                 .Include(x => x.Permissions)
+                                 .ThenInclude(x => x.Permission)
+                                 .Include(x => x.Notifications)
+                                 .ToArrayAsync()).FirstOrDefault();
         }
 
         public async Task<User> GetAllByLoginAsync(string login)
         {
-            return (await _userGR.GetDbSet().Where(x => x.Login == login).Include(x => x.Role).Include(x => x.Panels).ThenInclude(x => x.Panel).Include(x => x.Permissions).ThenInclude(x => x.Permission).Include(x => x.Notifications).ToArrayAsync()).FirstOrDefault();
+            return (await _userGR.GetDbSet()
+                                 .Where(x => x.Login == login)
+                                 .Include(x => x.Role)
+                                 .Include(x => x.Permissions)
+                                 .ThenInclude(x => x.Permission)
+                                 .Include(x => x.Notifications)
+                                 .ToArrayAsync()).FirstOrDefault();
+        }
+
+        public void SetPassword(User user, string password)
+        {
+            user = _userGR.Find(user.Id);
+            if (user == null)
+                throw new ClientException("u-inc-user-id");
+            user.PasswordHash = PasswordHandler.CreatePasswordHash(password);
+            _userGR.Update(user);
+        }
+
+        public async Task SetPasswordAsync(User user, string password)
+        {
+            user = await _userGR.FindAsync(user.Id);
+            if (user == null)
+                throw new ClientException("u-inc-user-id");
+            user.PasswordHash = PasswordHandler.CreatePasswordHash(password);
+            await _userGR.UpdateAsync(user);
         }
     }
 }

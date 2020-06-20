@@ -1,31 +1,93 @@
 ﻿using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
+using SchoolBridge.Helpers.AddtionalClases.ValidatingService;
 using SchoolBridge.Helpers.Managers.CClientErrorManager;
 using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
-    public delegate IDictionary<string, string> ValidateFunc(IValidatingService ser, object dto);
+    public delegate void ValidateFunc<T>(T prop, PropValidateContext context);
     public class ValidatingService: IValidatingService
     {
-        private readonly IUserService _userService;
-        private readonly ValidatingServiceConfiguration _configuration;
-        
-        public ValidatingService(IUserService userService,
-                                ValidatingServiceConfiguration configuration,
+        private readonly IServiceProvider _provider;
+        private static readonly IDictionary<string, object> _validateFunctions = new Dictionary<string, object>();
+
+        public ValidatingService(IServiceProvider provider,
                                 ClientErrorManager clientErrorManager) {
-            _userService = userService;
-            _configuration = configuration;
+            _provider = provider;
 
             if (!clientErrorManager.IsIssetErrors("Validating"))
+            {
+
                 clientErrorManager.AddErrors(new ClientErrors("Validating", new Dictionary<string, ClientError>{
-                    {"v-func-no", new ClientError("No validation function to dto!")},
+                    {"v-func-no", new ClientError("No validation function to property!")},
                     {"v-dto-invalid", new ClientError("Invalid dto!")}
                 }));
+
+                // default
+
+                AddValidateFunc("not-null", (object prop, PropValidateContext context) =>
+                {
+                    if (prop == null)
+                        context.Valid.Add($"[v-d-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
+                });
+
+                AddValidateFunc("str-input", (string prop, PropValidateContext context) =>
+                {
+                    if (string.IsNullOrEmpty(prop))
+                        context.Valid.Add($"[v-d-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
+                });
+
+                AddValidateFunc("str-email", (string prop, PropValidateContext context) =>
+                {
+                    if (prop == null) return;
+
+                    if (!Regex.IsMatch(prop, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
+                        context.Valid.Add($"[v-d-str-email, [pn-{context.PropName}]]");
+                });
+            }
+        }
+
+        public void Validate(string[] attrs, object obj, string objName)
+        {
+            IDictionary<string, IEnumerable<string>> valid = new Dictionary<string, IEnumerable<string>>();
+            PropValidateContext _context = new PropValidateContext(_provider, null, null);
+            _context.Valid = new List<string>();
+            _context.PropName = objName;
+            foreach (var s in attrs)
+                if (!_validateFunctions.ContainsKey(s))
+                    throw new ClientException("v-func-no");
+                else
+                { 
+                    try
+                    {
+                        if (obj is IEnumerable<object>) {
+                            var m = (IEnumerable<object>)obj;
+                            foreach (var item in m)
+                                ((Delegate)_validateFunctions[s]).DynamicInvoke(item, _context);
+                        }else ((Delegate)_validateFunctions[s]).DynamicInvoke(obj, _context);
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        throw e.InnerException;
+                    }
+                }
+
+            if (_context.Valid.Count > 0)
+            {
+                valid.Add(objName, _context.Valid);
+                _context.Valid = null;
+            }
+
+            if (valid.Count > 0)
+                throw new ClientException("v-dto-invalid", valid);
         }
 
         public void Validate<T>(T dto) {
@@ -33,91 +95,56 @@ namespace SchoolBridge.Domain.Services.Implementation
         }
 
         public void Validate(Type type, object dto) {
-            if (!_configuration.ValidateFunctions.ContainsKey(type))
-                throw new ClientException("v-func-no");
 
-            IDictionary<string, string> valid = _configuration.ValidateFunctions[type](this, dto);
+            IDictionary<string, IEnumerable<string>> valid = new Dictionary<string, IEnumerable<string>>();
+            PropValidAttribute temp;
+            PropValidateContext _context = new PropValidateContext(_provider, type, dto);
+            foreach (var item in type.GetProperties())
+            {
+                temp = (PropValidAttribute)item.GetCustomAttributes(false).FirstOrDefault(x => x.GetType() == typeof(PropValidAttribute));
+                if (temp != null) {
+                    if (_context.Valid == null)
+                        _context.Valid = new List<string>();
+                    _context.PropName = item.Name;
+
+                    foreach (var s in temp.FuncIdsAtributes)
+                        if (!_validateFunctions.ContainsKey(s))
+                            throw new ClientException("v-func-no");
+                        else
+                        {
+                            try
+                            {
+                                if (item.GetValue(dto) is IEnumerable<object>)
+                                {
+                                    var m = (IEnumerable<object>)item.GetValue(dto);
+                                    foreach (var r in m)
+                                        ((Delegate)_validateFunctions[s]).DynamicInvoke(r, _context);
+                                }
+                                else ((Delegate)_validateFunctions[s]).DynamicInvoke(item.GetValue(dto), _context);
+                            }
+                            catch (TargetInvocationException e)
+                            {
+                                throw e.InnerException;
+                            }
+                        }
+
+                    if (_context.Valid.Count > 0)
+                    {
+                        valid.Add(item.Name, _context.Valid);
+                        _context.Valid = null;
+                    }
+                }
+            }
 
             if (valid.Count > 0)
                 throw new ClientException("v-dto-invalid", valid);
         }
 
-        public bool IsIssetValidateFunc<T>()
-            => _configuration.ValidateFunctions.ContainsKey(typeof(T));
+        public bool IsIssetValidateFunc(string funcId)
+            => _validateFunctions.ContainsKey(funcId);
 
-        public void AddValidateFunc<T>(ValidateFunc func)
-            => _configuration.ValidateFunctions.Add(typeof(T), func);
-
-        public void ValidateLogin(string login, string propName, ref IDictionary<string, string> valid)
-        {
-            if (string.IsNullOrEmpty(login))
-                valid.Add(propName, "Input your login!");
-            else if (login.Length > _configuration.MaxCountCharsLogin)
-                valid.Add(propName, $"Too long login(max {_configuration.MaxCountCharsLogin} characters)!");
-            else if (!Regex.Match(login, "^[a-zA-Z_0-9]*$").Success)
-                valid.Add(propName, "Name musn't have specials chars!");
-            else if (_userService.IsIssetByLogin(login))
-                valid.Add(propName, "User with this login is already registered!");
-        }
-
-        public void ValidateName(string name, string propName, ref IDictionary<string, string> valid)
-        {
-            if (string.IsNullOrEmpty(name))
-                valid.Add(propName, "Input your name!");
-            else if (name.Length > _configuration.MaxCountCharsName)
-                valid.Add(propName, $"Too long name(max {_configuration.MaxCountCharsName} characters)!");
-            else if (!Regex.Match(name, "^[а-яА-ЯҐґЄєІіЇї]+$").Success)
-                valid.Add(propName, "Name musn't have specials chars!");
-        }
-
-        public void ValidateSurname(string surname, string propName, ref IDictionary<string, string> valid)
-        {
-            if (string.IsNullOrEmpty(surname))
-                valid.Add(propName, "Input your surname!");
-            else if (surname.Length > _configuration.MaxCountCharsSurname)
-                valid.Add(propName, $"Too long surname(max {_configuration.MaxCountCharsSurname} characters)!");
-            else if (!Regex.Match(surname, "^[а-яА-ЯҐґЄєІіЇї]+$").Success)
-                valid.Add(propName, "Surname musn't have specials chars!");
-        }
-
-        public void ValidateLastname(string lastname, string propName, ref IDictionary<string, string> valid)
-        {
-            if (string.IsNullOrEmpty(lastname))
-                valid.Add(propName, "Input your lastname!");
-            else if (lastname.Length > _configuration.MaxCountCharsLastname)
-                valid.Add(propName, $"Too long lastname(max {_configuration.MaxCountCharsLastname} characters)!");
-            else if (!Regex.Match(lastname, "^[а-яА-ЯҐґЄєІіЇї]+$").Success)
-                valid.Add(propName, "Lastname musn't have specials chars!");
-        }
-
-        public void ValidatePassword(string password, string propName, ref IDictionary<string, string> valid)
-        {
-            if (string.IsNullOrEmpty(password))
-                valid.Add(propName, "Input your password!");
-            else if (password.Length > _configuration.MaxCountCharsPassword)
-                valid.Add(propName, $"Too long password(max{_configuration.MaxCountCharsPassword} characters)!");
-            else if (password.Length < _configuration.MinCountCharsPassword)
-                valid.Add(propName, $"Password must have {_configuration.MinCountCharsPassword} and more chars!");
-            else if (!password.Any(c => char.IsDigit(c)))
-                valid.Add(propName, "Password must have minimum one digit!");
-        }
-
-        public void ValidateEmail(string email, string propName, ref IDictionary<string, string> valid)
-        {
-            if (string.IsNullOrEmpty(email))
-                valid.Add(propName, "Input your email!");
-            else if (!Regex.IsMatch(email, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
-                valid.Add(propName, "Incorrect email!");
-            else if (_userService.IsIssetByEmail(email))
-                valid.Add(propName, "User with this email is already registered!");
-        }
-
-        public void ValidateRepeatPassword(string password, string repeat, string propName, ref IDictionary<string, string> valid) {
-            if (string.IsNullOrEmpty(repeat))
-                valid.Add(propName, "Input repeat your password!");
-            else if (repeat != password)
-                valid.Add(propName, "Incorrect repeat password!");
-        }
+        public void AddValidateFunc<T>(string funcId, ValidateFunc<T> func)
+            => _validateFunctions.Add(funcId, func);
 
     }
 }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { EndRegister } from 'src/app/Models/endregister.model';
-import { RegisterService } from 'src/app/Services/register.service';
+import { EndRegister } from 'src/app/Modules/start/Models/endregister.model';
+import { RegisterService } from 'src/app/Modules/start/Services/register.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 

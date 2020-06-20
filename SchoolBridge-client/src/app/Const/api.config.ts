@@ -55,5 +55,27 @@ export const apiConfig: Record<string, Service> = {
                 loader: false
             }
         }
+    },
+    "globalization": {
+        url: "globalization/",
+        methods: {
+            "info": {
+                url: "info",
+                type: "GET"
+            },
+            "strings": {
+                url: "strings",
+                type: "GET",
+                loader: false
+            },
+            "add-language": {
+                url: "language/add",
+                type: "POST"
+            },
+            "remove-language": {
+                url: "language/remove",
+                type: "GET"
+            }
+        }
     }
 };

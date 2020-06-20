@@ -17,15 +17,16 @@ namespace SchoolBridge.Helpers.Managers.CClientErrorManager
             => GetErrorByID(Id) ?? _errors["inc-err"];
 
         private static ClientErrorDto MapClientError(ClientError error, object AdditionalInfo = null) {
+            var id = GetId(error);
             return AdditionalInfo == null ? new ClientErrorDto
             {
-                Id = GetId(error),
-                Message = error.Message
+                Id = id,
+                Message = $"[cl-{id}]"
             }:
             new ClientErrorDtoPlus
             {
-                Id = GetId(error),
-                Message = error.Message,
+                Id = id,
+                Message = $"[cl-{id}]",
                 AdditionalInfo = AdditionalInfo
             };
         }

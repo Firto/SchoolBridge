@@ -1,12 +1,8 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
 @import url("https://use.fontawesome.com/releases/v5.6.1/css/all.css");
+
 body {
-    background: #151515;
-    max-width: 81.25rem;
-    min-height: 100vh;
-    margin: 0 auto;
-    position: static;
-    scroll-behavior: smooth;
+  background: #151515;
 }
 
 .login-container{
@@ -14,31 +10,28 @@ body {
 	width: 100%;
 	color: #fff;
   }
-  .login-form{
+  .def-form{
 	margin: auto;
 	width: 370px;
 	padding: 15px;
 	max-width: 100%;
   }
-  .login-form .form-control{
+  .def-form .form-control{
 	font-size: 15px;
 	min-height: 48px;
 	font-weight: 500;
   }
-  .login-form a{
-	text-decoration: none;
-	color:#666;
+  a.forgot-link{
+	  text-decoration: none;
+    color:#666;
   }
-  .login-form a:hover{
-	color:#0984e3;
-  }
-  .forgot-link{
-	font-size: 13px;
+  a.forgot-link:hover{
+	  color:#0984e3;
   }
   
   .form-control:focus{
-	border-color:#0984e3;
-	box-shadow: 0 0 0 0.2rem #0984e3;
+	  border-color:#0984e3;
+	  box-shadow: 0 0 0 0.2rem #0984e3;
   }
 
   .form-control.ng-invalid{
@@ -65,4 +58,12 @@ body {
 
   .btn-custom:focus{
 	box-shadow: 0 0 0 0.2rem #0984e3;
+  }
+
+  .fill-white{
+    fill: white;
+  }
+
+  .font-weight-slight{
+    font-weight: 100!important;
   }

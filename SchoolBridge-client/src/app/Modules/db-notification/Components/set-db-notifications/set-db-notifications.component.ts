@@ -3,8 +3,10 @@ import { BehaviorSubject } from 'rxjs';
 import { KeyedCollection } from 'src/app/Collections/keyed-collection';
 import { DbNtfComponent } from '../db-notifications/db-ntf-component.iterface';
 import { DbNotificationService } from '../../Services/db-notification.service';
-import { DataBaseSource } from '../../../../Models/NotificationSources/database-source';
+import { DataBaseSource } from '../../../notification/Models/NotificationSources/database-source';
 import { DbNotificationsMapper } from '../../Mappers/db-notification.mapper';
+import { Guid } from "guid-typescript";
+import { UserService } from 'src/app/Services/user.service';
 
 @Component({
     selector: "set-db-notifications",
@@ -14,26 +16,23 @@ import { DbNotificationsMapper } from '../../Mappers/db-notification.mapper';
 
 export class SetDbNotificationsComponent implements AfterViewInit {
     @ViewChild('notificationContainer', { read: ViewContainerRef }) notifications: ViewContainerRef = null;
-    public countUnredNtfs: BehaviorSubject<number> = new BehaviorSubject<number>(0);
     public loader: boolean = false;
 
     private notificationList: KeyedCollection<string, DbNtfComponent> = new KeyedCollection<string, DbNtfComponent>();
-    private end: boolean = false;
+    private end: boolean = false; 
 
-    constructor(private ntfService: DbNotificationService,
+    constructor(public ntfService: DbNotificationService,
                 private ntfMapper: DbNotificationsMapper) {
 
-        this.ntfService.onReciveDbNotification.subscribe((data) => this.onReciveDbNotification(data));
+        this.ntfService.onReciveDbNotification.subscribe((data) => this.onReciveDbNotification(data.key, data.value, data.reverse));
 
-        this.ntfService.onReciveOnReadDbNotification.subscribe((data) => {
-            for (let ind = this.notificationList.getIndex(data.last); ind >= 0; ind--) 
-                this.notificationList.items[ind].value.baseSource.read = true;
-            this.countUnredNtfs.next(this.countUnredNtfs.value - data.count);
+        this.ntfService.notificationList.items.forEach(element => {
+            this.onReciveDbNotification(element.key, element.value);
         });
     }
 
     ngAfterViewInit(): void {
-        this.getCountNtfs();
+        this.ntfService.localUpdateCountUnreadNtfs();
     }
     
     public clear() {
@@ -41,13 +40,6 @@ export class SetDbNotificationsComponent implements AfterViewInit {
             this.notifications.clear();
         this.notificationList.clear();
         this.end = false;
-    }
-
-    public getCountNtfs() {
-        this.ntfService.getCountUnread().subscribe((x) => {
-            if (x.ok)
-                this.countUnredNtfs.next(x.result);
-        });
     }
 
     public onNtfScroll(event: Event) {
@@ -62,40 +54,26 @@ export class SetDbNotificationsComponent implements AfterViewInit {
                 if ((<HTMLElement>mutation.target).attributes.getNamedItem("aria-expanded").value === "true") {
                     if (!this.end && !this.loader)
                         this.getNtfs();
-                }
-                else if (this.notificationList.items.some((x) => x.value.baseSource.read == false))
-                    this.ntfService.read(this.getLastNtfId()).subscribe();
+                }else
+                    this.ntfService.readedNtfs();
             }
         });
     }
 
     public getNtfs(): void {
         this.loader = true;
-        this.ntfService.getn(this.getLastNtfId()).subscribe((data) => {
-            if (data.ok) {
-                const res: DataBaseSource[] = <DataBaseSource[]>data.result;
-                if (res.length > 0) {
-                    res.forEach(baseSource => this.onReciveDbNotification(baseSource, false));
-                    if (res.length < 20)
-                        this.end = true;
-                }
-                else this.end = true;
-            }
+        this.ntfService.getNtfs().subscribe(x => {
+            this.end = x;
             this.loader = false;
         });
     }
 
-    private onReciveDbNotification(baseSource: DataBaseSource, reverse:boolean = true): void {
-        const mon: DbNtfComponent =  this.notifications.createComponent(this.ntfMapper.map(baseSource.type), reverse ? 0 : null).instance;
-        mon.source = JSON.parse(atob(baseSource.base64Sourse));
-        mon.baseSource = baseSource;
-        if (reverse) 
-            this.notificationList.addOrUpdateShift(mon.baseSource.id, mon);
-        else this.notificationList.addOrUpdate(mon.baseSource.id, mon);
+    private onReciveDbNotification(key: string, source: DataBaseSource, reverse: boolean = true): void {
+        const mon: DbNtfComponent =  this.notifications.createComponent(this.ntfMapper.map(source.type), reverse ? 0 : null).instance;
+        mon.source = JSON.parse(atob(source.base64Sourse));
+        mon.baseSource = source;
+        if (reverse)
+            this.notificationList.addOrUpdateShift(key, mon);
+        else  this.notificationList.addOrUpdate(key, mon);
     }
-
-
-    private getLastNtfId(): string {
-        return this.notificationList.length() > 0 ? this.notificationList.items[this.notificationList.length() - 1].key : null;
-    }    
 }

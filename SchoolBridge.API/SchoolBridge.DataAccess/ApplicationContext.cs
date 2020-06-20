@@ -17,36 +17,83 @@ namespace SchoolBridge.DataAccess
 
     public class ApplicationContext: AuthContext<User>
     {
+        public DbSet<Role> Roles { get; set; }
+
         public DbSet<Notification<User>> Notifications { get; set; }
 
         public DbSet<File> Files { get; set; }
         public DbSet<Image> Images { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<Panel> Panels { get; set; }
-        public DbSet<Permission> Permissions { get; set; }
 
-        public DbSet<PanelPermission> PanelPermissions { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<DefaultRolePermission> DefaultRolePermissions { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
-        public DbSet<RolePanel> RolePanels { get; set; }
-        public DbSet<UserPanel> UserPanels { get; set; }
+
+        public DbSet<Language> Languages { get; set; }
+        public DbSet<LanguageStringId> LanguageStringIds { get; set; }
+        public DbSet<LanguageStringType> LanguageStringTypes { get; set; }
+        public DbSet<LanguageStringIdType> LanguageStringIdTypes { get; set; }
+        public DbSet<LanguageString> LanguageStrings { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options){}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Keys
+
             modelBuilder.Entity<Image>().HasKey((x) => x.FileId);
-            modelBuilder.Entity<PanelPermission>().HasKey((x) => new { x.PanelId,x.PermissionId });
+
+            modelBuilder.Entity<DefaultRolePermission>().HasKey((x) => new { x.RoleId, x.PermissionId });
             modelBuilder.Entity<UserPermission>().HasKey((x) => new { x.UserId, x.PermissionId });
-            modelBuilder.Entity<RolePanel>().HasKey((x) => new { x.RoleId, x.PanelId });
-            modelBuilder.Entity<UserPanel>().HasKey((x) => new { x.UserId, x.PanelId });
+
+            modelBuilder.Entity<LanguageString>().HasKey((x) => new { x.IdId, x.LanguageId });
+            modelBuilder.Entity<LanguageStringIdType>().HasKey((x) => new { x.TypeId, x.StringIdId });
+
+            //
+
+            modelBuilder.Entity<LanguageString>()
+                .HasOne(x => x.Language)
+                .WithMany(x => x.Strings);
+
+            modelBuilder.Entity<LanguageStringIdType>()
+                .HasOne(x => x.StringId)
+                .WithMany(x => x.Types);
+
+            modelBuilder.Entity<LanguageStringIdType>()
+               .HasOne(x => x.Type)
+               .WithMany(x => x.Strings);
+
+            modelBuilder.Entity<Notification<User>>()
+               .HasOne((x) => x.User)
+               .WithMany(x => x.Notifications);
+
+            modelBuilder.Entity<UserPermission>()
+               .HasOne((x) => x.User)
+               .WithMany(x => x.Permissions);
+
+            modelBuilder.Entity<DefaultRolePermission>()
+               .HasOne((x) => x.Role)
+               .WithMany(x => x.DefaultPermissions);
+
+            modelBuilder.Entity<User>()
+               .HasOne(t => t.Role)
+               .WithMany(t => t.Users);
+
+            // Seed data
+
+            modelBuilder.Entity<LanguageStringType>().HasData(
+                new LanguageStringType { Id = 1, Name = "client-error"},
+                new LanguageStringType { Id = 2, Name = "component" },
+                new LanguageStringType { Id = 3, Name = "valid-error" },
+                new LanguageStringType { Id = 4, Name = "default" }
+            );
+
+            modelBuilder.Entity<Language>().HasData(
+                new Language { Id = 1, AbbName = "en", FullName = "English" },
+                new Language { Id = 2, AbbName = "ua", FullName = "Українська" }
+            );
 
             modelBuilder.Entity<Role>().HasData(
                new Role { Id = 1, Name = "Admin" },
                new Role { Id = 9, Name = "Pupil" }
-            );
-
-            modelBuilder.Entity<Panel>().HasData(
-                new Panel { Id = 1, Name = "Admin" },
-                new Panel { Id = 9, Name = "Pupil" }
             );
 
             modelBuilder.Entity<Permission>().HasData(
@@ -60,43 +107,55 @@ namespace SchoolBridge.DataAccess
                 new Permission { Id = 7, Name = "EditPupil" },
                 new Permission { Id = 8, Name = "RemovePupil" },
 
-                // Get 
+                // Languages
 
-                /*
-                  new Panel { Id = 1, Name = "Admin" },
-                new Panel { Id = 2, Name = "Moderator" },
-                new Panel { Id = 3, Name = "RegionModerator" },
-                new Panel { Id = 4, Name = "DistinctModerator" },
-                new Panel { Id = 6, Name = "SchoolModerator" },
-                new Panel { Id = 7, Name = "HeadTeacher" },
-                new Panel { Id = 8, Name = "Teacher" },
-                new Panel { Id = 9, Name = "Pupil" }
-                 */
+                new Permission { Id = 9, Name = "CreateLanguage" },
+                new Permission { Id = 10, Name = "GetLanguage" },
+                new Permission { Id = 11, Name = "EditLanguage" },
+                new Permission { Id = 12, Name = "RemoveLanguage" },
 
-                new Permission { Id = 9, Name = "GetAdminsList" },
-                new Permission { Id = 10, Name = "GetAdminInfo" },
+                new Permission { Id = 13, Name = "CreateLanguageStringId" },
+                new Permission { Id = 14, Name = "GetLanguageStringId" },
+                new Permission { Id = 15, Name = "EditLanguageStringId" },
+                new Permission { Id = 16, Name = "RemoveLanguageStringId" },
 
-                new Permission { Id = 11, Name = "GetPupilsList" },
-                new Permission { Id = 12, Name = "GetPupilsInfo" }
+                new Permission { Id = 17, Name = "CreateLanguageStringIdType" },
+                new Permission { Id = 18, Name = "GetLanguageStringIdType" },
+                new Permission { Id = 19, Name = "EditLanguageStringIdType" },
+                new Permission { Id = 20, Name = "RemoveLanguageStringIdType" },
+
+                new Permission { Id = 21, Name = "CreateLanguageString" },
+                new Permission { Id = 22, Name = "GetLanguageString" },
+                new Permission { Id = 23, Name = "EditLanguageString" },
+                new Permission { Id = 24, Name = "RemoveLanguageString" },
+
+                new Permission { Id = 25, Name = "AddLanguageStringType" },
+                new Permission { Id = 26, Name = "GetLanguageStringType" },
+                new Permission { Id = 27, Name = "EditLanguageStringType" },
+                new Permission { Id = 28, Name = "RemoveLanguageStringType" },
+
+                new Permission { Id = 29, Name = "GetAdminsList" },
+                new Permission { Id = 30, Name = "GetAdminInfo" },
+
+                new Permission { Id = 31, Name = "GetPupilsList" },
+                new Permission { Id = 32, Name = "GetPupilsInfo" },
+
+                new Permission { Id = 33, Name = "UpdateBaseUpdateId" },
+                new Permission { Id = 34, Name = "GetAdminPanel" },
+                new Permission { Id = 35, Name = "GetGlobalizationTab" }
             );
 
-            modelBuilder.Entity<PanelPermission>().HasData(
+            modelBuilder.Entity<DefaultRolePermission>().HasData(
                 /*new PanelPermission { PanelId = 1, PermissionId = 1 },
                 new PanelPermission { PanelId = 1, PermissionId = 2 },
                 new PanelPermission { PanelId = 1, PermissionId = 3 },
                 new PanelPermission { PanelId = 1, PermissionId = 4 },*/
-                new PanelPermission { PanelId = 1, PermissionId = 5 },
-                new PanelPermission { PanelId = 1, PermissionId = 6 },
-                new PanelPermission { PanelId = 1, PermissionId = 7 },
-                new PanelPermission { PanelId = 1, PermissionId = 10 },
-                new PanelPermission { PanelId = 1, PermissionId = 11 },
-                new PanelPermission { PanelId = 1, PermissionId = 12 }
-            );
-
-            modelBuilder.Entity<RolePanel>().HasData(
-                new RolePanel { RoleId = 1, PanelId = 1 },
-                new RolePanel { RoleId = 1, PanelId = 9 },
-                new RolePanel { RoleId = 9, PanelId = 9 }
+                new DefaultRolePermission { RoleId = 1, PermissionId = 5 },
+                new DefaultRolePermission { RoleId = 1, PermissionId = 6 },
+                new DefaultRolePermission { RoleId = 1, PermissionId = 7 },
+                new DefaultRolePermission { RoleId = 1, PermissionId = 10 },
+                new DefaultRolePermission { RoleId = 1, PermissionId = 11 },
+                new DefaultRolePermission { RoleId = 1, PermissionId = 12 }
             );
 
             modelBuilder.Entity<UserPermission>().HasData(
@@ -109,12 +168,30 @@ namespace SchoolBridge.DataAccess
                 new UserPermission { UserId = "admin", PermissionId = 7 },
                 new UserPermission { UserId = "admin", PermissionId = 10 },
                 new UserPermission { UserId = "admin", PermissionId = 11 },
-                new UserPermission { UserId = "admin", PermissionId = 12 }
-            );
-
-            modelBuilder.Entity<UserPanel>().HasData(
-               new UserPanel { UserId = "admin", PanelId = 1 },
-               new UserPanel { UserId = "admin", PanelId = 9 }
+                new UserPermission { UserId = "admin", PermissionId = 12 },
+                new UserPermission { UserId = "admin", PermissionId = 13 },
+                new UserPermission { UserId = "admin", PermissionId = 14 },
+                new UserPermission { UserId = "admin", PermissionId = 15 },
+                new UserPermission { UserId = "admin", PermissionId = 16 },
+                new UserPermission { UserId = "admin", PermissionId = 17 },
+                new UserPermission { UserId = "admin", PermissionId = 18 },
+                new UserPermission { UserId = "admin", PermissionId = 19 },
+                new UserPermission { UserId = "admin", PermissionId = 20 },
+                new UserPermission { UserId = "admin", PermissionId = 21 },
+                new UserPermission { UserId = "admin", PermissionId = 22 },
+                new UserPermission { UserId = "admin", PermissionId = 23 },
+                new UserPermission { UserId = "admin", PermissionId = 24 },
+                new UserPermission { UserId = "admin", PermissionId = 25 },
+                new UserPermission { UserId = "admin", PermissionId = 26 },
+                new UserPermission { UserId = "admin", PermissionId = 27 },
+                new UserPermission { UserId = "admin", PermissionId = 28 },
+                new UserPermission { UserId = "admin", PermissionId = 29 },
+                new UserPermission { UserId = "admin", PermissionId = 30 },
+                new UserPermission { UserId = "admin", PermissionId = 31 },
+                new UserPermission { UserId = "admin", PermissionId = 32 },
+                new UserPermission { UserId = "admin", PermissionId = 33 },
+                new UserPermission { UserId = "admin", PermissionId = 34 },
+                new UserPermission { UserId = "admin", PermissionId = 35 }
             );
            
 
@@ -136,30 +213,6 @@ namespace SchoolBridge.DataAccess
                 PasswordHash = PasswordHandler.CreatePasswordHash("admin"),
                 RoleId = 1
             });
-
-            modelBuilder.Entity<Notification<User>>()
-               .HasOne((x) => x.User)
-               .WithMany(x => x.Notifications);
-
-            modelBuilder.Entity<UserPanel>()
-               .HasOne((x) => x.User)
-               .WithMany(x => x.Panels);
-
-            modelBuilder.Entity<UserPermission>()
-               .HasOne((x) => x.User)
-               .WithMany(x => x.Permissions);
-
-            modelBuilder.Entity<RolePanel>()
-               .HasOne((x) => x.Role)
-               .WithMany(x => x.Panels);
-
-            modelBuilder.Entity<PanelPermission>()
-               .HasOne((x) => x.Panel)
-               .WithMany(x => x.Permissions);
-
-            modelBuilder.Entity<User>()
-               .HasOne(t => t.Role)
-               .WithMany(t => t.Users);
 
 
             base.OnModelCreating(modelBuilder);

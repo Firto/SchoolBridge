@@ -15,6 +15,7 @@ export class NavbarComponent implements AfterViewInit{
 
   ngAfterViewInit(): void {
     this.checkbox = <HTMLInputElement> document.getElementById("chk");
+    console.log(this.constructor.name); 
   }
 
   onClickMenuItem(): void {

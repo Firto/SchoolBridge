@@ -7,8 +7,7 @@ namespace SchoolBridge.Helpers.DtoModels.Authefication
     {
         public LoggedTokensDto Tokens { get; set; }
         public string Role { get; set; }
-        public IEnumerable<string> Panels { get; set; }
         public IEnumerable<string> Permissions { get; set; }
-        public IEnumerable<DataBaseSourse> Notifications { get; set; }
+        public int CountUnreadNotifications { get; set; }
     }
 }

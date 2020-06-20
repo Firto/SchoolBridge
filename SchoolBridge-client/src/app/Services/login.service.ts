@@ -1,5 +1,4 @@
-import { Injectable, Injector } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -7,8 +6,6 @@ import { apiConfig } from 'src/app/Const/api.config';
 import { APIResult } from 'src/app/Models/api.result.model';
 import { BaseService } from './base.service';
 import { Loginned } from 'src/app/Models/loginned.model';
-import { CryptService } from 'src/app/Helpers/crypt.service';
-import { NotificationService } from './notification.service';
 import { Service } from 'src/app/Interfaces/Service/service.interface';
 import { UserService } from './user.service';
 import { SyncRequestHeader } from 'ts-sync-request';
@@ -20,9 +17,7 @@ export class LoginService {
     private timerRefreshToken: number = null;
 
     constructor(private baseService: BaseService,
-                private crypt: CryptService,
-                private userService: UserService,
-                private notificationService: NotificationService) {
+                private userService: UserService) {
            
         this.ser = apiConfig["login"];
 

@@ -1,0 +1,23 @@
+<nav class="navBar">
+    <svg class="h-100 float-left" viewBox="0 0 20 18">
+        <text x="0" y="15" class="fill-white text-uppercase font-weight-slight" >sb</text>
+    </svg>
+    <input type="checkbox" id="chk" name="chk">
+    <label for="chk" class="show-menu-btn">
+        <img src="./../../../assets/img/menu.png" class="nav-img" alt="menu" />
+    </label>
+    <ul class="menu align-middle">
+        <li (click)="onClickMenuItem()" >
+            <a routerLink="./login" routerLinkActive="active" >sign In</a>
+        </li>
+        <li (click)="onClickMenuItem()" >
+            <a routerLink="./register" routerLinkActive="active" >register</a>
+        </li>
+        <li>
+            <label for="chk" class="hide-menu-btn">
+                <i class="fas fa-times"></i>
+            </label>
+        </li>
+    </ul>
+    <app-language-selector class="lang-selector" ></app-language-selector>
+</nav>

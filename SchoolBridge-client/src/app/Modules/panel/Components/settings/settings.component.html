@@ -1,0 +1,34 @@
+<div class="align-items-center container content clear-fix text-center">
+  
+    <h1 class="mb-5 mt-5 font-weight-light text-uppercase text-white">Profile Settings</h1>
+    <div class="row" style="height:100%">
+      <div class="col-md-3">
+        <div href=# class="d-inline"><img src="https://image.flaticon.com/icons/svg/236/236831.svg" width=130px
+            style="margin:0;"><br>
+          <p class="pl-2 mt-2"><a href="#" class="btn" style="color:#8f9096;font-weight:600">Edit Picture</a></p>
+        </div>
+      </div>
+      <div class="col-md-9 text-left">
+          <form class="def-form w-100" >
+            <div class="form-group">
+              <input formControlName="name" type="text" class="form-control rounded-pill form-control-lg" placeholder="Name">
+            </div>
+            <div class="form-group">
+              <input formControlName="email" type="text" class="form-control rounded-pill form-control-lg" placeholder="Email">
+            </div>
+            <div class="form-group ">
+              <input formControlName="birthday" type="date" class="form-control rounded-pill form-control-lg" placeholder="Birthday">
+            </div>
+            <div class="row mt-5">
+              <div class="col mt-1">
+                <button type="button" class="btn rounded-pill btn-lg btn-custom btn-block text-uppercase">Save Changes</button>
+              </div>
+              <div class="col mt-1">
+                <button routerLink="../" type="button"
+                  class="btn rounded-pill btn-lg btn-custom btn-block text-uppercase btn-cancel">Cancel</button>
+              </div>
+            </div>
+          </form>
+      </div>
+    </div>
+</div>

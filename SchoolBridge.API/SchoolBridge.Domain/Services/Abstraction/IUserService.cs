@@ -19,6 +19,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
         bool IsIssetByEmail(string email);
         bool IsIssetByLogin(string login);
 
+        void SetPassword(User user, string password);
+
         Task<User> GetAsync(string Id);
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByLoginAsync(string login);
@@ -31,10 +33,12 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Task<bool> IsIssetByEmailAsync(string email);
         Task<bool> IsIssetByLoginAsync(string login);
 
-        Task<User> Add(User user, IEnumerable<Panel> noPanels = null, IEnumerable<Permission> noPermissions = null);
-        Task<User> Add(User user, string role, IEnumerable<Panel> noPanels = null, IEnumerable<Permission> noPermissions = null);
-        
-        Task Remove(User user);
-        Task Block(User ovner, User user, string comment, DateTime unblockDate);
+        Task<User> AddAsync(User user, IEnumerable<Permission> noPermissions = null);
+        Task<User> AddAsync(User user, string role, IEnumerable<Permission> noPermissions = null);
+
+        Task SetPasswordAsync(User user, string password);
+
+        Task RemoveAsync(User user);
+        Task BlockAsync(User ovner, User user, string comment, DateTime unblockDate);
     }
 }

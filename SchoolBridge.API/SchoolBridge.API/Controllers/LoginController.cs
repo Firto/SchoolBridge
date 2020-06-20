@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SchoolBridge.Helpers.DtoModels;
 using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Helpers.DtoModels.Authefication;
+using SchoolBridge.API.Controllers.Attributes.Validation;
 
 namespace GreenP.API.Controllers
 {

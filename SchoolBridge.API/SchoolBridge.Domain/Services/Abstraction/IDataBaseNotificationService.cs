@@ -11,6 +11,9 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Task Notify(AUser usr, string type, IDataBaseNotificationSourse sourse);
         Task Notify(AUser usr, string tokenId, string type, IDataBaseNotificationSourse sourse);
         Task Notify(AUser[] usrs, string type, IDataBaseNotificationSourse sourse);
+        Task NotifyNoBase(AUser usr, string type, IDataBaseNotificationSourse sourse);
+        Task NotifyNoBase(AUser usr, string tokenId, string type, IDataBaseNotificationSourse sourse);
+        Task NotifyNoBase(AUser[] usrs, string type, IDataBaseNotificationSourse sourse);
         Task Read(AUser usr, string last);
         Task<IEnumerable<DataBaseSourse>> Get(AUser usr, string last, int count = 20);
         Task<IEnumerable<DataBaseSourse>> GetAndRead(AUser usr, string last, int count = 20);

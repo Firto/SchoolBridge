@@ -15,6 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using SchoolBridge.Helpers.DtoModels.Authefication;
 using SchoolBridge.Helpers.AddtionalClases.NotificationService;
+using System;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
@@ -44,36 +45,22 @@ namespace SchoolBridge.Domain.Services.Implementation
             if (!clientErrorManager.IsIssetErrors("Login"))
             {
                 clientErrorManager.AddErrors(new ClientErrors("Login", new Dictionary<string, ClientError>(){
+                    {"l-user-banned", new ClientError("User banned!")},
                     {"l-pass-log-inc", new ClientError("Incorrect login or password!")},
                     {"l-too-many-devices", new ClientError("Too many devices logged!")}
                 }));
-
-                validatingService.AddValidateFunc<LoginDto>((IValidatingService ser, object obj) => {
-                    IDictionary<string, string> valid = new Dictionary<string, string>();
-                    LoginDto entity = (LoginDto)obj;
-
-                    if (string.IsNullOrEmpty(entity.Login))
-                        valid.Add(nameof(entity.Login), "Please input login!");
-                    if (string.IsNullOrEmpty(entity.Password))
-                        valid.Add(nameof(entity.Password), "Please input password!");
-
-                    return valid;
-                });
             }
         }
 
         public async Task<LoggedDto> Login(User user, string uuid) {
-            await _dataBaseNotificationService.Notify(user, "onLogin", new MessageNotificationSource { Message = "Login from another device!" });
+            await _dataBaseNotificationService.NotifyNoBase(user, "onLogin", new MessageNotificationSource { Message = "Login from another device!" });
             var dto = new LoggedDto
             {
                 Tokens = await _tokenService.Login(user, uuid),
-                Panels = user.Panels.Select(x => x.Panel.Name),
                 Permissions = user.Permissions.Select(x => x.Permission.Name),
-                Role = user.Role.Name
+                Role = user.Role.Name,
+                CountUnreadNotifications = await _dataBaseNotificationService.GetCountUnread(user)
             };
-            if (user.Notifications == null)
-                dto.Notifications = await _dataBaseNotificationService.Get(user, null);
-            else dto.Notifications = _mapper.Map<IEnumerable<Notification<User>>, IEnumerable<DataBaseSourse>>(user.Notifications.OrderByDescending((x) => x.Date).Take(20).ToArray());
             return dto;
         }
 
@@ -82,6 +69,8 @@ namespace SchoolBridge.Domain.Services.Implementation
             var user = _userService.GetAllByLogin(entity.Login);
             if (user == null || !PasswordHandler.Validate(entity.Password, user.PasswordHash))
                 throw new ClientException("l-pass-log-inc");
+            else if (user.Banned != null)
+                throw new ClientException("l-user-banned", user.Banned);
             else if (_tokenService.CountLoggedDevices(user) > 10)
                 throw new ClientException("l-too-many-devices");
 
@@ -96,5 +85,15 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task LogoutAll(IHeaderDictionary headers)
             => await _tokenService.DeactivateAllTokens(headers);
+
+        public Task ChangePasswordEmail(string email)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<LoggedDto> EndChangePasswordEmail(EndChangePasswordEmailDto entity)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
