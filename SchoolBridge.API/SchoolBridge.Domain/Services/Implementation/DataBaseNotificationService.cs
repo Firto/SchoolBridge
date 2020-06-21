@@ -36,8 +36,8 @@ namespace SchoolBridge.Domain.Services.Implementation
             _jsonSerializerSettings = new JsonSerializerSettings();
             _jsonSerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
-            if (!clientErrorManager.IsIssetErrors("Notification"))
-                clientErrorManager.AddErrors(new ClientErrors("Notification",
+            if (!clientErrorManager.IsIssetErrors("DataBaseNotification"))
+                clientErrorManager.AddErrors(new ClientErrors("DataBaseNotification",
                     new Dictionary<string, ClientError>
                     {
                         {"inc-ntf-id", new ClientError("Incorrect notification id!")}
@@ -87,16 +87,52 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Type = type
             };
             var outTemplate = _mapper.Map<Notification<AUser>, DataBaseSourse>(template);
-            var notifications = new Notification<AUser>[usrs.Length];
-            for (int i = 0; i < usrs.Length; i++)
+            Notification<AUser> temp;
+            var notifications = usrs.Select(x =>
             {
-                notifications[i] = (Notification<AUser>)template.Clone();
-                notifications[i].User = usrs[i];
-                notifications[i].UserId = usrs[i].Id;
-            }
+                temp = (Notification<AUser>)template.Clone();
+                temp.User = x;
+                temp.UserId = x.Id;
+                return temp;
+            });
             (await _notificationGR.CreateAsync(notifications)).ForEach(async (x) =>
                     await _notificationService.Notify(x.User, "dataBase", outTemplate)
             );
+        }
+
+        public async Task NotifyNoBase(AUser usr, string type, IDataBaseNotificationSourse sourse)
+        {
+            await _notificationService.Notify(usr, "dataBase",
+                new DataBaseSourse
+                {
+                    Date = DateTime.Now,
+                    Base64Sourse = ObjectToBase64String(sourse),
+                    Type = type
+                }
+            );
+        }
+
+        public async Task NotifyNoBase(AUser usr, string tokenId, string type, IDataBaseNotificationSourse sourse)
+        {
+            await _notificationService.Notify(usr, tokenId, "dataBase", 
+                new DataBaseSourse
+                {
+                    Date = DateTime.Now,
+                    Base64Sourse = ObjectToBase64String(sourse),
+                    Type = type
+                }
+            );
+        }
+
+        public async Task NotifyNoBase(AUser[] usrs, string type, IDataBaseNotificationSourse sourse)
+        {
+            var template = new DataBaseSourse
+            {
+                Date = DateTime.Now,
+                Base64Sourse = ObjectToBase64String(sourse),
+                Type = type
+            };
+            await _notificationService.Notify(usrs, "dataBase", template);
         }
 
         public async Task<IEnumerable<DataBaseSourse>> Get(AUser usr, string last, int count = 20)

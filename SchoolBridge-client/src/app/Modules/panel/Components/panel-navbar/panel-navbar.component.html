@@ -1,0 +1,29 @@
+<nav class="navBar">
+    <svg class="h-100" viewBox="0 0 20 18">
+        <text x="0" y="15" class="fill-white text-uppercase font-weight-slight" >sb</text>
+    </svg>
+    <input type="checkbox" id="chkk" name="chkk">
+    <label for="chkk" class="show-menu-btn">
+        <img src="./../../../assets/img/menu.png" class="nav-img" alt="menu" />
+    </label>
+    <ul class="menu align-middle">
+        <li (click)="onClickMenuItem()" >
+            <a routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" >panels</a>
+        </li>
+        <li (click)="onClickMenuItem()" >
+            <a routerLink="./settings" routerLinkActive="active" >settings</a>
+        </li>
+        <li (click)="onClickMenuItem()" >
+            <a class="cancel" (click)="logout()" >logout</a>
+        </li>
+        <li>
+            <app-language-selector ></app-language-selector>
+        </li>
+        <li >
+            <label for="chkk" class="hide-menu-btn">
+                <i class="fas fa-times"></i>
+            </label>
+        </li>
+    </ul>
+    <set-db-notifications dbNotifications></set-db-notifications>
+</nav>

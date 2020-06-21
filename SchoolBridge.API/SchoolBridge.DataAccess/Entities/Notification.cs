@@ -11,8 +11,11 @@ namespace SchoolBridge.DataAccess.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
         public string Type { get; set; }
+        [Required]
         public DateTime Date { get; set; }
+        [Required]
         public string Base64Sourse { get; set; }
+        [Required]
         public bool Read { get; set; } = false;
 
         [ForeignKey("User")]

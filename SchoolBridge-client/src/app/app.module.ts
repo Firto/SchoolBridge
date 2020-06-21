@@ -1,28 +1,56 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import {  HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HomeComponent } from './Components/home/home.component';
-import { NavbarComponent } from './Components/navbar/navbar.component';
-import { LoginComponent } from './Components/login/login.component';
-import { RegisterComponent } from './Components/register/register.component';
-import { EmailRegisterComponent } from './Components/email-register/email-register.component';
+import { BasicAuthInterceptor } from './Intercepors/basic-auth.interceptor';
+import { LoaderComponent } from './Components/loader/loader.component';
+import { LoaderInterceptor } from './Intercepors/loader.interceptor';
+import { SyncRequestService } from 'ts-sync-request/dist'
+import { ErrorInterceptor } from './Intercepors/user-error.interceptor';
+import { NotificationService } from './Modules/notification/Services/notification.service';
+import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
+import { UserService } from './Services/user.service';
+import { LoginService } from './Services/login.service';
+import { LoaderService } from './Services/loader.service';
+import { DeviceUUIDService } from './Services/device-uuid.service';
+import { CryptService } from './Services/crypt.service';
+import { BaseService } from './Services/base.service';
+import { GlobalizationModule } from './Modules/globalization/globalization.module';
+import { NotificationModule } from './Modules/notification/notification.module';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    HomeComponent,
-    NavbarComponent,
-    LoginComponent,
-    RegisterComponent,
-    EmailRegisterComponent
-    ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule
+    AppComponent, 
+    LoaderComponent
   ],
-  providers: [],
+  imports: [
+    HttpClientModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    FormsModule,
+    ToastrModule.forRoot({ preventDuplicates: true, countDuplicates: true, resetTimeoutOnDuplicate: true }),
+    ToastContainerModule,
+  ],
+  providers: [
+    BaseService,
+    UserService,
+    LoginService,
+    LoaderService,
+    DeviceUUIDService,
+    SyncRequestService, 
+    CryptService,
+    GlobalizationModule,
+    NotificationModule,
+    { provide: HTTP_INTERCEPTORS, useClass: BasicAuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+

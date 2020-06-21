@@ -10,8 +10,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
     {
         int CountLoggedDevices(AUser user);
 
-        Task<LoggedDto> Login(AUser user, string uuid);
-        Task<LoggedDto> RefreshToken(string token, string uuid);
+        Task<LoggedTokensDto> Login(AUser user, string uuid);
+        Task<LoggedTokensDto> RefreshToken(string token, string uuid);
 
         AUser GetUser(string token);
         AUser GetUser(IHeaderDictionary headers);

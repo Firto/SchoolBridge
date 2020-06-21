@@ -1,0 +1,20 @@
+<div class="container-fluid p-3">
+    <div *ngIf="'GetAdminPanel' | userPerm" class="col-sm-4 col-12 p-0">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Admin Panel</h5>
+          <p class="card-text">Administrating panel</p>
+          <a routerLink="./admin" class="btn btn-primary text-white">Go</a>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="'GetPupilPanel' | userPerm" class="col-sm-4 col-12 p-0">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Pupil panel</h5>
+          <p class="card-text">Panel for pupils</p>
+          <a href="#" class="btn btn-primary">Go</a>
+        </div>
+      </div>
+    </div>
+</div>

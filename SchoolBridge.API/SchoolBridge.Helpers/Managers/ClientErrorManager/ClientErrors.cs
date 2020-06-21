@@ -59,7 +59,7 @@ namespace SchoolBridge.Helpers.Managers.CClientErrorManager
         public void AddErrors(ClientErrors errors)
             => _childLists.Add(errors);
 
-        public virtual ClientBaseErrorsInfoDto GetInfo()
+        public virtual ClientErrorsInfoDto GetInfo()
         {
             ClientErrorsInfoDto dto = new ClientErrorsInfoDto { Name = DictionaryName };
             if (_clientErrors.Count > 0)
@@ -70,7 +70,7 @@ namespace SchoolBridge.Helpers.Managers.CClientErrorManager
             }
             if (_childLists.Count > 0)
             {
-                var set = new List<ClientBaseErrorsInfoDto>();
+                var set = new List<ClientErrorsInfoDto>();
                 foreach (var item in _childLists)
                     set.Add(item.GetInfo());
                 dto.Dictionaries = set;

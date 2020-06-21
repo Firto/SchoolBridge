@@ -17,22 +17,23 @@ namespace SchoolBridge.Helpers.Managers.CClientErrorManager
             => GetErrorByID(Id) ?? _errors["inc-err"];
 
         private static ClientErrorDto MapClientError(ClientError error, object AdditionalInfo = null) {
+            var id = GetId(error);
             return AdditionalInfo == null ? new ClientErrorDto
             {
-                Id = GetId(error),
-                Message = error.Message
+                Id = id,
+                Message = $"[cl-{id}]"
             }:
             new ClientErrorDtoPlus
             {
-                Id = GetId(error),
-                Message = error.Message,
+                Id = id,
+                Message = $"[cl-{id}]",
                 AdditionalInfo = AdditionalInfo
             };
         }
 
-        public override ClientBaseErrorsInfoDto GetInfo()
+        public override ClientErrorsInfoDto GetInfo()
         {
-            ClientBaseErrorsInfoDto dto = new ClientBaseErrorsInfoDto();
+            ClientErrorsInfoDto dto = new ClientErrorsInfoDto();
             if (_clientErrors.Count > 0)
             {
                 dto.Errors = new Dictionary<string, ClientErrorInfoDto>();
@@ -41,7 +42,7 @@ namespace SchoolBridge.Helpers.Managers.CClientErrorManager
             }
             if (_childLists.Count > 0)
             {
-                var set = new List<ClientBaseErrorsInfoDto>();
+                var set = new List<ClientErrorsInfoDto>();
                 foreach (var item in _childLists)
                     set.Add(item.GetInfo());
                 dto.Dictionaries = set;

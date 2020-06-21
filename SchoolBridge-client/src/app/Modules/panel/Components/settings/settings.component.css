@@ -1,0 +1,14 @@
+.btn-cancel {
+	background: #ff7474;
+	border-color:#ff7474;
+  }
+.btn-cancel:focus,
+  .btn-cancel:hover,
+  .btn-cancel:active,
+  .btn-cancel:active:focus {
+	background: #ff3232;
+	border-color: #ff3232;
+}
+  .btn-cancel:focus{
+	box-shadow: 0 0 0 0.2rem #ff3232;
+  }

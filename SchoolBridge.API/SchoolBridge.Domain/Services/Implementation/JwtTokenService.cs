@@ -121,7 +121,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             if (tkn == null)
                 throw new ClientException("inc-token");
 
-            _activeRefreshTokensGR.DeleteAsync((x) => x.UserId == tkn.UserId);
+            await _activeRefreshTokensGR.DeleteAsync((x) => x.UserId == tkn.UserId);
         }
 
         public async Task DeactivateAllTokens(IHeaderDictionary headers)
@@ -137,7 +137,7 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         // base methods
 
-        public async Task<LoggedDto> RefreshToken(string token, string uuid)
+        public async Task<LoggedTokensDto> RefreshToken(string token, string uuid)
         {
             JwtSecurityToken to = ValidateRefreshToken(token);
             ActiveRefreshToken<AUser> activeJwtRefreshToken = _activeRefreshTokensGR.GetAllInclude((x) => x.Jti == to.Id, (s) => s.User).FirstOrDefault();
@@ -152,7 +152,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             return await Login(activeJwtRefreshToken.User, activeJwtRefreshToken.UUID);
         }
 
-        public async Task<LoggedDto> Login(AUser user, string uuid) {
+        public async Task<LoggedTokensDto> Login(AUser user, string uuid) {
             var refreshExpires = DateTime.Now.Add(_configuration.RefreshTokenExpires);
             var expires = DateTime.Now.Add(_configuration.TokenExpires);
 
@@ -184,7 +184,7 @@ namespace SchoolBridge.Domain.Services.Implementation
 
             await _activeRefreshTokensGR.DeleteAsync((x) => x.UUID == uuid && x.UserId == user.Id);
             await _activeRefreshTokensGR.CreateAsync(new ActiveRefreshToken<AUser> { Jti = jti, UUID = uuid, User = user, Expire = refreshExpires });
-            return new LoggedDto { RefreshToken = _configuration.TokenHandler.WriteToken(refreshToken), Token = _configuration.TokenHandler.WriteToken(token), Expires = expires.ToUnixTimestamp() };
+            return new LoggedTokensDto { RefreshToken = _configuration.TokenHandler.WriteToken(refreshToken), Token = _configuration.TokenHandler.WriteToken(token), Expires = expires.ToUnixTimestamp() };
         }
 
         public AUser GetUser(string token)

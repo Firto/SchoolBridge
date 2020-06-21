@@ -4,14 +4,19 @@ namespace SchoolBridge.Helpers.Managers.CClientErrorManager
 {
     public class ClientError
     {
-        public string Message { get; private set; }
-        public ClientError(string Message) => this.Message = Message;
+        public string[] StringArguments { get; private set; }
+        public string Description { get; private set; }
+        public ClientError(string description, params string[] arguments)
+        {
+            Description = description;
+            StringArguments = arguments;
+        }
 
         public ClientErrorInfoDto GetInfo()
         {
             return new ClientErrorInfoDto
             {
-                Message = Message
+                Description = Description
             };
         }
     }

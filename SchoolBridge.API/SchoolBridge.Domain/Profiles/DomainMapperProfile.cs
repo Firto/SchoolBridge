@@ -13,8 +13,6 @@ namespace SchoolBridge.Domain.Profiles
                 {
                     Login = t.Login,
                     Email = t.Email,
-                    EmailConfirmed = t.EmailConfirmed,
-                    Photo = t.PhotoId != null ? t.PhotoId : null
                 }
             );
 

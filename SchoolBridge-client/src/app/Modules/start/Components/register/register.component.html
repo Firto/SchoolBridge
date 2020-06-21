@@ -1,0 +1,34 @@
+<div (keyup.enter)="register()" class="d-flex justify-content-center align-items-center login-container">
+    <form class="login-form text-center" [formGroup]="registerForm">
+        <h1 class="mb-5 font-weight-light text-uppercase">End registration</h1>
+        <div class="form-group">
+            <input [(ngModel)]="model.login" formControlName="login" type="text" class="form-control rounded-pill form-control-lg" placeholder="Login">
+            <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.login.getError("err")}}</p>
+        </div>
+        <div class="form-group">
+            <input [(ngModel)]="model.name" formControlName="name" type="text" class="form-control rounded-pill form-control-lg" placeholder="Name">
+            <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.name.getError("err")}}</p>
+        </div>
+        <div class="form-group">
+            <input [(ngModel)]="model.surname" formControlName="surname" type="text" class="form-control rounded-pill form-control-lg" placeholder="Surname">
+            <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.surname.getError("err")}}</p>
+        </div>
+        <div class="form-group">
+            <input [(ngModel)]="model.lastname" formControlName="lastname" type="text" class="form-control rounded-pill form-control-lg" placeholder="Lastname">
+            <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.lastname.getError("err")}}</p>
+        </div>
+        <div class="form-group">
+            <input [(ngModel)]="model.birthday" formControlName="birthday" type="password" class="form-control rounded-pill form-control-lg" placeholder="Birthday">
+            <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.birthday.getError("err")}}</p>
+        </div>
+        <div class="form-group">
+            <input [(ngModel)]="model.password" formControlName="password" type="password" class="form-control rounded-pill form-control-lg" placeholder="Password">
+            <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.password.getError("err")}}</p>
+        </div>
+        <div class="form-group">
+            <input [(ngModel)]="model.confirmPassword" formControlName="confirmPassword" type="password" class="form-control rounded-pill form-control-lg" placeholder="Confirm password">
+            <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.confirmPassword.getError("err")}}</p>
+        </div>
+        <button (click)="register()" type="submit" class="btn-reg btn mt-5 rounded-pill btn-lg btn-custom btn-block text-uppercase">End register</button>
+    </form>
+</div>

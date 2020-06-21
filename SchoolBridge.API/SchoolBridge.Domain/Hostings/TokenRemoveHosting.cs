@@ -36,6 +36,7 @@ namespace SchoolBridge.Domain.Hostings
             using (var scope = _serviceProvider.CreateScope()) {
                 DbContext _db = scope.ServiceProvider.GetRequiredService<DbContext>();
                 _db.Set<ActiveRefreshToken<AUser>>().RemoveRange(_db.Set<ActiveRefreshToken<AUser>>().Where((x) => x.Expire < DateTime.Now));
+                _db.SaveChanges();
             }
         }
 

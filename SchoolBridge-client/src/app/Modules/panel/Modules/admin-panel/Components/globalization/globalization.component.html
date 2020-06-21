@@ -1,0 +1,58 @@
+<div class=".container-fluid rounded bg-light p-0" >
+    <ul class="nav nav-tabs " id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="languages-tab" data-toggle="tab" href="#languages" role="tab" aria-controls="languages" aria-selected="true">
+                Languages
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="strings-tab" data-toggle="tab" href="#strings" role="tab" aria-controls="strings" aria-selected="false">
+                Profile
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="languages" role="tabpanel" aria-labelledby="languages-tab">
+            <div *ngIf="'CreateLanguage' | userPerm" class="p-3" >
+                <button id="add-lang-btn" class="btn btn-primary rounded-pill mb-3 " 
+                    data-toggle="collapse" 
+                    href="#cllps-add-lang" 
+                    type="button" 
+                    aria-expanded="false" 
+                    aria-controls="cllps-add-lang">
+                    Add language
+                </button>
+                <div class="collapse" id="cllps-add-lang">
+                    <form class="def-form w-100" [formGroup]="addForm" >
+                        <div class="form-group">
+                            <input formControlName="abbName" type="text" class="form-control rounded-pill form-control-lg text-lowercase" placeholder="Abbrivature name">
+                            <p class="text-danger font-weight-bold text-center" >{{addForm.controls.abbName.getError("err")}}</p>
+                        </div>
+                        <div class="form-group">
+                            <input formControlName="fullName" type="text" class="form-control rounded-pill form-control-lg" placeholder="Full name">
+                            <p class="text-danger font-weight-bold text-center" >{{addForm.controls.fullName.getError("err")}}</p>
+                        </div>
+                        <button (click)="addLanguage()" class="btn mt-5 rounded-pill btn-lg btn-custom btn-block text-uppercase">Submit</button>
+                    </form>
+                </div>
+            </div>
+            <table *ngIf="'GetLanguage' | userPerm" class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Tag</th>
+                    <th scope="col">Name</th>
+                    <th *ngIf="'RemoveLanguage' | userPerm" scope="col">Remove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of (globalizationService.info | async).awaibleLanguages | keyvalue;" >
+                    <th class="text-uppercase" scope="row">{{item.key}}</th>
+                    <td>{{item.value}}</td>
+                    <td *ngIf="'RemoveLanguage' | userPerm" ><button class="btn btn-danger rounded-circle" title="{{item.key}}" (click)="removeLanguage($event)" >X</button></td>
+                  </tr>
+            </table>
+            
+        </div>
+        <div class="tab-pane fade" id="strings" role="tabpanel" aria-labelledby="strings-tab">...</div>
+    </div>
+</div>

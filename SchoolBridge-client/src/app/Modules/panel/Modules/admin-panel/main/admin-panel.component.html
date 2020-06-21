@@ -1,0 +1,23 @@
+<div class="wrapper">
+    <!-- Sidebar  -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3>Admin Panel</h3>
+            <strong>AP</strong>
+        </div>
+        <ul class="list-unstyled components">
+            <li *ngIf="'GetGlobalizationTab' | userPerm" >
+                <a routerLink="./globalization" routerLinkActive="router-link-active">
+                    <i class="fas fa-globe"></i>
+                    Globalization
+                </a>
+            </li>
+        </ul>
+
+    </nav>
+
+    <!-- Page Content  -->
+    <div id="content" class="w-100 px-3">
+        <router-outlet ></router-outlet>
+    </div>
+</div>
