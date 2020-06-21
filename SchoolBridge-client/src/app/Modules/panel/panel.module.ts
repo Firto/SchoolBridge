@@ -9,6 +9,7 @@ import { PanelRoutingModule } from './panel-routing.module';
 import { SelectPanelComponent } from './Components/select-panel/select-panel.component';
 import { SettingsComponent } from './Components/settings/settings.component';
 import { GlobalizationModule } from '../globalization/globalization.module';
+import { ProfileService } from './Services/profile.service';
 
 @NgModule({
     declarations: [
@@ -27,7 +28,7 @@ import { GlobalizationModule } from '../globalization/globalization.module';
         GlobalizationModule
     ],
     providers: [
-        
+        ProfileService
     ],
     exports: [
         PanelComponent

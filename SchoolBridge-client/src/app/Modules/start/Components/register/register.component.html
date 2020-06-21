@@ -18,7 +18,7 @@
             <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.lastname.getError("err")}}</p>
         </div>
         <div class="form-group">
-            <input [(ngModel)]="model.birthday" formControlName="birthday" type="password" class="form-control rounded-pill form-control-lg" placeholder="Birthday">
+            <input [(ngModel)]="model.birthday" formControlName="birthday" type="Date" class="form-control rounded-pill form-control-lg" placeholder="Birthday">
             <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.birthday.getError("err")}}</p>
         </div>
         <div class="form-group">

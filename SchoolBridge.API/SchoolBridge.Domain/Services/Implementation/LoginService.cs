@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 using SchoolBridge.Helpers.DtoModels.Authefication;
 using SchoolBridge.Helpers.AddtionalClases.NotificationService;
 using System;
+using Microsoft.Extensions.DependencyInjection;
+using SchoolBridge.Helpers.AddtionalClases.ValidatingService;
+using SchoolBridge.Domain.Services.Configuration;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
@@ -34,7 +37,8 @@ namespace SchoolBridge.Domain.Services.Implementation
                                 IDataBaseNotificationService<User> dataBaseNotificationService,
                                 IImageService imageService,
                                 IValidatingService validatingService,
-                                IMapper mapper)
+                                IMapper mapper,
+                                RegistrationServiceConfiguration configuration)
         {
             _userService = userService;
             _tokenService = tokenService;
@@ -49,6 +53,59 @@ namespace SchoolBridge.Domain.Services.Implementation
                     {"l-pass-log-inc", new ClientError("Incorrect login or password!")},
                     {"l-too-many-devices", new ClientError("Too many devices logged!")}
                 }));
+
+                validatingService.AddValidateFunc("date-birthday", (DateTime? prop, PropValidateContext context) => {
+                    if (prop == null) return;
+
+                    if (prop.Value == null || prop.Value > DateTime.Now)
+                        context.Valid.Add($"[r-date-birthday-incorrect]");
+                });
+
+                validatingService.AddValidateFunc("str-email-reg-no", (string prop, PropValidateContext context) => {
+                    if (prop == null) return;
+
+                    if (context.SeriviceProvider.GetService<IUserService>().IsIssetByEmail(prop))
+                        context.Valid.Add($"[r-email-reg]"); // "User with this email is already registered!"
+                });
+
+                validatingService.AddValidateFunc("str-login", (string prop, PropValidateContext ctx) => {
+                    if (prop == null) return;
+
+                    if (prop.Length > configuration.MaxCountCharsLogin)
+                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {configuration.MaxCountCharsLogin}]"); // "Too long login(max {_configuration.MaxCountCharsLogin} characters)!"
+                    if (!Regex.Match(prop, "^[a-zA-Z_0-9]*$").Success)
+                        ctx.Valid.Add($"[str-no-spc-ch, [pn-{ctx.PropName}]]"); // "Login musn't have specials chars!"
+                });
+
+                validatingService.AddValidateFunc("str-creds", (string prop, PropValidateContext ctx) => {
+                    if (prop == null) return;
+
+                    if (prop.Length > configuration.MaxCountCharsName)
+                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {255}]");
+                    if (!Regex.Match(prop, "^[а-яА-ЯҐґЄєІіЇї]+$").Success)
+                        ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Name musn't have specials chars!"
+                });
+
+                validatingService.AddValidateFunc("str-password", (string prop, PropValidateContext ctx) => {
+                    if (prop == null) return;
+
+                    if (prop.Length > configuration.MaxCountCharsPassword)
+                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {configuration.MaxCountCharsPassword}]");//$"Too long password(max{} characters)!"
+                    if (prop.Length < configuration.MinCountCharsPassword)
+                        ctx.Valid.Add($"[str-too-sh, [pn-{ctx.PropName}], {configuration.MaxCountCharsPassword}]");//$"Password must have {_configuration.MinCountCharsPassword} and more chars!
+                    if (!prop.Any(c => char.IsDigit(c)))
+                        ctx.Valid.Add($"[str-no-dig, [pn-{ctx.PropName}]]");//$"Password must have minimum one digit!"
+                });
+
+                validatingService.AddValidateFunc("str-password-rep", (string prop, PropValidateContext ctx) => {
+                    if (prop == null || ctx.TypeDto.GetProperty("Password") == null ||
+                                        ctx.TypeDto.GetProperty("Password").GetValue(ctx.Dto) == null) return;
+
+
+                    if (prop != (string)ctx.TypeDto.GetProperty("Password").GetValue(ctx.Dto))
+                        ctx.Valid.Add($"[str-inc-rep, [pn-{ctx.PropName}]]"); //$"Incorrect repeat password!"
+
+                });
             }
         }
 

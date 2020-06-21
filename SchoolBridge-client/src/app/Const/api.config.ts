@@ -77,5 +77,18 @@ export const apiConfig: Record<string, Service> = {
                 type: "GET"
             }
         }
+    },
+    "profile":{
+        url: "profile/",
+        methods: {
+            "info": {
+                url: "info",
+                type: "GET"
+            },
+            "change-login": {
+                url: "changeLogin",
+                type: "POST"
+            }
+        }
     }
 };

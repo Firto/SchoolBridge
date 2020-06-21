@@ -71,10 +71,6 @@ export class DbNotificationService {
                 this._countUnreadNtfs.next(x.login.countUnreadNotifications);
             }
         });*/
-
-        this._countUnreadNtfs.subscribe(x => console.log(x));
-
-
     }
 
     public readedNtfs(){
