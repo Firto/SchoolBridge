@@ -106,6 +106,14 @@ namespace SchoolBridge.Domain.Services.Implementation
                         ctx.Valid.Add($"[str-inc-rep, [pn-{ctx.PropName}]]"); //$"Incorrect repeat password!"
 
                 });
+
+                validatingService.AddValidateFunc("str-email", (string prop, PropValidateContext context) =>
+                {
+                    if (prop == null) return;
+
+                    if (!Regex.IsMatch(prop, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
+                        context.Valid.Add($"[v-str-email, [pn-{context.PropName}]]");
+                });
             }
         }
 

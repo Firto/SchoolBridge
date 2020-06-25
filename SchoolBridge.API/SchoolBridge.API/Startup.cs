@@ -110,25 +110,12 @@ namespace SchoolBridge.API
                 DefaultSendFrom = _emailServiceConfiguration["DefaultSendFrom"],
             });
 
-            services.UseRegistrationService(new RegistrationServiceConfiguration {
-                RegistrationTokenValidation = new TokenValidationParameters
-                {
-                    ValidateLifetime = true,
-                    ValidateAudience = false,
-                    ValidateIssuer = true,
-                    ValidIssuer = _jwtConfiguration["Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_registrationServiceConfiguration["RegistrationKey"])),
-                    ClockSkew = TimeSpan.Zero
-                },
-                RegistrationTokenExpires = TimeSpan.FromDays(int.Parse(_registrationServiceConfiguration["RegistrationExpireDays"]))
-            });
 
             services.AddSingleton(new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new DomainMapperProfile());
             }).CreateMapper());
 
-            services.AddSingleton(new LanguageStringServiceConfiguration { DefaultLanguage = "en" });
 
             services.AddScoped<IValidatingService, ValidatingService>();
 
@@ -141,9 +128,24 @@ namespace SchoolBridge.API
             services.AddScoped<IPermissionService, PermissionService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRegistrationService, RegistrationService>();
-
             services.AddScoped<ILoginService, LoginService>();
 
+            services.UseSubjectService(new SubjectServiceConfiguration());
+            services.UseLoginService(new RegistrationServiceConfiguration
+            {
+                RegistrationTokenValidation = new TokenValidationParameters
+                {
+                    ValidateLifetime = true,
+                    ValidateAudience = false,
+                    ValidateIssuer = true,
+                    ValidIssuer = _jwtConfiguration["Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_registrationServiceConfiguration["RegistrationKey"])),
+                    ClockSkew = TimeSpan.Zero
+                },
+                RegistrationTokenExpires = TimeSpan.FromDays(int.Parse(_registrationServiceConfiguration["RegistrationExpireDays"]))
+            });
+            services.UseLanguageStringService(new LanguageStringServiceConfiguration());
+            services.UseLanguageStringService(new LanguageStringServiceConfiguration { DefaultLanguage = "en" });
             //SignalR
             services.AddSignalR().AddNewtonsoftJsonProtocol();
             services.AddControllers();

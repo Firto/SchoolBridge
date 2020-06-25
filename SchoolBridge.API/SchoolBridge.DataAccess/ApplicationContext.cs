@@ -23,6 +23,7 @@ namespace SchoolBridge.DataAccess
 
         public DbSet<File> Files { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<PupilSubject> PupilSubjects { get; set; }
 
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<DefaultRolePermission> DefaultRolePermissions { get; set; }
@@ -142,7 +143,14 @@ namespace SchoolBridge.DataAccess
 
                 new Permission { Id = 33, Name = "UpdateBaseUpdateId" },
                 new Permission { Id = 34, Name = "GetAdminPanel" },
-                new Permission { Id = 35, Name = "GetGlobalizationTab" }
+                new Permission { Id = 35, Name = "GetGlobalizationTab" },
+
+                //Diary
+                new Permission { Id = 36, Name = "CreateSubject" },
+                new Permission { Id = 37, Name = "UpdateSubject" },
+                new Permission { Id = 38, Name = "GetSubject" },
+                new Permission { Id = 39, Name = "RemoveSubject" }
+
             );
 
             modelBuilder.Entity<DefaultRolePermission>().HasData(
@@ -191,7 +199,10 @@ namespace SchoolBridge.DataAccess
                 new UserPermission { UserId = "admin", PermissionId = 32 },
                 new UserPermission { UserId = "admin", PermissionId = 33 },
                 new UserPermission { UserId = "admin", PermissionId = 34 },
-                new UserPermission { UserId = "admin", PermissionId = 35 }
+                new UserPermission { UserId = "admin", PermissionId = 35 },
+                new UserPermission { UserId = "admin", PermissionId = 36 },
+                new UserPermission { UserId = "admin", PermissionId = 37 },
+                new UserPermission { UserId = "admin", PermissionId = 38 }
             );
            
 
