@@ -1,4 +1,5 @@
 ﻿using SchoolBridge.DataAccess.Entities;
+using SchoolBridge.Helpers.DtoModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
         bool IsIssetByLogin(string login);
 
         void SetPassword(User user, string password);
+        void ChangeLogin(string Login, User user);
 
         Task<User> GetAsync(string Id);
         Task<User> GetByEmailAsync(string email);
@@ -37,6 +39,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Task<User> AddAsync(User user, string role, IEnumerable<Permission> noPermissions = null);
 
         Task SetPasswordAsync(User user, string password);
+        Task ChangeLoginAsync(string Login, User user);
+
 
         Task RemoveAsync(User user);
         Task BlockAsync(User ovner, User user, string comment, DateTime unblockDate);

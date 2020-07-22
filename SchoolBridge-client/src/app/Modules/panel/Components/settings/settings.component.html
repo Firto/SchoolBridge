@@ -9,19 +9,14 @@
         </div>
       </div>
       <div class="col-md-9 text-left">
-          <form class="def-form w-100" >
+          <form class="def-form w-100" [formGroup]="settingsForm">
             <div class="form-group">
-              <input formControlName="name" type="text" class="form-control rounded-pill form-control-lg" placeholder="Name">
-            </div>
-            <div class="form-group">
-              <input formControlName="email" type="text" class="form-control rounded-pill form-control-lg" placeholder="Email">
-            </div>
-            <div class="form-group ">
-              <input formControlName="birthday" type="date" class="form-control rounded-pill form-control-lg" placeholder="Birthday">
+              <input formControlName="login" type="text" class="form-control rounded-pill form-control-lg" placeholder="Login">
+              <p class="text-danger font-weight-bold text-center" >{{settingsForm.controls.login.getError("err")}}</p>
             </div>
             <div class="row mt-5">
               <div class="col mt-1">
-                <button type="button" class="btn rounded-pill btn-lg btn-custom btn-block text-uppercase">Save Changes</button>
+                <button type="button" (click)="changeLogin()" class="btn rounded-pill btn-lg btn-custom btn-block text-uppercase">Save Changes</button>
               </div>
               <div class="col mt-1">
                 <button routerLink="../" type="button"

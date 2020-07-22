@@ -17,7 +17,7 @@ namespace SchoolBridge.Helpers.DtoModels.Authefication
         [PropValid("str-input", "str-creds")]
         public string Lastname { get; set; }
         [PropValid("not-null", "date-birthday")]
-        public DateTime? Birtday { get; set; }
+        public DateTime? Birthday { get; set; }
         [PropValid("str-input", "str-password")]
         public string Password { get; set; }
         [PropValid("str-input", "str-password-rep")]

@@ -65,58 +65,7 @@ namespace SchoolBridge.Domain.Services.Implementation
 
                 // validation //  [PropValid("str-input", "str-email", "str-email-no-reg")]
 
-                validatingService.AddValidateFunc("date-birthday", (DateTime? prop, PropValidateContext context) => {
-                    if (prop == null) return;
-
-                    if (prop.Value == null || prop.Value > DateTime.Now)
-                        context.Valid.Add($"[r-date-birthday-incorrect]"); 
-                });
-
-                validatingService.AddValidateFunc("str-email-reg-no", (string prop, PropValidateContext context) => {
-                    if (prop == null) return;
-
-                    if (context.SeriviceProvider.GetService<IUserService>().IsIssetByEmail(prop))
-                        context.Valid.Add($"[r-email-reg]"); // "User with this email is already registered!"
-                });
-
-                validatingService.AddValidateFunc("str-login", (string prop, PropValidateContext ctx) => {
-                    if (prop == null) return;
-
-                    if (prop.Length > _configuration.MaxCountCharsLogin)
-                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {_configuration.MaxCountCharsLogin}]"); // "Too long login(max {_configuration.MaxCountCharsLogin} characters)!"
-                    if (!Regex.Match(prop, "^[a-zA-Z_0-9]*$").Success)
-                        ctx.Valid.Add($"[str-no-spc-ch, [pn-{ctx.PropName}]]"); // "Login musn't have specials chars!"
-                });
-
-                validatingService.AddValidateFunc("str-creds", (string prop, PropValidateContext ctx) => {
-                    if (prop == null) return;
-
-                    if (prop.Length > _configuration.MaxCountCharsName)
-                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {255}]");
-                    if (!Regex.Match(prop, "^[à-ÿÀ-ß¥´ªº²³¯¿]+$").Success)
-                        ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Name musn't have specials chars!"
-                });
-
-                validatingService.AddValidateFunc("str-password", (string prop, PropValidateContext ctx) => {
-                    if (prop == null) return;
-
-                    if (prop.Length > _configuration.MaxCountCharsPassword)
-                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {_configuration.MaxCountCharsPassword}]");//$"Too long password(max{} characters)!"
-                    if (prop.Length < _configuration.MinCountCharsPassword)
-                        ctx.Valid.Add($"[str-too-sh, [pn-{ctx.PropName}], {_configuration.MaxCountCharsPassword}]");//$"Password must have {_configuration.MinCountCharsPassword} and more chars!
-                    if (!prop.Any(c => char.IsDigit(c)))
-                        ctx.Valid.Add($"[str-no-dig, [pn-{ctx.PropName}]]");//$"Password must have minimum one digit!"
-                });
-
-                validatingService.AddValidateFunc("str-password-rep", (string prop, PropValidateContext ctx) => {
-                    if (prop == null || ctx.TypeDto.GetProperty("Password") == null ||
-                                        ctx.TypeDto.GetProperty("Password").GetValue(ctx.Dto) == null) return;
-
-
-                    if (prop != (string)ctx.TypeDto.GetProperty("Password").GetValue(ctx.Dto))
-                        ctx.Valid.Add($"[str-inc-rep, [pn-{ctx.PropName}]]"); //$"Incorrect repeat password!"
-          
-                });
+                
             }
         }
         public string CreateRegistrationToken(TimeSpan exp, string email, Role role, IEnumerable<Permission> noPermissions = null)
@@ -222,7 +171,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Name = entity.Name,
                 Surname = entity.Surname,
                 Lastname = entity.Lastname,
-                Birthday = entity.Birtday.Value,
+                Birthday = entity.Birthday.Value,
                 RoleId = int.Parse(token.Claims.First(x => x.Type == "role").Value),
                 PasswordHash = PasswordHandler.CreatePasswordHash(entity.Password)
             };

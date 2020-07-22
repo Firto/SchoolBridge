@@ -1,10 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace SchoolBridge.DataAccess.Migrations
 {
-    public partial class mm : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -24,7 +23,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     AbbName = table.Column<string>(nullable: false),
                     FullName = table.Column<string>(nullable: false)
                 },
@@ -38,7 +37,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -51,7 +50,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -64,7 +63,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -77,7 +76,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -366,7 +365,7 @@ namespace SchoolBridge.DataAccess.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Banned", "Birthday", "Email", "Lastname", "Login", "Name", "PasswordHash", "RoleId", "Surname" },
-                values: new object[] { "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@admin.admin", "Admin", "admin", "Admin", "7542ASJ1O5YXKDP987B8F3E798119380C6FBFA167EF357EB408402A3AED1C590B881C13E1AA5BCD0D4BCEB1EF4BF8291EFE3247D5A", 1, "Admin" });
+                values: new object[] { "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@admin.admin", "Admin", "admin", "Admin", "26ECBVYXG5LTG6S4F7DE7CE0EAAB506AF411CABC26BE20437F9E83957412E1E501A5AEF5A1A62F1CC6528EC4F013CF617FDBDAE076", 1, "Admin" });
 
             migrationBuilder.InsertData(
                 table: "UserPermissions",

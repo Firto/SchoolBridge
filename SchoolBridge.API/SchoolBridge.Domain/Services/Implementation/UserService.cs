@@ -2,6 +2,7 @@
 using SchoolBridge.DataAccess.Entities;
 using SchoolBridge.DataAccess.Interfaces;
 using SchoolBridge.Domain.Services.Abstraction;
+using SchoolBridge.Helpers.DtoModels;
 using SchoolBridge.Helpers.Extentions;
 using SchoolBridge.Helpers.Managers;
 using SchoolBridge.Helpers.Managers.CClientErrorManager;
@@ -218,6 +219,20 @@ namespace SchoolBridge.Domain.Services.Implementation
             if (user == null)
                 throw new ClientException("u-inc-user-id");
             user.PasswordHash = PasswordHandler.CreatePasswordHash(password);
+            await _userGR.UpdateAsync(user);
+        }
+
+        public void ChangeLogin(string Login, User user)
+        {
+            user = _userGR.Find(user.Id);
+            user.Login = Login;
+            _userGR.Update(user);
+        }
+
+        public async Task ChangeLoginAsync(string Login, User user)
+        {
+            user = await _userGR.FindAsync(user.Id);
+            user.Login = Login;
             await _userGR.UpdateAsync(user);
         }
     }
