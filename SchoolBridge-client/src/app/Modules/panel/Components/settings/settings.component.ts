@@ -21,11 +21,9 @@ export class SettingsComponent implements OnInit {
 
   changeLogin() {
     if (this.settingsForm.valid) {
-      this._profileService.changeLogin(this.settingsForm.controls.login.value).subscribe(res => {
-        if (!res.ok && res.result.id == "v-dto-invalid") {
-          for (const [key, value] of Object.entries(res.result.additionalInfo))
-            this.settingsForm.controls[key].setErrors({ "err": value });
-        }
+      this._profileService.changeLogin(this.settingsForm.controls.login.value).subscribe(res => {}, err => {
+        for (const [key, value] of Object.entries(err.additionalInfo))
+          this.settingsForm.controls[key].setErrors({ "err": value });
       });
     }}
 }

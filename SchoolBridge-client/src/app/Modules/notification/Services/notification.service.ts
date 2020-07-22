@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';  
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@aspnet/signalr';  
 import { environment } from 'src/environments/environment';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import { Notification } from 'src/app/Modules/notification/Models/notification.model'
 import { BaseService } from '../../../Services/base.service';
 import { apiConfig } from 'src/app/Const/api.config';
@@ -10,16 +10,15 @@ import { Service } from 'src/app/Interfaces/Service/service.interface';
   
 @Injectable({ providedIn: 'root' })  
 export class NotificationService {    
-  connectionEstablished:Subject<Boolean> = new Subject<Boolean>();
+  private _connectionEstablished:Subject<Boolean> = new Subject<Boolean>();
+  private _reciveNotification:Subject<Notification> = new Subject<Notification>(); 
 
-  reciveNotification:Subject<Notification> = new Subject<Notification>();  
+  public connectionEstablished:Observable<Boolean> = this._connectionEstablished.asObservable();
+  public reciveNotification:Observable<Notification> = this._reciveNotification.asObservable();  
   
   private _hubConnection: HubConnection;  
-  private ser: Service;
-  constructor(private baseService: BaseService,
-              public toastr: ToastrService) { 
-    this.ser = apiConfig["notification"];
-    
+ 
+  constructor(public toastr: ToastrService) { 
     this.createConnection();  
     this.registerOnServerEvents();
   }  
@@ -31,7 +30,7 @@ export class NotificationService {
   }  
   
   private reconnect(msec: number): void {
-    this.connectionEstablished.next(false); 
+    this._connectionEstablished.next(false); 
     console.log('Error while establishing connection, retrying...');  
     let t_func = () => this.startConnection();
     setTimeout(t_func, msec);
@@ -43,7 +42,7 @@ export class NotificationService {
       .start()  
       .then(() => {   
         console.log('Hub connection started');  
-        this.connectionEstablished.next(true);
+        this._connectionEstablished.next(true);
         if (f != null) f(); 
       })
       .catch(err => { 
@@ -57,7 +56,7 @@ export class NotificationService {
   private registerOnServerEvents(): void {  
     this._hubConnection.on('Notification', (data: any) => {
       console.log(data);
-      this.reciveNotification.next(data);
+      this._reciveNotification.next(data);
     }); 
   } 
 

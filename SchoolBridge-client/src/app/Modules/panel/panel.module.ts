@@ -20,7 +20,7 @@ import { ProfileService } from './Services/profile.service';
     ],
     imports: [
         CommonModule,
-        ReactiveFormsModule,
+        ReactiveFormsModule, 
         FormsModule,
         DbNotificationModule,
         UserPermissionModule,

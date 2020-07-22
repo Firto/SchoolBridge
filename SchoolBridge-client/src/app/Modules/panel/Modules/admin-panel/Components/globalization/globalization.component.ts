@@ -37,4 +37,8 @@ export class GlobalizationComponent {
     public removeLanguage(e: MouseEvent){
         this.globalizationService.removeLanguage((<any>e.target).title).subscribe();
     }
+    
+    public toggleEditingMode(){
+        this.globalizationService.setEditingState(!this.globalizationService.getEditingState());
+    }
 }

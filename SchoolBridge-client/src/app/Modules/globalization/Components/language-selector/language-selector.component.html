@@ -1,4 +1,4 @@
-<div class="dropdown d-inline">
+<div class="dropdown d-inline" *ngIf="(globalizationService.info | async) !== null">
     <button class="btn btn-primary btn-rounded dropdown-toggle rounded-pill text-uppercase" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       {{(globalizationService.info | async).currentLanguage}}
     </button>

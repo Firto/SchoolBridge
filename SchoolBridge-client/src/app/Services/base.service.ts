@@ -1,83 +1,92 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Service } from 'src/app/Interfaces/Service/service.interface';
-import { HttpClient, HttpHeaders, HttpParams, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpRequest } from '@angular/common/http';
 import { APIResult } from 'src/app/Models/api.result.model';
-import { Observable, Subject } from 'rxjs';
-import { SyncRequestService, SyncRequestHeader } from 'ts-sync-request';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { ConnectionService } from 'ng-connection-service';
+import { take } from 'rxjs/operators';
 
 export interface HttpOptions{
+    headers?: HttpHeaders;
+    reportProgress?: boolean;
+    params?: HttpParams;
+    responseType?: 'json' | 'arraybuffer' | 'blob' | 'text';
+    withCredentials?: boolean;
+}
+
+export interface HttpOptionsWide{
+    reportProgress?: boolean;
+    withCredentials?: boolean;
+    observe?: 'body';
+    responseType?: 'json';
     headers?: HttpHeaders | {
         [header: string]: string | string[];
     };
-    observe?: 'body';
     params?: HttpParams | {
         [param: string]: string | string[];
     };
-    reportProgress?: boolean;
-    responseType?: 'json';
-    withCredentials?: boolean;
 }
+
+
 
 @Injectable({ providedIn: 'root' })
 export class BaseService {
 
-    private most: Array<{obs: Subject<APIResult>, 
+    /*private most: Array<{obs: Subject<APIResult>, 
                         ser: Service, 
                         method:string,
                         body?:any, 
-                        options?: HttpOptions}> = new Array<{obs: Subject<APIResult>, ser: Service, method:string, body?:any, options?: HttpOptions}>();
+                        options?: HttpOptionsWide}> = new Array<{obs: Subject<APIResult>, ser: Service, method:string, body?:any, options?: HttpOptionsWide}>();
+*/
+    //private cnn: boolean = true;
 
-    private cnn: boolean = true;
+    private _state: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+    public state: Observable<boolean> = this._state.asObservable();
 
     constructor(private http: HttpClient,
-                private syncHttp: SyncRequestService,
                 private connectionService: ConnectionService) {
-        this.connectionService.monitor().subscribe((x) => {
+        /*this.connectionService.monitor().subscribe((x) => {
             this.cnn = x;
             if (x) this.most.forEach((s) => this.send(s.ser, s.method, s.body, s.options).subscribe((m) =>  s.obs.next(m)));
-        });
+        });*/
     }
 
-    send(ser: Service, method:string, body?:any, options?: HttpOptions): Observable<APIResult> {
-        if (this.cnn){
-            switch  (ser.methods[method].type){
-                case "POST":
-                    return this.post(ser, method, body, options);
-                case "GET":
-                    return this.get(ser, method, options);
-            }
+    setState(state: boolean) {
+        this._state.next(state);
+    }
+
+    getState(): boolean {
+        return this._state.value;
+    }
+
+    send<T>(ser: Service, method:string, body?:any, options?: HttpOptionsWide): Observable<T> {
+        //if (!this._state.value) return;
+        switch  (ser.methods[method].type){
+            case "POST":
+                return <Observable<T>>this.post(ser, method, body, options).pipe(take(1));
+            case "GET":
+                return <Observable<T>>this.get(ser, method, options).pipe(take(1));
+        }
+        /*if (this.cnn){
+           
         }
 
         const obs: Subject<APIResult> = new Subject<APIResult>()
         this.most.push({obs: obs, ser: ser, method:method, body:body, options: options});
-        return obs;
+        return <Observable<T>><unknown>obs;*/
     }
 
-    post(ser: Service, method:string, body?:any, options?: HttpOptions): Observable<APIResult> {
-        return this.http.post<APIResult>(environment.apiUrl+ser.url+ser.methods[method].url,body, options);
+    createRequest(ser: Service, method:string, body?:any, options?: HttpOptions){
+        return new HttpRequest<APIResult>(ser.methods[method].type, environment.apiUrl+ser.url+ser.methods[method].url, body, options);
     }
 
-    get(ser: Service, method:string, options?: HttpOptions): Observable<APIResult> {
+    post(ser: Service, method:string, body?:any, options?: HttpOptionsWide): Observable<APIResult> {
+        return this.http.post<APIResult>(environment.apiUrl+ser.url+ser.methods[method].url, body, options);
+    }
+
+    get(ser: Service, method:string, options?: HttpOptionsWide): Observable<APIResult> {
         return this.http.get<APIResult>(environment.apiUrl+ser.url+ser.methods[method].url, options);
-    }
-
-    sendSync(ser: Service, method:string, body?:any, headers?: SyncRequestHeader[]): APIResult {
-        switch  (ser.methods[method].type){
-            case "POST":
-                return this.postSync(ser, method, body, headers);
-            case "GET":
-                return this.getSync(ser, method, headers);
-        }
-    }
-
-    postSync(ser: Service, method:string, body?:any, headers?: SyncRequestHeader[]): APIResult {
-        return this.syncHttp.post<any, APIResult>(environment.apiUrl+ser.url+ser.methods[method].url, body, headers);
-    }
-
-    getSync(ser: Service, method:string, headers?: SyncRequestHeader[]): APIResult {
-        return this.syncHttp.get<APIResult>(environment.apiUrl+ser.url+ser.methods[method].url, headers);
     }
 
 }

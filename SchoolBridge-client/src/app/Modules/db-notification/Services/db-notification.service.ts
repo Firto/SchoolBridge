@@ -10,6 +10,7 @@ import { OnReadNtfSource } from '../Models/onreadntf-source';
 import { UserService } from 'src/app/Services/user.service';
 import { KeyedCollection } from 'src/app/Collections/keyed-collection';
 import { Guid } from 'guid-typescript';
+import { takeUntil, take } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class DbNotificationService {
@@ -28,6 +29,7 @@ export class DbNotificationService {
     constructor(private baseService: BaseService,
                 private userService: UserService,
                 private ntfService: NotificationService) {
+       
         this.ser = apiConfig["notification"];
 
         this.ntfService.reciveNotification.subscribe((data) => {
@@ -51,8 +53,7 @@ export class DbNotificationService {
             if (x){
                 this.notificationList.clear();
                 this.getCountUnread().subscribe(s => {
-                    if (s.ok)
-                        this._countUnreadNtfs.next(s.result);
+                    this._countUnreadNtfs.next(s);
                 });
             }
         });
@@ -88,18 +89,15 @@ export class DbNotificationService {
         const sub: Subject<boolean> = new Subject<boolean>();
         this.getn(this.getLastNtfId()).subscribe((data) => {
             let end: boolean = false;
-            if (data.ok) {
-                const res: DataBaseSource[] = <DataBaseSource[]>data.result;
-                if (res.length > 0) {
-                    res.forEach(baseSource => this.localAddNotifications(baseSource, false));
-                    if (res.length < 20)
-                    end = true;
-                }
-                else end = true;
+            if (data.length > 0) {
+                data.forEach(baseSource => this.localAddNotifications(baseSource, false));
+                if (data.length < 20)
+                end = true;
             }
+            else end = true;
             sub.next(end);
         });
-        return sub;
+        return sub.pipe(take(1));
     }
 
     public localAddNotifications(source: DataBaseSource, reverse: boolean = true){
@@ -119,20 +117,20 @@ export class DbNotificationService {
         return ntfs.length > 0 ? ntfs[ntfs.length-1].id : null;
     }    
 
-    public read(last: string = null): Observable<APIResult> {
+    public read(last: string = null): Observable<any> {
         
-        return last == null ? this.baseService.send(this.ser, "read") : this.baseService.send(this.ser, "read", null, { params: { last: last } });
+        return this.baseService.send<any>(this.ser, "read", null, { params: last == null ? null : {last: last} });
     }
 
-    public getn(last: string = null): Observable<APIResult> {
-        return last == null ? this.baseService.send(this.ser, "get") : this.baseService.send(this.ser, "get", null, { params: { last: last } });
+    public getn(last: string = null): Observable<DataBaseSource[]> {
+        return this.baseService.send<DataBaseSource[]>(this.ser, "get", null, { params: last == null ? null : {last: last} })
     }
 
-    public getAndRead(last: string = null): Observable<APIResult> {
-        return last == null ? this.baseService.send(this.ser, "getandread") : this.baseService.send(this.ser, "getandread", null, { params: { last: last } });
+    public getAndRead(last: string = null): Observable<DataBaseSource[]> {
+        return this.baseService.send<DataBaseSource[]>(this.ser, "getandread", null, { params: last == null ? null : {last: last} });
     }
 
-    public getCountUnread(): Observable<APIResult> {
-        return this.baseService.send(this.ser, "getcountunread");
+    public getCountUnread(): Observable<number> {
+        return this.baseService.send<number>(this.ser, "getcountunread");
     }
 }

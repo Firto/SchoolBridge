@@ -1,11 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { RegisterService } from 'src/app/Modules/start/Services/register.service';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { UserError } from 'src/app/Models/user-error.model';
+import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
 
 @Component({
   selector: 'app-email-register',
   templateUrl: './email-register.component.html',
   styleUrls: ['./email-register.component.css']
+})
+@Globalization('cm-st-reg', {
+  errors: [],
+  validating: [],
+  args: [
+    'email'
+  ]
 })
 export class EmailRegisterComponent implements OnInit {
   registerForm: FormGroup;
@@ -23,12 +32,14 @@ export class EmailRegisterComponent implements OnInit {
               
 
   public register(): void {
-    this.registerService.start(this.registerForm.controls.email.value).subscribe(res => {
-      if (res.ok != true && res.result.id == "v-dto-invalid"){
-        for (const [key, value] of Object.entries(res.result.additionalInfo)) 
+    this.registerService.start(this.registerForm.controls.email.value).subscribe(
+      res => {}, 
+      (err: UserError) =>{
+        if (err.id != "v-dto-invalid") return;
+        for (const [key, value] of Object.entries(err.additionalInfo)) 
           this.registerForm.controls[key].setErrors({"err":value});
       }
-    });
+    );
   }
 
 }

@@ -1,6 +1,6 @@
 import { Injectable, Injector } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, takeUntil, tap } from 'rxjs/operators';
 
 import { apiConfig } from 'src/app/Const/api.config';
 import { APIResult } from 'src/app/Models/api.result.model';
@@ -35,28 +35,28 @@ export class RegisterService {
                 if ((<OnSendEmailSource>x.source).ok)
                 {
                     this.toastrService.success("Succesful sending email to "+ (<OnSendEmailSource>x.source).email +"!");
-                    this.router.navigate(["/login"]);
+                    this.router.navigateByUrl("/start");
                 }
                 else this.toastrService.error("Error while sending email to "+ (<OnSendEmailSource>x.source).email +", try again!");
             }
         })
     }
 
-    start(email: string): Observable<APIResult> {
-        return this.baseService.send(this.ser, "start", null, { headers: {'UUID':this.userService.uuid}, params: { email: email}}).pipe(map(res => {
-            if (res.ok == true){
-                this.notificationService.permanentSubscribe((<PermanentSubscribe>res.result).token);
+    start(email: string): Observable<PermanentSubscribe> {
+        return this.baseService.send<PermanentSubscribe>(this.ser, "start", null, { headers: {'UUID':this.userService.uuid}, params: { email: email}}).pipe(
+            tap(res => {
+                this.router.navigateByUrl("/start");
+                this.notificationService.permanentSubscribe(res.token);
                 this.loaderService.show("Wait sending email...");
-            }
-            return res;
-        }));
+            })
+        );
     }
 
-    end(model: EndRegister): Observable<APIResult> {
-        return this.baseService.send(this.ser, "end", model, {headers: {'UUID':this.userService.uuid}}).pipe(map(res => {
-            if (res.ok == true)
-                this.userService.localLogin(<Loginned>res.result);
-            return res;
-        }));
+    end(model: EndRegister): Observable<Loginned> {
+        return this.baseService.send<Loginned>(this.ser, "end", model, {headers: {'UUID':this.userService.uuid}}).pipe(
+            tap(res => {
+                this.userService.localLogin(<Loginned>res);
+            })
+        );
     }
 }

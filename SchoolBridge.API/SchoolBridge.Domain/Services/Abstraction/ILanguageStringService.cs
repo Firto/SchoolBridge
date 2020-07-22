@@ -12,6 +12,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
         GlobalizationInfoDto GetGlobalizationInfo();
         string GetUpdateId();
         string UpdateBaseUpdateId();
+        string GetCurrentLanguage();
 
         Language AddLanguage(string abbName, string fullName);
         void RemoveLanguage(string abbName);
@@ -29,7 +30,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
 
         LanguageString AddString(int IdId, int langId, string str);
         LanguageString AddString(string idName, string langAbbName, string str);
-        LanguageString AddOrUpdateString(string idName, string[] types, string langAbbName, string str);
+        LanguageString AddOrUpdateString(string idName, string langAbbName, string str);
 
         IEnumerable<Language> GetLanguages();
         IEnumerable<LanguageStringType> GetLanguageStringTypes();
@@ -38,6 +39,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
         IDictionary<string, string> GetByType(string langAddName, string[] types);
         IDictionary<string, string> GetByType(int langId, string[] types);
 
+        IDictionary<string, string> GetByStringName(string langAddName, string[] names);
+
         IDictionary<string, IDictionary<string, string>> GetByType(string[] langAddNames, int[] typeIds);
         IDictionary<string, IDictionary<string, string>> GetByType(int[] langIds, int[] typeIds);
         IDictionary<string, IDictionary<string, string>> GetByType(string[] langAddNames, string[] types);
@@ -45,6 +48,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
 
         IDictionary<string, string> GetByTypeCurrent(int[] typeIds);
         IDictionary<string, string> GetByTypeCurrent(string[] types);
+
+        IDictionary<string, string> GetByStringNameCurrent(string[] names);
 
         IDictionary<string, string> GetByTypeDefault(int[] typeIds);
         IDictionary<string, string> GetByTypeDefault(string[] types);

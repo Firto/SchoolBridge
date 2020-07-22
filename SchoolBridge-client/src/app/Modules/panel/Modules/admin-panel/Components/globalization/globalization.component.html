@@ -7,7 +7,7 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" id="strings-tab" data-toggle="tab" href="#strings" role="tab" aria-controls="strings" aria-selected="false">
-                Profile
+                Strings
             </a>
         </li>
     </ul>
@@ -53,6 +53,9 @@
             </table>
             
         </div>
-        <div class="tab-pane fade" id="strings" role="tabpanel" aria-labelledby="strings-tab">...</div>
+        <div class="tab-pane fade p-2" id="strings" role="tabpanel" aria-labelledby="strings-tab">
+            <button *ngIf="!(this.globalizationService.changeEditing | async)" (click)="toggleEditingMode()" class="btn btn-primary rounded-pill mb-3 ">Enable editing mode</button>
+            <button *ngIf="(this.globalizationService.changeEditing | async)" (click)="toggleEditingMode()" class="btn btn-primary rounded-pill mb-3 ">Disable editing mode</button>
+        </div>
     </div>
 </div>

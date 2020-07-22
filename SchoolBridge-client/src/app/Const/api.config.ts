@@ -61,16 +61,21 @@ export const apiConfig: Record<string, Service> = {
         methods: {
             "info": {
                 url: "info",
-                type: "GET"
+                type: "GET",
             },
             "strings": {
                 url: "strings",
-                type: "GET",
+                type: "POST",
                 loader: false
             },
             "add-language": {
                 url: "language/add",
                 type: "POST"
+            },
+            "add-or-upd-string": {
+                url: "string/addorupdate",
+                type: "POST",
+                loader: false
             },
             "remove-language": {
                 url: "language/remove",

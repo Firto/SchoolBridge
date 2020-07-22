@@ -19,12 +19,18 @@ import { DbNtfOnLoginComponent } from './Components/db-notifications/db-ntf-on-l
     imports: [
         CommonModule
     ],
-    providers: [
-        DbNotificationService,
-        DbNotificationsMapper
-    ],
     exports: [
         SetDbNotificationsComponent
     ]
 })
-export class DbNotificationModule  {} 
+export class DbNotificationModule  {
+    static forRoot() {
+        return {
+            ngModule: DbNotificationModule,
+            providers: [
+                DbNotificationService,
+                DbNotificationsMapper
+            ],
+        };
+    }
+} 

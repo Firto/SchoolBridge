@@ -3,11 +3,27 @@ import { EndRegister } from 'src/app/Modules/start/Models/endregister.model';
 import { RegisterService } from 'src/app/Modules/start/Services/register.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { UserError } from 'src/app/Models/user-error.model';
+import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
+})
+
+@Globalization('cm-reg-end', {
+  args: [
+    "login",
+    "name",
+    "surname",
+    "lastname",
+    "password",
+    "confirmPassword",
+    "birthday"
+  ],
+  errors: [],
+  validating: []
 })
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
@@ -35,14 +51,15 @@ export class RegisterComponent implements OnInit {
   public register(): void {
     this.model = <EndRegister>this.registerForm.getRawValue();
     this.model.registrationToken = this.regToken;
-    this.registerService.end(this.model).subscribe(res => {
-      if (res.ok == true)
+    this.registerService.end(this.model).subscribe(
+      res => {
         this.router.navigateByUrl('/');
-      else if (res.result.id == "v-dto-invalid"){
-        for (const [key, value] of Object.entries(res.result.additionalInfo)) 
-          this.registerForm.controls[key].setErrors({"err":value});
-      }
-    });
+      },
+      (err: UserError) => {
+        if (err.id == "v-dto-invalid")
+          for (const [key, value] of Object.entries(err.additionalInfo)) 
+            this.registerForm.controls[key].setErrors({"err":value});
+      });
   }
 
 }

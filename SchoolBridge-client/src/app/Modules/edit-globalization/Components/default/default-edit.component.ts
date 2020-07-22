@@ -3,16 +3,16 @@ import { UserService } from 'src/app/Services/user.service';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-default',
+  selector: 'app-default-edit',
   template: '',
 })
-export class DefaultComponent {
+export class DefaultEditComponent {
 
   constructor(userService: UserService,
               route: Router) { 
     if (userService.getUser())
-      route.navigateByUrl('/panel');
-    else route.navigateByUrl('/start');
+      route.navigateByUrl('/ed-gb/panel');
+    else route.navigateByUrl('/ed-gb/start');
   }
 
 }

@@ -13,6 +13,6 @@ export class LanguageSelectorComponent {
   }
 
   public onSelect(e: MouseEvent){
-    this.globalizationService.getFirstGlobalizationData((<any>e.target).classList[1]);
+    this.globalizationService.changeLanguage((<any>e.target).classList[1]).subscribe();
   }
 }

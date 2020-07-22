@@ -5,6 +5,12 @@ body {
   background: #151515;
 }
 
+.editing {
+  border-width: 3px;
+  border-style: solid;
+  border-color: yellow;
+}
+
 .login-container{
 	height: 65vh;
 	width: 100%;

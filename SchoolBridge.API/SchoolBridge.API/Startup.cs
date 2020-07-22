@@ -1,4 +1,7 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -38,6 +41,7 @@ namespace SchoolBridge.API
         private readonly IConfiguration _notificationServiceConfiguration;
         private readonly IConfiguration _registrationServiceConfiguration;
         private readonly IWebHostEnvironment _env;
+        private readonly IEnumerable<string> _allowedOrgins = new string[] { "http://192.168.0.6:4200", };
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
@@ -53,7 +57,7 @@ namespace SchoolBridge.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DbContext, ApplicationContext>(opt =>
-                opt.UseSqlServer(_configuration.GetSection("ConnectionStrings")["mssql"]), optionsLifetime: ServiceLifetime.Singleton);
+                opt.UseNpgsql(_configuration.GetSection("ConnectionStrings")["mypostgres"]), optionsLifetime: ServiceLifetime.Singleton);
 
             services.UseClientErrorManager();
             services.UseJwtTokenService<User>(new TokenServiceConfiguration
@@ -151,14 +155,10 @@ namespace SchoolBridge.API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors(x => x.SetIsOriginAllowed(_ => true)
+            app.UseCors(x => x.SetIsOriginAllowed((x) => { Console.WriteLine(x); return _allowedOrgins.Contains(x); })
                             .AllowAnyHeader()
                             .WithMethods("GET", "POST")
                             .AllowCredentials());
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
 
             app.UseDeveloperExceptionPage();
             app.UseMiddleware<ScopedHttpContextMiddleware>();

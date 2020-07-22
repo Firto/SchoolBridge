@@ -106,6 +106,10 @@ namespace SchoolBridge.Domain.Services.Implementation
             // var m = _languageStringGR.GetDbSet().Where((x) => x.Id == Id && x.Language.AbbName == langAddName).Include(x => x.Language).ToArray().FirstOrDefault();
         }
 
+        public string GetCurrentLanguage() {
+            return _langAddName;
+        }
+
         public string GetUpdateId() {
             return _configuration.BaseUpdId;
         }
@@ -259,22 +263,17 @@ namespace SchoolBridge.Domain.Services.Implementation
             var m = _languageStringGR.GetAll(x => x.IdId == r.Id && l.ContainsKey(x.LanguageId)).TakeWhile(br => l.ContainsKey(br.LanguageId) && l[br.LanguageId])
         }*/
 
-        public LanguageString AddOrUpdateString(string idName, string[] types, string langAbbName, string str) 
+        public LanguageString AddOrUpdateString(string idName, string langAbbName, string str) 
         {
             var l = _languaesGR.GetAll(x => x.AbbName == langAbbName).FirstOrDefault();
             if (l == null)
                 throw new ClientException("lss-lng-no-reg");
 
-            var r = _languageStringIdGR.GetDbSet().Where(x => x.Name == idName).Include(x => x.Types).ThenInclude(x => x.Type).FirstOrDefault();
-            if (r == null) {
-                var s = _languageStringTypeGR.GetAll(x => types.Contains(x.Name));
-                if (s.Count() != types.Length)
-                    throw new ClientException("lss-type-no-reg", types);
-                _languageStringIdGR.Create(new LanguageStringId { Name = idName, Types = s.Select(x => new LanguageStringIdType { TypeId = x.Id }).ToList() });
-                r = _languageStringIdGR.GetDbSet().Where(x => x.Name == idName).Include(x => x.Types).ThenInclude(x => x.Type).FirstOrDefault();
-            }
+            var r = _languageStringIdGR.GetDbSet().Where(x => x.Name == idName).FirstOrDefault();
+            if (r == null) 
+                r = _languageStringIdGR.Create(new LanguageStringId { Name = idName });
 
-            if (types.Intersect(r.Types.Select(x => x.Type.Name)).Count() != types.Length)
+            /*if (types.Intersect(r.Types.Select(x => x.Type.Name)).Count() != types.Length)
             {
                 var s = _languageStringTypeGR.GetAll(x => types.Contains(x.Name));
                 if (s.Count() != types.Length)
@@ -283,7 +282,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 _languageStringIdTypeGR.GetDbSet().RemoveRange(r.Types);
                 _languageStringIdTypeGR.GetDbSet().AddRange(s.Select(x => new LanguageStringIdType { TypeId = x.Id, StringIdId = r.Id }));
                 _languageStringIdTypeGR.GetDbContext().SaveChanges();
-            }
+            }*/
 
             var m = _languageStringGR.GetAll(x => x.IdId == r.Id && x.LanguageId == l.Id).FirstOrDefault();
 
@@ -329,6 +328,16 @@ namespace SchoolBridge.Domain.Services.Implementation
                                       .ThenInclude(x => x.Type)
                                       .ToArray()
                                       .Where(s => s.Id.Types.Select(x => x.Type.Name).Any(types.Contains))
+                                      .ToDictionary(k => k.Id.Name, v => v.String);
+        }
+
+        public IDictionary<string, string> GetByStringName(string langAddName, string[] names)
+        {
+            return _languageStringGR.GetDbSet()
+                                      .Where(x => x.Language.AbbName == langAddName && names.Contains(x.Id.Name))
+                                      .Include(x => x.Language)
+                                      .Include(x => x.Id)
+                                      .ToArray()
                                       .ToDictionary(k => k.Id.Name, v => v.String);
         }
 
@@ -442,6 +451,11 @@ namespace SchoolBridge.Domain.Services.Implementation
         public IDictionary<string, string> GetByTypeCurrent(string[] types)
         {
             return GetByType(_langAddName, types);
+        }
+
+        public IDictionary<string, string> GetByStringNameCurrent(string[] names)
+        {
+            return GetByStringName(_langAddName, names);
         }
 
         public Task<IDictionary<string, string>> GetByTypeCurrentAsync(int[] typeIds)

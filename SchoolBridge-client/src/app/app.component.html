@@ -1,3 +1,4 @@
 <app-loader></app-loader>
+<gb-edit *ngIf="this.globalizationService.changeEditing | async" ></gb-edit>
 <div class="overlay-container" toastContainer></div>
 <router-outlet></router-outlet>

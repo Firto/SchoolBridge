@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { UserService } from '../../../../Services/user.service';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class UserPermissionService {
@@ -16,8 +17,8 @@ export class UserPermissionService {
     }
 
     public HasPermission(names: string[]): boolean {
-        if (this.userService.user.value == null || 
-            !names.every(el => this.userService.user.value.login.permissions.includes(el)))
+        if (this.userService.getUser() == null || 
+            !names.every(el => this.userService.getUser().login.permissions.includes(el)))
             return false;
         return true;
     }

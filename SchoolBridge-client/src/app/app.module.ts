@@ -21,11 +21,15 @@ import { CryptService } from './Services/crypt.service';
 import { BaseService } from './Services/base.service';
 import { GlobalizationModule } from './Modules/globalization/globalization.module';
 import { NotificationModule } from './Modules/notification/notification.module';
+import { GuardService } from './Services/guard.service';
+import { DefaultComponent } from './Components/default/default.component';
+import { DbNotificationModule } from './Modules/db-notification/db-notification.module';
 
 @NgModule({
   declarations: [
     AppComponent, 
-    LoaderComponent
+    LoaderComponent,
+    DefaultComponent
   ],
   imports: [
     HttpClientModule,
@@ -33,8 +37,11 @@ import { NotificationModule } from './Modules/notification/notification.module';
     ReactiveFormsModule,
     BrowserAnimationsModule,
     FormsModule,
-    ToastrModule.forRoot({ preventDuplicates: true, countDuplicates: true, resetTimeoutOnDuplicate: true }),
     ToastContainerModule,
+    ToastrModule.forRoot({ preventDuplicates: true, countDuplicates: true, resetTimeoutOnDuplicate: true }),
+    GlobalizationModule.forRoot(),
+    NotificationModule.forRoot(),
+    DbNotificationModule.forRoot()
   ],
   providers: [
     BaseService,
@@ -44,11 +51,10 @@ import { NotificationModule } from './Modules/notification/notification.module';
     DeviceUUIDService,
     SyncRequestService, 
     CryptService,
-    GlobalizationModule,
-    NotificationModule,
+    GuardService, 
     { provide: HTTP_INTERCEPTORS, useClass: BasicAuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true }  
   ],
   bootstrap: [AppComponent]
 })
