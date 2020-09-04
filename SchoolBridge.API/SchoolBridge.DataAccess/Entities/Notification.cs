@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolBridge.DataAccess.Entities
 {
-    public class Notification<AUser> : ICloneable where AUser : AuthUser
+    public class Notification : ICloneable
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -20,10 +20,10 @@ namespace SchoolBridge.DataAccess.Entities
 
         [ForeignKey("User")]
         public string UserId { get; set; }
-        public AUser User { get; set; }
+        public User User { get; set; }
 
         public object Clone()
-            => new Notification<AUser>
+            => new Notification
             {
                 Id = Id,
                 Type = Type,

@@ -12,21 +12,21 @@ import { UserService } from 'src/app/Services/user.service';
 import { ProfileModel } from '../Models/profile.model';
 
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ProfileService {
     private _ser: Service;
     private _info: BehaviorSubject<ProfileModel> = new BehaviorSubject<ProfileModel>(null);
     public info: Observable<ProfileModel> = this._info.asObservable();
 
     constructor(private baseService: BaseService,
-        private userService: UserService) {
+                private userService: UserService) {
        
         this._ser = apiConfig["profile"];
-        this.userService.user.subscribe((user) => {
+        this.userService.userObs.subscribe((user) => {
             if (user != null)
                 this.getInfo();
         });
-        if (this.userService.getUser() != null) {
+        if (this.userService.user != null) {
             this.getInfo().subscribe();
         }
     }

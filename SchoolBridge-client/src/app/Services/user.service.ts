@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { User } from '../Models/user.model';
 import { Injectable, Injector } from '@angular/core';
 import { ActivatedRoute, RouterStateSnapshot } from '@angular/router';
@@ -7,69 +7,60 @@ import { Loginned } from '../Models/loginned.model';
 import { LoginnedTokens } from '../Models/loginned-tokens';
 import { CryptService } from './crypt.service';
 import { DeviceUUIDService } from './device-uuid.service';
+import { ClientConnectionService } from './client-connection.service';
+import { MyLocalStorageService } from './my-local-storage.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class UserService {
     private _user: BehaviorSubject<User> = new BehaviorSubject<User>(null);
-
-    public user: Observable<User> = this._user.asObservable();
-    public getUser(): User {return this._user.getValue()};
-
-    public uuid: string;
-
-    constructor(private _crypt: CryptService,
-                private _route: ActivatedRoute,
-                private _injector: Injector,
-                private _notificationService: NotificationService,
-                uuidService: DeviceUUIDService) {
-        this.uuid = uuidService.get(); 
-
-        if (localStorage.getItem('user')){
-            try {
-                this._user.next(JSON.parse(this._crypt.decode(localStorage.getItem('user'), this.uuid)));
-                this._notificationService.subscribe(this._user.value.login.tokens.token);
-            }
-            catch{
-                this.localLogout();
-            }
-        }
+    public get userObs(): Observable<User> {return this._user;};
+    
+    public get user(): User {return this._user.value};
+    public set user(usr: User) {
+        this._localStorage.write("user", usr);
+        this._user.next(usr);
+    };
+    constructor(private _clientConnectionService: ClientConnectionService,
+                private _localStorage: MyLocalStorageService,
+                private _uuidService: DeviceUUIDService){
+        if (_localStorage.isIssetKey('user')){
+            this._user.next(_localStorage.read('user'));
+            this._clientConnectionService.subscribe(this.user.login.tokens.token).subscribe();
+        }else this.localLogout();
     }
 
     
 
     forceRunAuthGuard(): void {
-        console.log(this._route);
+        /*console.log(this._route);
         if (this._route.children.length && this._route.children['0'].snapshot._routeConfig.canActivate) {
             const curr__route = this._route.children[ '0' ];
             const AuthGuard = curr__route.snapshot._routeConfig.canActivate[ '0' ];
             const authGuard = this._injector.get(AuthGuard);
             const _routerStateSnapshot: RouterStateSnapshot = Object.assign({}, curr__route.snapshot, {url: "/"+curr__route.snapshot.url[0]});
             authGuard.canActivate(curr__route.snapshot, _routerStateSnapshot);
-        }
+        }*/
     }
 
     // local
 
     localLogout(): void {
-        localStorage.removeItem('user');
-        this._user.next(null);
-        this._notificationService.unsubscribe();
+        this.user = null;
+        this._clientConnectionService.unsubscribe().subscribe();
         //this.forceRunAuthGuard();
     }
 
     localLogin(login: Loginned): void {
         const user = new User();
         user.login = login;
-        this._user.next(user);
-        localStorage.setItem('user', this._crypt.encode(JSON.stringify(this.getUser()), this.uuid));
-        this._notificationService.subscribe(login.tokens.token);
+        this.user = user;
+        this._clientConnectionService.subscribe(login.tokens.token).subscribe();
     }
 
     localSetLoginTokens(tokens: LoginnedTokens): void {
-        const user = this.getUser();
+        const user = this.user;
         user.login.tokens = tokens;
-        this._user.next(user);
-        localStorage.setItem('user', this._crypt.encode(JSON.stringify(this.getUser()), this.uuid));
-        this._notificationService.subscribe(user.login.tokens.token);
+        this.user = user;
+        this._clientConnectionService.subscribe(user.login.tokens.token).subscribe();
     }
 }

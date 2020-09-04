@@ -19,7 +19,9 @@ export class PanelNavbarComponent implements AfterViewInit{
   }
 
   logout(): void {
-    this.loginService.logout().subscribe();
+    this.loginService.logout().subscribe(() => {
+      this.router.navigateByUrl("/start");
+    });
   }
 
   ngAfterViewInit(): void {

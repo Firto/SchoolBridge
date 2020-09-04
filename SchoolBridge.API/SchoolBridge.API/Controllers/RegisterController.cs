@@ -24,7 +24,7 @@ namespace SchoolBridge.API.Controllers
         [MyNoAutorize]
         public async Task<ResultDto> Start([FromQuery, MyValidation] StartRegisterDto entity)
         {
-            return ResultDto.Create(_registrationService.StartRegister(entity.Email, new Role { Id = 9 }));
+            return ResultDto.Create(_registrationService.StartRegister(entity.Email, new Role { Name = "Pupil" }));
         }
 
         [UUID]

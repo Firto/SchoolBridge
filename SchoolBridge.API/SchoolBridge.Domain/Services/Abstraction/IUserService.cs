@@ -2,12 +2,21 @@
 using SchoolBridge.Helpers.DtoModels;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface IUserService
+    public interface IUserService: IOnInitService, IOnFirstInitService
     {
+        UserDto GetFullDto(string tokenId, string Id);
+        UserDto GetFullDtoByGetToken(string tokenId, string getToken);
+        ShortUserDto GetShortDto(string Id);
+        ShortUserDto GetStaticShortDto(string Id);
+
+        Task<UserDto> GetFullDtoAsync(string tokenId, string Id);
+        Task<UserDto> GetFullDtoByGetTokenAsync(string tokenId, string getToken);
+
         User Get(string Id);
         User GetByEmail(string email);
         User GetByLogin(string login);

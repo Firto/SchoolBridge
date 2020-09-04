@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using SchoolBridge.Domain.Services.Abstraction;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using System.Linq;
 
 namespace SchoolBridge.API.Controllers.Attributes.Globalization

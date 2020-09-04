@@ -4,7 +4,7 @@ using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Helpers.AddtionalClases;
 using SchoolBridge.Helpers.AddtionalClases.EmailService;
 using SchoolBridge.Helpers.Extentions;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
 using System;
 using System.Collections.Generic;
 using System.Net.Mail;
@@ -19,17 +19,16 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly PriorityQueue<EmailEntity> _queue = new PriorityQueue<EmailEntity>();
         public PriorityQueue<EmailEntity> EmailQueue { get => _queue; }
 
-        public EmailService(EmailServiceConfiguration configuration,
-                            ClientErrorManager clientErrorManager) {
+        public EmailService(EmailServiceConfiguration configuration) {
             _configuration = configuration;
-            if (!clientErrorManager.IsIssetErrors("Email"))
-                clientErrorManager.AddErrors(new ClientErrors("Email", new Dictionary<string, ClientError>
-                {
-
-                }));
-
         }
 
+        public static void OnInit(ClientErrorManager manager) {
+            manager.AddErrors(new ClientErrors("EmailService", new Dictionary<string, ClientError>
+            {
+
+            }));
+        }
         private string CreateDraftPath(string name) {
             return _configuration.DraftsPath + "/" + name + ".draft.html";
         }

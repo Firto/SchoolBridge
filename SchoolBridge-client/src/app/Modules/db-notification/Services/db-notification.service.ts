@@ -3,17 +3,16 @@ import { Service } from 'src/app/Interfaces/Service/service.interface';
 import { BaseService } from 'src/app/Services/base.service';
 import { apiConfig } from 'src/app/Const/api.config';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
-import { APIResult } from 'src/app/Models/api.result.model';
 import { NotificationService } from 'src/app/Modules/notification/Services/notification.service';
 import { DataBaseSource } from '../../notification/Models/NotificationSources/database-source';
-import { OnReadNtfSource } from '../Models/onreadntf-source';
 import { UserService } from 'src/app/Services/user.service';
 import { KeyedCollection } from 'src/app/Collections/keyed-collection';
 import { Guid } from 'guid-typescript';
-import { takeUntil, take } from 'rxjs/operators';
+import { OnReadNtfSource } from '../../notification/Models/NotificationSources/on-read-ntf.source';
+import { take } from 'rxjs/operators';
 
-@Injectable({ providedIn: 'root' })
-export class DbNotificationService {
+@Injectable()
+export class DbNotificationService { 
     private ser: Service;
     
     private _onReciveDbNotification: Subject<{key: string, value: DataBaseSource, reverse: boolean}> = new Subject<{key: string, value: DataBaseSource, reverse: boolean}>();
@@ -39,17 +38,17 @@ export class DbNotificationService {
                     this.localAddNotifications(<DataBaseSource>data.source);
                   break;
                 case "onReadNtf":
-                    const som: OnReadNtfSource = <OnReadNtfSource>data.source;
+                    const som = <OnReadNtfSource>data.source;
                     for (let ind = this.notificationList.getIndex(som.last); ind >= 0; ind--) 
-                        if (this.notificationList.items[ind].value.id != null) 
-                            this.notificationList.items[ind].value.read = true;
+                    if (this.notificationList.items[ind].value.id != null) 
+                        this.notificationList.items[ind].value.read = true;
                     this._countUnreadNtfs.next(this._countUnreadNtfs.value - som.count);
-                    this._onReciveOnReadDbNotification.next(<OnReadNtfSource>som);
-                break;
+                    this._onReciveOnReadDbNotification.next(som);
+                  break;
               }
         });
 
-        this.userService.user.subscribe(x => {
+        this.userService.userObs.subscribe(x => {
             if (x){
                 this.notificationList.clear();
                 this.getCountUnread().subscribe(s => {

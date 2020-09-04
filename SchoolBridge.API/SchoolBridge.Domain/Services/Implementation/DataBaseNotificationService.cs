@@ -6,8 +6,8 @@ using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Helpers.AddtionalClases.DataBaseNotoficationService;
 using SchoolBridge.Helpers.AddtionalClases.NotificationService;
 using SchoolBridge.Helpers.Extentions;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -15,94 +15,108 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using SchoolBridge.Domain.SignalR.Hubs;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
-    public class DataBaseNotificationService<AUser> : IDataBaseNotificationService<AUser> where AUser : AuthUser
+    public class DataBaseNotificationService : IDataBaseNotificationService
     {
-        private readonly INotificationService<AUser> _notificationService;
-        private readonly IGenericRepository<Notification<AUser>> _notificationGR;
-        private readonly JsonSerializerSettings _jsonSerializerSettings;
+       
+        private readonly INotificationService _notificationService;
+        private readonly IGenericRepository<Notification> _notificationGR;
+        private readonly IJsonConverterService _jsonConverterService;
         private readonly IMapper _mapper;
-
-        public DataBaseNotificationService(INotificationService<AUser> notificationService,
-                                    IGenericRepository<Notification<AUser>> notificationGR,
-                                     IMapper mapper,
-                                     ClientErrorManager clientErrorManager)
+        private readonly string methodReadName = "onReadNtf";
+        public DataBaseNotificationService(INotificationService notificationService,
+                                        IGenericRepository<Notification> notificationGR,
+                                        IJsonConverterService jsonConverterService,
+                                        IMapper mapper)
         {
             _notificationService = notificationService;
             _notificationGR = notificationGR;
+            _jsonConverterService = jsonConverterService;
             _mapper = mapper;
-            _jsonSerializerSettings = new JsonSerializerSettings();
-            _jsonSerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        }
 
-            if (!clientErrorManager.IsIssetErrors("DataBaseNotification"))
-                clientErrorManager.AddErrors(new ClientErrors("DataBaseNotification",
-                    new Dictionary<string, ClientError>
-                    {
+        public static void OnInit(ClientErrorManager manager) {
+            manager.AddErrors(new ClientErrors("DataBaseNotificationService",
+                new Dictionary<string, ClientError>
+                {
                         {"inc-ntf-id", new ClientError("Incorrect notification id!")}
-                    }
-                ));
+                }
+           ));
         }
 
         private string ObjectToBase64String(object obj)
-            => Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(obj, _jsonSerializerSettings)));
+            => Convert.ToBase64String(Encoding.UTF8.GetBytes(_jsonConverterService.ConvertObjectToJson(obj)));
 
-        public async Task Notify(AUser usr, string type, IDataBaseNotificationSourse sourse)
+        public async Task NotifyAsync(string userId, string type, IDataBaseNotificationSourse sourse)
         {
-            await _notificationService.Notify(usr, "dataBase", _mapper.Map<Notification<AUser>, DataBaseSourse>(
+            await _notificationService.NotifyAsync(userId, _mapper.Map<Notification, DataBaseSourse>(
                 await _notificationGR.CreateAsync(
-                    new Notification<AUser>
+                    new Notification
                     {
                         Date = DateTime.Now,
                         Base64Sourse = ObjectToBase64String(sourse),
                         Type = type,
-                        UserId = usr.Id
+                        UserId = userId
+                    }
+                ))
+            , "dataBase");
+        }
+
+        public async Task NotifyAsync(string userId, string tokenId, string type, IDataBaseNotificationSourse sourse)
+        {
+            await _notificationService.NotifyAsync(userId, tokenId, "dataBase", _mapper.Map<Notification, DataBaseSourse>(
+                await _notificationGR.CreateAsync(
+                    new Notification
+                    {
+                        Date = DateTime.Now,
+                        Base64Sourse = ObjectToBase64String(sourse),
+                        Type = type,
+                        UserId = userId
                     }
                 ))
             );
         }
 
-        public async Task Notify(AUser usr, string tokenId, string type, IDataBaseNotificationSourse sourse)
+        public async Task NotifyAsync(string[] userIds, string type, IDataBaseNotificationSourse sourse)
         {
-            await _notificationService.Notify(usr, tokenId, "dataBase", _mapper.Map<Notification<AUser>, DataBaseSourse>(
-                await _notificationGR.CreateAsync(
-                    new Notification<AUser>
-                    {
-                        Date = DateTime.Now,
-                        Base64Sourse = ObjectToBase64String(sourse),
-                        Type = type,
-                        UserId = usr.Id
-                    }
-                ))
-            );
-        }
-
-        public async Task Notify(AUser[] usrs, string type, IDataBaseNotificationSourse sourse)
-        {
-            var template = new Notification<AUser>
+            var template = new Notification
             {
                 Date = DateTime.Now,
                 Base64Sourse = ObjectToBase64String(sourse),
                 Type = type
             };
-            var outTemplate = _mapper.Map<Notification<AUser>, DataBaseSourse>(template);
-            Notification<AUser> temp;
-            var notifications = usrs.Select(x =>
+            var outTemplate = _mapper.Map<Notification, DataBaseSourse>(template);
+            Notification temp;
+            var notifications = userIds.Select(x =>
             {
-                temp = (Notification<AUser>)template.Clone();
-                temp.User = x;
-                temp.UserId = x.Id;
+                temp = (Notification)template.Clone();
+                temp.UserId = x;
                 return temp;
             });
             (await _notificationGR.CreateAsync(notifications)).ForEach(async (x) =>
-                    await _notificationService.Notify(x.User, "dataBase", outTemplate)
+                    await _notificationService.NotifyAsync(x.UserId, outTemplate, "dataBase")
             );
         }
 
-        public async Task NotifyNoBase(AUser usr, string type, IDataBaseNotificationSourse sourse)
+        public async Task NotifyNoBaseAsync(string userId, string type, IDataBaseNotificationSourse sourse)
         {
-            await _notificationService.Notify(usr, "dataBase",
+            await _notificationService.NotifyAsync(userId,
+                new DataBaseSourse
+                {
+                    Date = DateTime.Now,
+                    Base64Sourse = ObjectToBase64String(sourse),
+                    Type = type
+                }
+            ,"dataBase");
+        }
+
+        public async Task NotifyNoBaseAsync(string userId, string tokenId, string type, IDataBaseNotificationSourse sourse)
+        {
+            await _notificationService.NotifyAsync(userId, tokenId, "dataBase", 
                 new DataBaseSourse
                 {
                     Date = DateTime.Now,
@@ -112,19 +126,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             );
         }
 
-        public async Task NotifyNoBase(AUser usr, string tokenId, string type, IDataBaseNotificationSourse sourse)
-        {
-            await _notificationService.Notify(usr, tokenId, "dataBase", 
-                new DataBaseSourse
-                {
-                    Date = DateTime.Now,
-                    Base64Sourse = ObjectToBase64String(sourse),
-                    Type = type
-                }
-            );
-        }
-
-        public async Task NotifyNoBase(AUser[] usrs, string type, IDataBaseNotificationSourse sourse)
+        public async Task NotifyNoBaseAsync(string[] userIds, string type, IDataBaseNotificationSourse sourse)
         {
             var template = new DataBaseSourse
             {
@@ -132,48 +134,51 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Base64Sourse = ObjectToBase64String(sourse),
                 Type = type
             };
-            await _notificationService.Notify(usrs, "dataBase", template);
+            await _notificationService.NotifyAsync(userIds, template, "dataBase");
         }
 
-        public async Task<IEnumerable<DataBaseSourse>> Get(AUser usr, string last, int count = 20)
+        public async Task<IEnumerable<DataBaseSourse>> GetAsync(string userId, string last, int count = 20)
         {
-            Notification<AUser> notification = last != null ? await _notificationGR.FindAsync(last) : null;
+            Notification notification = last != null ? await _notificationGR.FindAsync(last) : null;
             if (last != null && notification == null)
                 throw new ClientException("inc-ntf-id", last);
-            return _mapper.Map<IEnumerable<Notification<AUser>>, IEnumerable<DataBaseSourse>>(_notificationGR.GetDbSet().Where((x) => x.UserId == usr.Id && (notification == null || x.Date < notification.Date)).OrderByDescending((x) => x.Date).Take(count).ToArray());
+            return _mapper.Map<IEnumerable<Notification>, IEnumerable<DataBaseSourse>>(_notificationGR.GetDbSet().Where((x) => x.UserId == userId && (notification == null || x.Date < notification.Date)).OrderByDescending((x) => x.Date).Take(count).ToArray());
         }
 
-        public async Task<IEnumerable<DataBaseSourse>> GetAndRead(AUser usr, string last, int count = 20)
+        public async Task<IEnumerable<DataBaseSourse>> GetAndReadAsync(string userId, string last, int count = 20)
         {
-            Notification<AUser> notification = last != null ? await _notificationGR.FindAsync(last) : null;
+            Notification notification = last != null ? await _notificationGR.FindAsync(last) : null;
             if (last != null && notification == null)
                 throw new ClientException("inc-ntf-id", last);
             var ntfs = _notificationGR.GetDbSet()
-                                                   .Where((x) => x.UserId == usr.Id && (notification == null || x.Date < notification.Date))
+                                                   .Where((x) => x.UserId == userId && (notification == null || x.Date < notification.Date))
                                                    .OrderByDescending((x) => x.Date).Take(count)
                                                    .AsEnumerable();
             var ms = ntfs.Where((x) => x.Read == false).Select((x) => { x.Read = true; return x; });
             _notificationGR.GetDbContext().UpdateRange(ms);
             var mon = await _notificationGR.GetDbContext().SaveChangesAsync();
             if (mon > 0)
-                await _notificationService.Read(usr, ms.Last().Id, mon);
-            return _mapper.Map<IEnumerable<Notification<AUser>>, IEnumerable<DataBaseSourse>>(ntfs);
+                await ReadAsync(userId, ms.Last().Id, mon);
+            return _mapper.Map<IEnumerable<Notification>, IEnumerable<DataBaseSourse>>(ntfs);
         }
 
-        public async Task Read(AUser usr, string last) {
-            Notification<AUser> notification = last != null ? await _notificationGR.FindAsync(last) : null;
+        public async Task ReadAsync(string userId, string last) {
+            Notification notification = last != null ? await _notificationGR.FindAsync(last) : null;
             if (notification == null)
                 throw new ClientException("inc-ntf-id", last);
-            var ms = _notificationGR.GetDbSet().Where((x) => x.UserId == usr.Id && x.Date >= notification.Date && !x.Read).ToArray().Select((x) => { x.Read = true; return x; }).OrderByDescending((x) => x.Date);
+            var ms = _notificationGR.GetDbSet().Where((x) => x.UserId == userId && x.Date >= notification.Date && !x.Read).ToArray().Select((x) => { x.Read = true; return x; }).OrderByDescending((x) => x.Date);
 
             _notificationGR.GetDbContext().UpdateRange(ms);
             var mon = await _notificationGR.GetDbContext().SaveChangesAsync();
             if (mon > 0 && ms.Count() > 0)
-                await _notificationService.Read(usr, ms.Last().Id, mon);
+                await ReadAsync(userId, ms.Last().Id, mon);
         }
 
-        public async Task<int> GetCountUnread(AUser usr)
-            => await _notificationGR.CountWhereAsync((x) => x.UserId == usr.Id && !x.Read);
+        public async Task<int> GetCountUnreadAsync(string userId)
+            => await _notificationGR.CountWhereAsync((x) => x.UserId == userId && !x.Read);
+
+        public async Task ReadAsync(string userId, string last, int count)
+            => await _notificationService.NotifyAsync(userId, new OnReadSource { Last = last, Count = count }, methodReadName);
 
     }
 }

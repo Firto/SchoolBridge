@@ -9,6 +9,7 @@ import { RegisterComponent } from './Components/register/register.component';
 import { StartNavbarComponent } from './Components/navbar/start-navbar.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GlobalizationModule } from '../globalization/globalization.module';
+import { PermanentConnectionService } from './Services/permanent-connection.service';
 
 @NgModule({
     declarations: [
@@ -26,12 +27,10 @@ import { GlobalizationModule } from '../globalization/globalization.module';
         GlobalizationModule
     ],
     providers: [
+        PermanentConnectionService,
         RegisterService
     ],
     exports: [
-        StartComponent
-    ],
-    bootstrap:[
         StartComponent
     ]
 })

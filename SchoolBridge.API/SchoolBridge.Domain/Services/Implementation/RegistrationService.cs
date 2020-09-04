@@ -12,8 +12,8 @@ using SchoolBridge.Helpers.DtoModels;
 using SchoolBridge.Helpers.DtoModels.Authefication;
 using SchoolBridge.Helpers.Extentions;
 using SchoolBridge.Helpers.Managers;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -29,7 +29,8 @@ namespace SchoolBridge.Domain.Services.Implementation
     {
         private readonly IRoleService _roleService;
         private readonly IEmailService _emailService;
-        private readonly INotificationService<User> _notificationService;
+        private readonly IPermanentConnectionService _permanentConnectionService;
+        private readonly INotificationService _notificationService;
         private readonly IUserService _userService;
         private readonly ILoginService _loginService;
         private readonly HttpContext _httpContext;
@@ -37,37 +38,34 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public RegistrationService(IRoleService roleService,
                                     IEmailService emailService,
-                                    INotificationService<User> notificationService,
+                                    INotificationService notificationService,
+                                    IPermanentConnectionService permanentConnectionService,
                                     IUserService userService,
-                                    IValidatingService validatingService,
                                     ILoginService loginService,
                                     ScopedHttpContext httpContext,
-                                    RegistrationServiceConfiguration configuration,
-                                    ClientErrorManager clientErrorManager)
+                                    RegistrationServiceConfiguration configuration)
         {
             _roleService = roleService;
             _emailService = emailService;
             _notificationService = notificationService;
+            _permanentConnectionService = permanentConnectionService;
             _userService = userService;
             _loginService = loginService;
             _httpContext = httpContext.HttpContext;
             _configuration = configuration;
+        }
 
-            if (!clientErrorManager.IsIssetErrors("Registration"))
-            {
-                clientErrorManager.AddErrors(new ClientErrors("Registration", new Dictionary<string, ClientError>
+        public static void OnInit(ClientErrorManager manager)
+        {
+            manager.AddErrors(new ClientErrors("Registration", new Dictionary<string, ClientError>
                 {
                     { "r-token-inc", new ClientError("Incorrect registration token!")},
                     { "r-token-already-used", new ClientError("User with this registration token is already registered!")},
                     { "r-login-alrd-reg", new ClientError("User with this login is already registered!") },
                     { "r-email-alrd-reg", new ClientError("User with this email is already registered!")}
                 }));
-
-                // validation //  [PropValid("str-input", "str-email", "str-email-no-reg")]
-
-                
-            }
         }
+
         public string CreateRegistrationToken(TimeSpan exp, string email, Role role, IEnumerable<Permission> noPermissions = null)
         {
             DateTime expires = DateTime.Now.Add(exp);
@@ -106,7 +104,7 @@ namespace SchoolBridge.Domain.Services.Implementation
         }
         public async Task<string> CreateRegistrationToken(TimeSpan exp, string email, string role)
         {
-            return CreateRegistrationToken(exp, email, await _roleService.Get(role));
+            return CreateRegistrationToken(exp, email, await _roleService.GetAsync(role));
         }
         public JwtSecurityToken ValidateRegistrationToken(string token)
         {
@@ -125,12 +123,12 @@ namespace SchoolBridge.Domain.Services.Implementation
         public void SendEmailCompleated(EmailSendCompleatedEntity entity)
         {
             var tokenId = (string)entity.EmailEntity.AddtionalInfo;
-            _notificationService.PermanentNotify(tokenId, "onSendEmail", new OnSendEmailSource { Ok = entity.IsSended, Email = entity.EmailEntity.Message.To.FirstOrDefault()?.Address });
+            _notificationService.PermanentNotifyAsync(tokenId, "onSendEmail", new OnSendEmailSource { Ok = entity.IsSended, Email = entity.EmailEntity.Message.To.FirstOrDefault()?.Address });
         }
         public PermanentSubscribeDto StartRegister(string email, Role role, IEnumerable<Permission> noPermissions = null)
         {
-            var permanent = _notificationService.CreatePermanentToken(TimeSpan.FromHours(1), out var permTokenId);
-            var regToken = CreateRegistrationToken(_configuration.RegistrationTokenExpires, email, role, noPermissions);
+            var permanent = _permanentConnectionService.CreatePermanentToken(TimeSpan.FromHours(1), out var permTokenId);
+            var regToken = CreateRegistrationToken(_configuration.RegistrationTokenExpires, email, _roleService.Get(role.Name), noPermissions);
             _emailService.SendByDraft(email,
                                         "registration@schoolbridge.com",
                                         "Registration in Schoolbridge",
@@ -149,7 +147,7 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task<PermanentSubscribeDto> StartRegister(string email, string role)
         {
-            return StartRegister(email, await _roleService.Get(role));
+            return StartRegister(email, await _roleService.GetAsync(role));
         }
 
         public async Task<LoggedDto> EndRegister(EndRegisterDto entity, string uuid)
@@ -171,6 +169,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Name = entity.Name,
                 Surname = entity.Surname,
                 Lastname = entity.Lastname,
+                PhotoId = "default-user-photo",
                 Birthday = entity.Birthday.Value,
                 RoleId = int.Parse(token.Claims.First(x => x.Type == "role").Value),
                 PasswordHash = PasswordHandler.CreatePasswordHash(entity.Password)
@@ -181,7 +180,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 foreach (var item in token.Claims.First(x => x.Type == "noPermissions").Value.Split(' '))
                     noPermissions.Add(new Permission { Id = int.Parse(item) });
             var usr = await _userService.AddAsync(user, noPermissions);
-            usr.Role = await _roleService.Get(usr.RoleId);
+            usr.Role = await _roleService.GetAsync(usr.RoleId);
             return await _loginService.Login(usr, uuid);
         }
     }

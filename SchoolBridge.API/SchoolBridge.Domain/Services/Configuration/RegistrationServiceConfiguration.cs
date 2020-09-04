@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using SchoolBridge.Domain.Services.Abstraction;
 
 namespace SchoolBridge.Domain.Services.Configuration
 {
-    public class RegistrationServiceConfiguration
+    public class RegistrationServiceConfiguration: IMyService
     {
         public SecurityTokenHandler TokenHandler { get; set; } = new JwtSecurityTokenHandler();
         public TokenValidationParameters RegistrationTokenValidation { get; set; }

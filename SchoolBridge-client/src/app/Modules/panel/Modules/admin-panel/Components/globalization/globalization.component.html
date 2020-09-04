@@ -1,11 +1,11 @@
 <div class=".container-fluid rounded bg-light p-0" >
     <ul class="nav nav-tabs " id="myTab" role="tablist">
-        <li class="nav-item">
+        <li *ngIf="'GetLanguagesEditTab' | userPerm" class="nav-item">
             <a class="nav-link active" id="languages-tab" data-toggle="tab" href="#languages" role="tab" aria-controls="languages" aria-selected="true">
                 Languages
             </a>
         </li>
-        <li class="nav-item">
+        <li *ngIf="'GetStringsEditTab' | userPerm" class="nav-item">
             <a class="nav-link" id="strings-tab" data-toggle="tab" href="#strings" role="tab" aria-controls="strings" aria-selected="false">
                 Strings
             </a>
@@ -36,7 +36,7 @@
                     </form>
                 </div>
             </div>
-            <table *ngIf="'GetLanguage' | userPerm" class="table">
+            <table class="table">
                 <thead>
                   <tr>
                     <th scope="col">Tag</th>
@@ -45,7 +45,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of (globalizationService.info | async).awaibleLanguages | keyvalue;" >
+                  <tr *ngFor="let item of (gbiService.infoObs | async).awaibleLanguages | keyvalue;" >
                     <th class="text-uppercase" scope="row">{{item.key}}</th>
                     <td>{{item.value}}</td>
                     <td *ngIf="'RemoveLanguage' | userPerm" ><button class="btn btn-danger rounded-circle" title="{{item.key}}" (click)="removeLanguage($event)" >X</button></td>
@@ -53,9 +53,9 @@
             </table>
             
         </div>
-        <div class="tab-pane fade p-2" id="strings" role="tabpanel" aria-labelledby="strings-tab">
-            <button *ngIf="!(this.globalizationService.changeEditing | async)" (click)="toggleEditingMode()" class="btn btn-primary rounded-pill mb-3 ">Enable editing mode</button>
-            <button *ngIf="(this.globalizationService.changeEditing | async)" (click)="toggleEditingMode()" class="btn btn-primary rounded-pill mb-3 ">Disable editing mode</button>
+        <div *ngIf="'ToggleEditGbStringsMode' | userPerm" class="tab-pane fade p-2" id="strings" role="tabpanel" aria-labelledby="strings-tab">
+            <button *ngIf="!(gbeService.stateObs | async)" (click)="toggleEditingMode()" class="btn btn-primary rounded-pill mb-3 ">Enable editing mode</button>
+            <button *ngIf="(gbeService.stateObs | async)" (click)="toggleEditingMode()" class="btn btn-primary rounded-pill mb-3 ">Disable editing mode</button>
         </div>
     </div>
 </div>

@@ -10,7 +10,7 @@ export class DefaultComponent {
 
   constructor(userService: UserService,
               route: Router) { 
-    if (userService.getUser())
+    if (userService.user)
       route.navigateByUrl('/panel');
     else route.navigateByUrl('/start');
   }

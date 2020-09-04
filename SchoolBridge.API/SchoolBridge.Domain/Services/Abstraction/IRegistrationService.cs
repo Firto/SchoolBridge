@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface IRegistrationService
+    public interface IRegistrationService: IOnInitService
     {
         string CreateRegistrationToken(TimeSpan exp, string email, Role role, IEnumerable<Permission> noPermissions = null);
         string CreateRegistrationToken(TimeSpan exp, string email, Role role);

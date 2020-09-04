@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SchoolBridge.Domain.Services.Abstraction;
+using System;
 using System.Net.Mail;
 
 namespace SchoolBridge.Domain.Services.Configuration
 {
-    public class EmailServiceConfiguration
+    public class EmailServiceConfiguration: IMyService
     {
         public SmtpClient[] SmtpClients { get; set; }
         public string DefaultSendFrom { get; set; }

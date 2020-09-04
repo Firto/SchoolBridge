@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { Queue } from '../Collections/queue-collection';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class LoaderService {
     private loading: Queue<string> = new Queue<string>();
     private _isLoading: BehaviorSubject<string> = new BehaviorSubject<string>(null);

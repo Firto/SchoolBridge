@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface IValidatingService
+    public interface IValidatingService: IOnInitService
     {
         void Validate(string[] attrs, object obj, string objName);
         void Validate<T>(T dto);

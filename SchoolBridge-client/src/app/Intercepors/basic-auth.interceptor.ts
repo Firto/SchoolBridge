@@ -13,8 +13,7 @@ import { UserError } from '../Models/user-error.model';
 @Injectable()
 export class BasicAuthInterceptor implements HttpInterceptor {
     constructor(private userService: UserService,
-                private loginService: LoginService,
-                private httpClient: HttpClient) { }
+                private loginService: LoginService) { }
 
     private isRefreshing = false;
     private refreshTokenSubject: BehaviorSubject<string> = new BehaviorSubject<string>(null);
@@ -23,7 +22,7 @@ export class BasicAuthInterceptor implements HttpInterceptor {
         if (request.headers.has('skip')) 
             return next.handle(request);
         
-        if (this.userService.getUser()){
+        if (this.userService.user){
             return next.handle(this.attachTokenToRequest(request)).pipe(
                 catchError((err: any, obs: Observable<HttpEvent<any>>) => {
                     if ('id' in err && err.id === 'inc-token'){
@@ -52,9 +51,9 @@ export class BasicAuthInterceptor implements HttpInterceptor {
     }
 
     private attachTokenToRequest(request: HttpRequest<any>) {
-        if (this.userService.getUser()) {
+        if (this.userService.user) {
           return request.clone({
-            setHeaders: { Authorization: `Bearer ${this.userService.getUser().login.tokens.token}` },
+            setHeaders: { Authorization: `Bearer ${this.userService.user.login.tokens.token}` },
           });
         }
         return request;

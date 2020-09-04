@@ -1,4 +1,5 @@
-import { GlobalizationService } from '../services/globalization.service';
+import { GlobalizationService } from '../Services/globalization.service';
+
 
 
 export function Globalization(prefix: string, constStrings: {errors: string[], validating: string[], args: string[]} | string[]) {
@@ -11,11 +12,11 @@ export function Globalization(prefix: string, constStrings: {errors: string[], v
         const _gb: GlobalizationService = argss.find(x => x instanceof GlobalizationService);
         if (_gb){
           if ('errors' in constStrings)
-            constStrings = [].concat(...constStrings.errors,...constStrings.validating, ...constStrings.args.map(x => 'pn-' + x));
+            constStrings = [].concat(...constStrings.errors.map(x => 'cl-'+x),...constStrings.validating, ...constStrings.args.map(x => 'pn-' + x));
             _gb.initComponent(constr.name, prefix, constStrings);
         }
         
       }
-    }
+    } 
   }
 }

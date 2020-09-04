@@ -18,7 +18,7 @@ export class LoginnedGuard implements CanActivate, CanActivateChild {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         if (!this._guardService.getState())
             return true;
-        if (this.userService.getUser()) 
+        if (this.userService.user)  
             return true;
         this.toastrService.error("No permission to page!");
         this.router.navigateByUrl('/start?returnUrl=' + encodeURI(window.location.pathname));

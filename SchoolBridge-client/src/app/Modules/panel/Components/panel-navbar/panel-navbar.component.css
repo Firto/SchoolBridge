@@ -43,7 +43,6 @@ nav a img {
     height: 50px;
     width: 50px;
     margin-right: 20px;
-    margin-bottom: 7px;
 }
 
 .menu {
@@ -81,7 +80,6 @@ nav a img {
 .show-menu-btn,
 .hide-menu-btn {
     transition: 0.4s;
-    font-size: 30px;
     cursor: pointer;
     color: gray;
     display: block;
@@ -96,6 +94,7 @@ nav a img {
 
 .show-menu-btn {
     float: right;
+    margin-bottom: 0;
 }
 
 .show-menu-btn i {

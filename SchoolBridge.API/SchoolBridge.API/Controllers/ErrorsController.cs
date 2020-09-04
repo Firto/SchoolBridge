@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SchoolBridge.Helpers.DtoModels;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
 
 namespace SchoolBridge.API.Controllers
 {

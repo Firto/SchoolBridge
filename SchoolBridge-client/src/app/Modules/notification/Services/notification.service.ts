@@ -3,104 +3,19 @@ import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@aspnet
 import { environment } from 'src/environments/environment';
 import { Subject, Observable } from 'rxjs';
 import { Notification } from 'src/app/Modules/notification/Models/notification.model'
-import { BaseService } from '../../../Services/base.service';
-import { apiConfig } from 'src/app/Const/api.config';
-import { ToastrService } from 'ngx-toastr';
-import { Service } from 'src/app/Interfaces/Service/service.interface';
+import { ServerHub } from 'src/app/Services/server.hub';
   
-@Injectable({ providedIn: 'root' })  
+@Injectable()  
 export class NotificationService {    
-  private _connectionEstablished:Subject<Boolean> = new Subject<Boolean>();
-  private _reciveNotification:Subject<Notification> = new Subject<Notification>(); 
+  private _reciveNotification:Subject<Notification> = new Subject<Notification>();  
 
-  public connectionEstablished:Observable<Boolean> = this._connectionEstablished.asObservable();
   public reciveNotification:Observable<Notification> = this._reciveNotification.asObservable();  
-  
-  private _hubConnection: HubConnection;  
  
-  constructor(public toastr: ToastrService) { 
-    this.createConnection();  
-    this.registerOnServerEvents();
-  }  
-  
-  private createConnection() {  
-    this._hubConnection = new HubConnectionBuilder()  
-      .withUrl(environment.apiUrl + "notify")  
-      .build();  
-  }  
-  
-  private reconnect(msec: number): void {
-    this._connectionEstablished.next(false); 
-    console.log('Error while establishing connection, retrying...');  
-    let t_func = () => this.startConnection();
-    setTimeout(t_func, msec);
-  }
-
-  private startConnection(f: () => void = null): void {  
-    try{
-    this._hubConnection  
-      .start()  
-      .then(() => {   
-        console.log('Hub connection started');  
-        this._connectionEstablished.next(true);
-        if (f != null) f(); 
-      })
-      .catch(err => { 
-        this.reconnect(10000) 
-      });
-    }catch{
-
-    }
-  } 
-
-  private registerOnServerEvents(): void {  
-    this._hubConnection.on('Notification', (data: any) => {
+  constructor(public serverHub: ServerHub) { 
+    console.log("registered");
+    this.serverHub.registerOnServerEvent('Notification', (data: any) => {
       console.log(data);
       this._reciveNotification.next(data);
-    }); 
-  } 
-
-  public subscribe(token:string): void{
-    let f = () => {
-      try{
-      console.log("subscribed");
-      this._hubConnection.invoke('subscribe', token); // https://codepen.io/sabeelmuttil/pen/yWBrxw
-      }catch{
-
-      }
-    };
-    if (this._hubConnection.state == HubConnectionState.Connected)
-      f();
-    else this.startConnection(f);
-  } 
-
-  public permanentSubscribe(token:string): void{
-    let f = () => {
-      try{
-        console.log("permanentsubscribe");
-        this._hubConnection.invoke('permanentSubscribe', token); // https://codepen.io/sabeelmuttil/pen/yWBrxw
-      }catch{
-  
-      }
-    };
-    if (this._hubConnection.state == HubConnectionState.Connected)
-      f();
-    else this.startConnection(f);
-  } 
-
-  public unsubscribe(): void{
-    let f = () => {
-      try{
-        console.log("unsubscribed");
-        this._hubConnection.invoke('unsubscribe').then(() => this._hubConnection.stop());
-        
-      }catch{
-  
-      }
-    };
-    if (this._hubConnection.state == HubConnectionState.Connected)
-      f();
-    else this.startConnection(f);
-    
-  }
+    });
+  }  
 }    

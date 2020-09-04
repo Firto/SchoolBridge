@@ -1,5 +1,5 @@
-<div class="container-fluid p-3">
-    <div *ngIf="'GetAdminPanel' | userPerm" class="col-sm-4 col-12 p-0">
+<div class="row w-100 m-0">
+    <div *ngIf="'GetAdminPanel' | userPerm" class="mb-3 col-12 col-sm-6 col-lg-4">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Admin Panel</h5>
@@ -8,7 +8,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="'GetPupilPanel' | userPerm" class="col-sm-4 col-12 p-0">
+    <div *ngIf="'GetPupilPanel' | userPerm" class="pl-sm-0 mb-3 col-12 col-sm-6 col-lg-4">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Pupil panel</h5>

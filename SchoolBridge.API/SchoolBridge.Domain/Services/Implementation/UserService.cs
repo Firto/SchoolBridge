@@ -5,13 +5,17 @@ using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Helpers.DtoModels;
 using SchoolBridge.Helpers.Extentions;
 using SchoolBridge.Helpers.Managers;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using SchoolBridge.Domain.Services.Configuration;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
@@ -22,24 +26,164 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly IRoleService _roleService;
 
         private readonly IGenericRepository<DefaultRolePermission> _defaultRolePermissionGR;
-
+        private readonly IOnlineService _onlineService;
+        private readonly UserServiceConfiguration _configuration;
         public UserService(IGenericRepository<User> userGR,
                             IPermissionService permissionService,
                             IRoleService roleService,
                             IGenericRepository<DefaultRolePermission> defaultRolePermissionGR,
-                            ClientErrorManager clientErrorManager)
+                            IOnlineService onlineService,
+                            UserServiceConfiguration configuration)
         {
             _userGR = userGR;
             _permissionService = permissionService;
             _roleService = roleService;
             _defaultRolePermissionGR = defaultRolePermissionGR;
+            _onlineService = onlineService;
+            _configuration = configuration;
+        }
 
-            if (!clientErrorManager.IsIssetErrors("User"))
-                clientErrorManager.AddErrors(new ClientErrors("User", new Dictionary<string, ClientError>
+        public static void OnInit(ClientErrorManager manager)
+        {
+            manager.AddErrors(new ClientErrors("User", new Dictionary<string, ClientError>
                 {
-                    { "u-inc-user-id" , new ClientError ("Incorrect user id!")}
+                    { "u-inc-user-id" , new ClientError ("Incorrect user id!")},
+                    { "u-inc-gettoken" , new ClientError ("Incorrect get user token!")}
                 }));
         }
+
+        public static void OnFirstInit(IGenericRepository<User> userGR, IGenericRepository<Role> roleGR)
+        {
+            userGR.Create(new User
+            {
+                Id = "admin",
+                Name = "Admin",
+                Surname = "Admin",
+                Lastname = "Admin",
+                Email = "admin@admin.admin",
+                Login = "admin",
+                PhotoId = "default-user-photo",
+                PasswordHash = PasswordHandler.CreatePasswordHash("admin"),
+                RoleId = roleGR.GetAll(x => x.Name == "Admin").FirstOrDefault().Id
+            });
+        }
+
+        public UserGetToken CreateGetToken(string userId, TimeSpan expires)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Jti, userId),
+            };
+
+            var creds = new SigningCredentials(_configuration.UserGetTokenValidation.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
+            var expiress = DateTime.Now.Add(expires);
+            var token = new JwtSecurityToken(
+                issuer: _configuration.UserGetTokenValidation.ValidIssuer,
+                expires: expiress,
+                claims: claims,
+                signingCredentials: creds
+            );
+
+            return new UserGetToken { Token = _configuration.TokenHandler.WriteToken(token), Expires = expiress.ToUnixTimestamp() };
+        }
+
+        public UserGetToken CreateStaticGetToken(string userId)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Jti, userId),
+            };
+            var creds = new SigningCredentials(_configuration.UserGetTokenValidation.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
+            var token = new JwtSecurityToken(
+                issuer: _configuration.UserGetTokenValidation.ValidIssuer,
+                expires: DateTime.UnixEpoch,
+                claims: claims,
+                signingCredentials: creds
+            );
+
+            return new UserGetToken { Token = _configuration.TokenHandler.WriteToken(token), Expires = 0 };
+        }
+
+        public JwtSecurityToken ValidateToken(string token)
+        {
+            SecurityToken validatedToken;
+            try
+            {
+                _configuration.TokenHandler.ValidateToken(token, _configuration.UserGetTokenValidation, out validatedToken);
+            }
+            catch (SecurityTokenExpiredException ex)
+            {
+                if (ex.Expires != DateTime.UnixEpoch)
+                    throw new ClientException("u-inc-gettoken");
+                return new JwtSecurityToken(token);
+            }
+            catch (Exception) {
+                throw new ClientException("u-inc-gettoken");
+            }
+
+            return validatedToken as JwtSecurityToken;
+        }
+
+        public UserDto GetFullDto(string tokenId, string Id) {
+            var usr = _userGR.GetDbSet()
+                          .Where(x => x.Id == Id)
+                          .Include(x => x.Role).FirstOrDefault();
+            return new UserDto
+            {
+                Id = usr.Id,
+                Login = usr.Login,
+                Role = usr.Role.Name,
+                Photo = usr.PhotoId,
+                OnlineStatusSubscriptionToken = _onlineService.CreateOnlineStatusSubscriptionToken(tokenId, Id),
+                OnlineStatus = _onlineService.GetOnlineStatus(Id)
+            };
+        }
+
+        public UserDto GetFullDtoByGetToken(string tokenId, string getToken)
+        {
+            var token = ValidateToken(getToken);
+            return GetFullDto(tokenId, token.Id);
+        }
+
+        public ShortUserDto GetShortDto(string Id)
+        {
+            return new ShortUserDto
+            {
+                Id = Id,
+                GetToken = CreateGetToken(Id, new TimeSpan(0, 15, 0))
+            };
+        }
+
+        public ShortUserDto GetStaticShortDto(string Id) {
+            return new ShortUserDto
+            {
+                Id = Id,
+                GetToken = CreateStaticGetToken(Id)
+            };
+        }
+
+        public async Task<UserDto> GetFullDtoAsync(string tokenId, string Id)
+        {
+            var usr = await _userGR.GetDbSet()
+                          .Where(x => x.Id == Id)
+                          .Include(x => x.Role).FirstOrDefaultAsync();
+            return new UserDto
+            {
+                Id = usr.Id,
+                Login = usr.Login,
+                Role = usr.Role.Name,
+                Photo = usr.PhotoId,
+                OnlineStatusSubscriptionToken = _onlineService.CreateOnlineStatusSubscriptionToken(tokenId, Id),
+                OnlineStatus = _onlineService.GetOnlineStatus(Id)
+            };
+        }
+
+        public async Task<UserDto> GetFullDtoByGetTokenAsync(string tokenId, string getToken)
+        {
+            var token = ValidateToken(getToken);
+            return await GetFullDtoAsync(tokenId, token.Id);
+        }
+
         public async Task<User> AddAsync(User user, IEnumerable<Permission> noPermissions = null)
         {
             user = await _userGR.CreateAsync(user);
@@ -50,13 +194,13 @@ namespace SchoolBridge.Domain.Services.Implementation
                 .TakeWhile(x => noPermissions.FirstOrDefault(z => z.Id == x.PermissionId) == null)
                 .Select(x => x.Permission);
          
-            user.Permissions = await _permissionService.AddPermissions(user, permissions);
+            user.Permissions = await _permissionService.AddUserPermissionsAsync(user, permissions);
             return user;
         }
 
         public async Task<User> AddAsync(User user, string role, IEnumerable<Permission> noPermissions = null)
         {
-            user.Role = await _roleService.Get(role);
+            user.Role = await _roleService.GetAsync(role);
             return await AddAsync(user, noPermissions);
         }
 
@@ -87,12 +231,15 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public async Task<User> GetAsync(string Id)
         {
-            return await _userGR.FindAsync(Id);
+            var usr = await _userGR.FindAsync(Id);
+            if (usr == null)
+                throw new ClientException("u-inc-user-id");
+            return usr;
         }
 
         public async Task<bool> IsIssetAsync(string Id)
         {
-            return (await GetAsync(Id)) != null;
+            return (await _userGR.FindAsync(Id)) != null;
         }
 
         public User GetByEmail(string email)
@@ -117,7 +264,10 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public User Get(string Id)
         {
-            return _userGR.Find(Id);
+            var usr = _userGR.Find(Id);
+            if (usr == null)
+                throw new ClientException("u-inc-user-id");
+            return usr;
         }
 
         public bool IsIsset(string Id)

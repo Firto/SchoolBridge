@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { UserError } from 'src/app/Models/user-error.model';
 import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
+import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
 
 @Component({
   selector: 'app-register',
@@ -28,8 +29,11 @@ import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-
 export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   regToken: string = "";
+  
   public model: EndRegister = new EndRegister(); 
-  constructor(private registerService: RegisterService,
+
+  constructor(private gbService: GlobalizationService,
+              private registerService: RegisterService,
               private route: ActivatedRoute,
               private router: Router,
               private fb: FormBuilder) { 

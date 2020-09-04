@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface IProfileService
+    public interface IProfileService: IOnInitService
     {
         Task<ProfileDto> ChangeProfile(User user, ProfileDto entity);
         Task ChangePassword(User user, ChangePasswordDto entity);

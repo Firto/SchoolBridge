@@ -28,9 +28,7 @@ export interface HttpOptionsWide{
     };
 }
 
-
-
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class BaseService {
 
     /*private most: Array<{obs: Subject<APIResult>, 
@@ -44,12 +42,11 @@ export class BaseService {
     private _state: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public state: Observable<boolean> = this._state.asObservable();
 
-    constructor(private http: HttpClient,
-                private connectionService: ConnectionService) {
+    constructor(private http: HttpClient) {
         /*this.connectionService.monitor().subscribe((x) => {
             this.cnn = x;
             if (x) this.most.forEach((s) => this.send(s.ser, s.method, s.body, s.options).subscribe((m) =>  s.obs.next(m)));
-        });*/
+        });*/ 
     }
 
     setState(state: boolean) {
@@ -62,6 +59,7 @@ export class BaseService {
 
     send<T>(ser: Service, method:string, body?:any, options?: HttpOptionsWide): Observable<T> {
         //if (!this._state.value) return;
+        let m;
         switch  (ser.methods[method].type){
             case "POST":
                 return <Observable<T>>this.post(ser, method, body, options).pipe(take(1));

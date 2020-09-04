@@ -1,7 +1,11 @@
 import { Component } from '@angular/core';
-import { DBNMessageSource } from 'src/app/Modules/db-notification/Sources/DataBaseSources/DBN-message-source';
 import { DbNtfComponent } from '../db-ntf-component.iterface';
 import { DataBaseSource } from 'src/app/Modules/notification/Models/NotificationSources/database-source';
+import { IDBNSource } from '../../../Models/IDBN-source.interface';
+
+export interface DBNMessageSource extends IDBNSource{
+    message: string;
+}
 
 @Component({
     selector: "db-ntf-message",
@@ -15,5 +19,5 @@ import { DataBaseSource } from 'src/app/Modules/notification/Models/Notification
 
 export class DbNtfMessageComponent implements DbNtfComponent {
     public baseSource: DataBaseSource;
-    public source: DBNMessageSource; 
+    public source: DBNMessageSource;
 }

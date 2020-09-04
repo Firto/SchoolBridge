@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { GlobalizationService } from 'src/app/Modules/globalization/services/globalization.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
+import { GlobalizationEditService } from 'src/app/Modules/globalization/Services/globalization-edit.service';
+import { GlobalizationInfoService } from 'src/app/Modules/globalization/Services/globalization-info.service';
 
 @Component({
     selector: "adm-globalization",
@@ -11,7 +13,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 export class GlobalizationComponent {
     addForm: FormGroup;
 
-    constructor(public globalizationService: GlobalizationService,
+    constructor(public gbeService: GlobalizationEditService,
+                public gbiService: GlobalizationInfoService,
                 private fb: FormBuilder){
         this.addForm = this.fb.group({
             abbName: [''],
@@ -21,7 +24,7 @@ export class GlobalizationComponent {
 
     public addLanguage(){
         if (this.addForm.valid) 
-            this.globalizationService.addLanguage(this.addForm.controls.abbName.value, this.addForm.controls.fullName.value).subscribe(
+            this.gbeService.addLanguage(this.addForm.controls.abbName.value, this.addForm.controls.fullName.value).subscribe(
                 result => {
                 if (result.ok == true){
                     this.addForm.reset();
@@ -35,10 +38,10 @@ export class GlobalizationComponent {
     }
 
     public removeLanguage(e: MouseEvent){
-        this.globalizationService.removeLanguage((<any>e.target).title).subscribe();
+        this.gbeService.removeLanguage((<any>e.target).title).subscribe();
     }
     
     public toggleEditingMode(){
-        this.globalizationService.setEditingState(!this.globalizationService.getEditingState());
+        this.gbeService.state = !this.gbeService.state;
     }
 }

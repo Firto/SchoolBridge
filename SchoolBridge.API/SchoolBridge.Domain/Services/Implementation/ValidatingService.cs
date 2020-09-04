@@ -1,8 +1,8 @@
 ﻿using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Helpers.AddtionalClases.ValidatingService;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -19,32 +19,27 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly IServiceProvider _provider;
         private static readonly IDictionary<string, object> _validateFunctions = new Dictionary<string, object>();
 
-        public ValidatingService(IServiceProvider provider,
-                                ClientErrorManager clientErrorManager) {
+        public ValidatingService(IServiceProvider provider) {
             _provider = provider;
+        }
 
-            if (!clientErrorManager.IsIssetErrors("Validating"))
-            {
-
-                clientErrorManager.AddErrors(new ClientErrors("Validating", new Dictionary<string, ClientError>{
+        public static void OnInit(ClientErrorManager manager, IValidatingService validatingService) {
+            manager.AddErrors(new ClientErrors("Validating", new Dictionary<string, ClientError>{
                     {"v-func-no", new ClientError("No validation function to property!")},
                     {"v-dto-invalid", new ClientError("Invalid dto!")}
                 }));
 
-                // default
+            validatingService.AddValidateFunc("not-null", (object prop, PropValidateContext context) =>
+            {
+                if (prop == null)
+                    context.Valid.Add($"[v-d-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
+            });
 
-                AddValidateFunc("not-null", (object prop, PropValidateContext context) =>
-                {
-                    if (prop == null)
-                        context.Valid.Add($"[v-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
-                });
-
-                AddValidateFunc("str-input", (string prop, PropValidateContext context) =>
-                {
-                    if (string.IsNullOrEmpty(prop))
-                        context.Valid.Add($"[v-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
-                });
-            }
+            validatingService.AddValidateFunc("str-input", (string prop, PropValidateContext context) =>
+            {
+                if (string.IsNullOrEmpty(prop))
+                    context.Valid.Add($"[v-d-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
+            });
         }
 
         public void Validate(string[] attrs, object obj, string objName)
@@ -52,7 +47,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             IDictionary<string, IEnumerable<string>> valid = new Dictionary<string, IEnumerable<string>>();
             PropValidateContext _context = new PropValidateContext(_provider, null, null);
             _context.Valid = new List<string>();
-            _context.PropName = objName;
+            _context.PropName = objName.ToLower();
             foreach (var s in attrs)
                 if (!_validateFunctions.ContainsKey(s))
                     throw new ClientException("v-func-no");
@@ -97,7 +92,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 if (temp != null) {
                     if (_context.Valid == null)
                         _context.Valid = new List<string>();
-                    _context.PropName = item.Name;
+                    _context.PropName = item.Name.ToLower();
 
                     foreach (var s in temp.FuncIdsAtributes)
                         if (!_validateFunctions.ContainsKey(s))

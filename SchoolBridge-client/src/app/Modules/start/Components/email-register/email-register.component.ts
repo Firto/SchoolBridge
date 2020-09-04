@@ -3,6 +3,7 @@ import { RegisterService } from 'src/app/Modules/start/Services/register.service
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { UserError } from 'src/app/Models/user-error.model';
 import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
+import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
 
 @Component({
   selector: 'app-email-register',
@@ -11,7 +12,7 @@ import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-
 })
 @Globalization('cm-st-reg', {
   errors: [],
-  validating: [],
+  validating: ["v-str-email"],
   args: [
     'email'
   ]
@@ -19,7 +20,8 @@ import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-
 export class EmailRegisterComponent implements OnInit {
   registerForm: FormGroup;
   
-  constructor(private registerService: RegisterService,
+  constructor(private gbService: GlobalizationService,
+              private registerService: RegisterService,
               private fb: FormBuilder) { 
     
   }

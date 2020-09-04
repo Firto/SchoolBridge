@@ -10,8 +10,7 @@ using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Hostings
 {
-    public class TokenRemoveHosting<AUser> : IHostedService, IDisposable
-        where AUser: AuthUser
+    public class TokenRemoveHosting : IHostedService, IDisposable
     {
         private Timer _timer;
         private readonly IServiceProvider _serviceProvider;
@@ -33,9 +32,10 @@ namespace SchoolBridge.Domain.Hostings
 
         private void DoWork(object state)
         {
-            using (var scope = _serviceProvider.CreateScope()) {
+            using (var scope = _serviceProvider.CreateScope())
+            {
                 DbContext _db = scope.ServiceProvider.GetRequiredService<DbContext>();
-                _db.Set<ActiveRefreshToken<AUser>>().RemoveRange(_db.Set<ActiveRefreshToken<AUser>>().Where((x) => x.Expire < DateTime.Now));
+                _db.Set<ActiveRefreshToken>().RemoveRange(_db.Set<ActiveRefreshToken>().Where((x) => x.Expire < DateTime.Now));
                 _db.SaveChanges();
             }
         }

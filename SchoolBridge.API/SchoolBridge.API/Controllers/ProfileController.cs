@@ -39,6 +39,7 @@ namespace SchoolBridge.API.Controllers
             model.Name = user.Name;
             model.Surname = user.Surname;
             model.Lastname = user.Lastname;
+            model.Photo = user.PhotoId;
             return ResultDto.Create(model);
         }
 

@@ -4,4 +4,5 @@ export class ProfileModel {
     name: string;
     surname: string;
     lastname: string;
+    photo: string;
 }

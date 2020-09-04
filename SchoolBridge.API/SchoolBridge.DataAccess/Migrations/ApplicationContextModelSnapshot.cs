@@ -19,7 +19,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Authorization.ActiveRefreshToken<SchoolBridge.DataAccess.Entities.User>", b =>
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Authorization.ActiveRefreshToken", b =>
                 {
                     b.Property<string>("Jti")
                         .HasColumnType("text");
@@ -40,6 +40,65 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.ToTable("ActiveRefreshTokens");
                 });
 
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Chat.DirectChat", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastModify")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("Read")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("User1Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("User2Id")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("User1Id");
+
+                    b.HasIndex("User2Id");
+
+                    b.ToTable("DirectChats");
+                });
+
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Chat.DirectMessage", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Base64Source")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ChatId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("DirectMessages");
+                });
+
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.DefaultRolePermission", b =>
                 {
                     b.Property<int>("RoleId")
@@ -53,38 +112,6 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.HasIndex("PermissionId");
 
                     b.ToTable("DefaultRolePermissions");
-
-                    b.HasData(
-                        new
-                        {
-                            RoleId = 1,
-                            PermissionId = 5
-                        },
-                        new
-                        {
-                            RoleId = 1,
-                            PermissionId = 6
-                        },
-                        new
-                        {
-                            RoleId = 1,
-                            PermissionId = 7
-                        },
-                        new
-                        {
-                            RoleId = 1,
-                            PermissionId = 10
-                        },
-                        new
-                        {
-                            RoleId = 1,
-                            PermissionId = 11
-                        },
-                        new
-                        {
-                            RoleId = 1,
-                            PermissionId = 12
-                        });
                 });
 
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Files.File", b =>
@@ -96,12 +123,6 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Files");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "default-user-photo"
-                        });
                 });
 
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Files.Images.Image", b =>
@@ -119,14 +140,6 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.HasKey("FileId");
 
                     b.ToTable("Images");
-
-                    b.HasData(
-                        new
-                        {
-                            FileId = "default-user-photo",
-                            Static = true,
-                            Type = "image/jpeg"
-                        });
                 });
 
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Language", b =>
@@ -147,20 +160,6 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Languages");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AbbName = "en",
-                            FullName = "English"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AbbName = "ua",
-                            FullName = "Українська"
-                        });
                 });
 
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.LanguageString", b =>
@@ -227,31 +226,9 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LanguageStringTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "client-error"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "component"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "valid-error"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "default"
-                        });
                 });
 
-            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Notification<SchoolBridge.DataAccess.Entities.User>", b =>
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Notification", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -294,183 +271,37 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Permissions");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "CreateAdmin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "EditAdmin"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "EditAdminPermissions"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "RemoveAdmin"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "CreatePupil"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "EditPupilPermissions"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "EditPupil"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "RemovePupil"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Name = "CreateLanguage"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Name = "GetLanguage"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Name = "EditLanguage"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Name = "RemoveLanguage"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Name = "CreateLanguageStringId"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Name = "GetLanguageStringId"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Name = "EditLanguageStringId"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Name = "RemoveLanguageStringId"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Name = "CreateLanguageStringIdType"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Name = "GetLanguageStringIdType"
-                        },
-                        new
-                        {
-                            Id = 19,
-                            Name = "EditLanguageStringIdType"
-                        },
-                        new
-                        {
-                            Id = 20,
-                            Name = "RemoveLanguageStringIdType"
-                        },
-                        new
-                        {
-                            Id = 21,
-                            Name = "CreateLanguageString"
-                        },
-                        new
-                        {
-                            Id = 22,
-                            Name = "GetLanguageString"
-                        },
-                        new
-                        {
-                            Id = 23,
-                            Name = "EditLanguageString"
-                        },
-                        new
-                        {
-                            Id = 24,
-                            Name = "RemoveLanguageString"
-                        },
-                        new
-                        {
-                            Id = 25,
-                            Name = "AddLanguageStringType"
-                        },
-                        new
-                        {
-                            Id = 26,
-                            Name = "GetLanguageStringType"
-                        },
-                        new
-                        {
-                            Id = 27,
-                            Name = "EditLanguageStringType"
-                        },
-                        new
-                        {
-                            Id = 28,
-                            Name = "RemoveLanguageStringType"
-                        },
-                        new
-                        {
-                            Id = 29,
-                            Name = "GetAdminsList"
-                        },
-                        new
-                        {
-                            Id = 30,
-                            Name = "GetAdminInfo"
-                        },
-                        new
-                        {
-                            Id = 31,
-                            Name = "GetPupilsList"
-                        },
-                        new
-                        {
-                            Id = 32,
-                            Name = "GetPupilsInfo"
-                        },
-                        new
-                        {
-                            Id = 33,
-                            Name = "UpdateBaseUpdateId"
-                        },
-                        new
-                        {
-                            Id = 34,
-                            Name = "GetAdminPanel"
-                        },
-                        new
-                        {
-                            Id = 35,
-                            Name = "GetGlobalizationTab"
-                        });
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.PupilSubject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte>("DayNumber")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte>("LessonNumber")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("PupilId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SubjectName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PupilId");
+
+                    b.ToTable("PupilSubjects");
                 });
 
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Role", b =>
@@ -486,18 +317,6 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Name = "Pupil"
-                        });
                 });
 
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.User", b =>
@@ -538,6 +357,9 @@ namespace SchoolBridge.DataAccess.Migrations
                         .HasColumnType("character varying(210)")
                         .HasMaxLength(210);
 
+                    b.Property<string>("PhotoId")
+                        .HasColumnType("text");
+
                     b.Property<int>("RoleId")
                         .HasColumnType("integer");
 
@@ -548,23 +370,11 @@ namespace SchoolBridge.DataAccess.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("PhotoId");
+
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "admin",
-                            Birthday = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "admin@admin.admin",
-                            Lastname = "Admin",
-                            Login = "admin",
-                            Name = "Admin",
-                            PasswordHash = "140C86WVC/E8ZUY2BE8F1BB200F2B65385D4E7B1B8D911BB08819E286D6821075A0F6A9EB3D7F6A32AF16FC11405459C55374092C3",
-                            RoleId = 1,
-                            Surname = "Admin"
-                        });
                 });
 
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.UserPermission", b =>
@@ -580,180 +390,35 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.HasIndex("PermissionId");
 
                     b.ToTable("UserPermissions");
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 1
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 2
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 3
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 4
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 5
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 6
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 7
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 10
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 11
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 12
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 13
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 14
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 15
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 16
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 17
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 18
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 19
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 20
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 21
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 22
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 23
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 24
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 25
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 26
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 27
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 28
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 29
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 30
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 31
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 32
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 33
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 34
-                        },
-                        new
-                        {
-                            UserId = "admin",
-                            PermissionId = 35
-                        });
                 });
 
-            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Authorization.ActiveRefreshToken<SchoolBridge.DataAccess.Entities.User>", b =>
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Authorization.ActiveRefreshToken", b =>
                 {
                     b.HasOne("SchoolBridge.DataAccess.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Chat.DirectChat", b =>
+                {
+                    b.HasOne("SchoolBridge.DataAccess.Entities.User", "User1")
+                        .WithMany()
+                        .HasForeignKey("User1Id");
+
+                    b.HasOne("SchoolBridge.DataAccess.Entities.User", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2Id");
+                });
+
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Chat.DirectMessage", b =>
+                {
+                    b.HasOne("SchoolBridge.DataAccess.Entities.Chat.DirectChat", "Chat")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId");
+
+                    b.HasOne("SchoolBridge.DataAccess.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId");
                 });
 
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.DefaultRolePermission", b =>
@@ -810,15 +475,26 @@ namespace SchoolBridge.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Notification<SchoolBridge.DataAccess.Entities.User>", b =>
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.Notification", b =>
                 {
                     b.HasOne("SchoolBridge.DataAccess.Entities.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("SchoolBridge.DataAccess.Entities.PupilSubject", b =>
+                {
+                    b.HasOne("SchoolBridge.DataAccess.Entities.User", "Pupil")
+                        .WithMany()
+                        .HasForeignKey("PupilId");
+                });
+
             modelBuilder.Entity("SchoolBridge.DataAccess.Entities.User", b =>
                 {
+                    b.HasOne("SchoolBridge.DataAccess.Entities.Files.Images.Image", "Photo")
+                        .WithMany()
+                        .HasForeignKey("PhotoId");
+
                     b.HasOne("SchoolBridge.DataAccess.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")

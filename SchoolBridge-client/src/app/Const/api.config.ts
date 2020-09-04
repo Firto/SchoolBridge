@@ -80,6 +80,10 @@ export const apiConfig: Record<string, Service> = {
             "remove-language": {
                 url: "language/remove",
                 type: "GET"
+            },
+            "update-baseupdateid": {
+                url: "update-baseupdateid",
+                type: "GET"
             }
         }
     },
@@ -93,6 +97,29 @@ export const apiConfig: Record<string, Service> = {
             "change-login": {
                 url: "changeLogin",
                 type: "POST"
+            }
+        }
+    },
+    "users": {
+        url: "user/",
+        methods: {
+            "get": {
+                url: "get",
+                type: "GET"
+            },
+            "getMany": {
+                url: "getmany",
+                type: "POST",
+                loader: false
+            },
+        }
+    },
+    "chat": {
+        url: "chat/",
+        methods: {
+            "getChats": {
+                url: "getchats",
+                type: "GET"
             }
         }
     }

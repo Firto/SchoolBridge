@@ -3,7 +3,7 @@ import { LoginService } from '../../../../Services/login.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormBuilder} from '@angular/forms';
 import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
-import { GlobalizationService } from 'src/app/Modules/globalization/services/globalization.service';
+import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
 
 @Component({
   selector: 'app-login',
@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
   loginForm: FormGroup;
 
   private returnUrl: string;
-  constructor(privategbService: GlobalizationService,
+  constructor(private gbService: GlobalizationService,
               private authService: LoginService, 
               private router:Router,
               private route: ActivatedRoute,
@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
       password: ['']
     });
 
-    console.log((<any>this).__proto__.constructor._usedBackendStrings, this);
+    //console.log((<any>this).__proto__.constructor._usedBackendStrings, this);
   }
               
   logon(){

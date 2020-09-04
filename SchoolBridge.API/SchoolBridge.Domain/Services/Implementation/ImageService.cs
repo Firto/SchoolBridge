@@ -3,39 +3,47 @@ using SchoolBridge.DataAccess.Entities.Files.Images;
 using SchoolBridge.DataAccess.Interfaces;
 using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using SchoolBridge.Helpers.Managers.Image;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
     public class ImageService : IImageService
     {
         private readonly IGenericRepository<Image> _imageGR;
-        private readonly IMapper _mapper;
         private readonly ImageServiceConfiguration _configuration;
         private readonly IFileService _fileService;
         public ImageService(IGenericRepository<Image> imageGR,
                             IMapper mapper,
                             ImageServiceConfiguration configuration,
-                            IFileService fileService,
-                            ClientErrorManager clientErrorManager)
+                            IFileService fileService)
         {
             _imageGR = imageGR;
-            _mapper = mapper;
             _configuration = configuration;
             _fileService = fileService;
+        }
 
-            if (!clientErrorManager.IsIssetErrors("Image"))
-                clientErrorManager.AddErrors(new ClientErrors("Image", new Dictionary<string, ClientError> {
+        public static void OnInit(ClientErrorManager manager, ImageServiceConfiguration configuration)
+        {
+            manager.AddErrors(new ClientErrors("ImageService", new Dictionary<string, ClientError> {
                     { "inc-photo-type", new ClientError("Incorrect photo type!") },
                     { "image-load-err", new ClientError("Image loading error!") },
                     { "too-big-image", new ClientError($"Too big image > {configuration.MaxSizeByte} byte" ) },
                 }));
+        }
+
+        public static void OnFirstInit(IGenericRepository<Image> imageGR)
+        {
+            imageGR.Create(
+               new Image { FileId = "default-user-photo", Type = "image/jpeg", Static = true }
+            );
         }
 
         public async Task<string> Add(DataImage base64Image) {

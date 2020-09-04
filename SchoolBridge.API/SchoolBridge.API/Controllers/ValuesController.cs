@@ -20,12 +20,12 @@ namespace SchoolBridge.API.Controllers
     public class ValuesController : ControllerBase
     {
         IWebHostEnvironment _webHostEnvironment;
-        IDataBaseNotificationService<User> _dataBaseNotificationManager;
+        IDataBaseNotificationService _dataBaseNotificationManager;
         IGenericRepository<User> _userGR;
         IEmailService _emailService;
        
         public ValuesController(IWebHostEnvironment webHostEnvironment,
-                                IDataBaseNotificationService<User> dataBaseNotificationManager,
+                                IDataBaseNotificationService dataBaseNotificationManager,
                                 IGenericRepository<User> userGR,
                                 IEmailService emailService) {
             _webHostEnvironment = webHostEnvironment;
@@ -38,7 +38,7 @@ namespace SchoolBridge.API.Controllers
         [ActionName("")]
         public async Task<ActionResult<IEnumerable<string>>> Get()
         {
-            await _dataBaseNotificationManager.Notify(_userGR.GetAll((x) => x.Login == "admin").First(), "test", new MessageNotificationSource { Message = "Baboola" });
+            await _dataBaseNotificationManager.NotifyAsync(_userGR.GetAll((x) => x.Login == "admin").First().Id, "test", new MessageNotificationSource { Message = "Baboola" });
             return new string[] { _webHostEnvironment.ContentRootPath, _webHostEnvironment.WebRootPath };
         }
 

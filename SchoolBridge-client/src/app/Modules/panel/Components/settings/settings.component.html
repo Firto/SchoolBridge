@@ -3,7 +3,7 @@
     <h1 class="mb-5 mt-5 font-weight-light text-uppercase text-white">Profile Settings</h1>
     <div class="row" style="height:100%">
       <div class="col-md-3">
-        <div href=# class="d-inline"><img src="https://image.flaticon.com/icons/svg/236/236831.svg" width=130px
+        <div href=# class="d-inline"><img *ngIf="(profileService.info | async)" src="{{apiUrl}}image/{{(profileService.info | async)?.photo}}" width=130px
             style="margin:0;"><br>
           <p class="pl-2 mt-2"><a href="#" class="btn" style="color:#8f9096;font-weight:600">Edit Picture</a></p>
         </div>
@@ -24,6 +24,6 @@
               </div>
             </div>
           </form>
-      </div>
+      </div> 
     </div>
 </div>

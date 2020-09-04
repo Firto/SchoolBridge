@@ -1,5 +1,7 @@
 import { AES, enc } from 'crypto-ts';
+import { Injectable } from '@angular/core';
 
+@Injectable()
 export class CryptService {
     /*encode(text:string, key:string): string {
         var j=0;

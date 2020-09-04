@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit, AfterContentChecked, AfterViewChecked, AfterViewInit } from '@angular/core';
 import { ToastContainerDirective, ToastrService } from 'ngx-toastr';
-import { GlobalizationService } from './Modules/globalization/services/globalization.service';
+import { GlobalizationEditService } from './Modules/globalization/Services/globalization-edit.service';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +14,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   @ViewChild(ToastContainerDirective, {static: true}) toastContainer: ToastContainerDirective;
  
   constructor(private toastrService: ToastrService,
-              public globalizationService: GlobalizationService) {}
+              public gbeService: GlobalizationEditService) {}
 
   ngOnInit() {
     this.toastrService.overlayContainer = this.toastContainer;

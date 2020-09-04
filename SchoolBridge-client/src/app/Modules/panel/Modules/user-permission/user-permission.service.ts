@@ -9,7 +9,7 @@ export class UserPermissionService {
     public onUpdatePermissions: Subject<string[]> = new Subject<string[]>();
 
     constructor(private userService: UserService) {
-        this.userService.user.subscribe(x => {
+        this.userService.userObs.subscribe(x => {
             if (x != null)
                 this.onUpdatePermissions.next(x.login.permissions);
             else this.onUpdatePermissions.next([]);
@@ -17,8 +17,8 @@ export class UserPermissionService {
     }
 
     public HasPermission(names: string[]): boolean {
-        if (this.userService.getUser() == null || 
-            !names.every(el => this.userService.getUser().login.permissions.includes(el)))
+        if (this.userService.user == null || 
+            !names.every(el => this.userService.user.login.permissions.includes(el)))
             return false;
         return true;
     }

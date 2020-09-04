@@ -32,11 +32,11 @@ namespace SchoolBridge.DataAccess.Entities
         public DateTime Birthday { get; set; }
 
 
-        /*[ForeignKey("Photo")]
+        [ForeignKey("Photo")]
         public string PhotoId { get; set; }
-        public Image Photo { get; set; }*/
+        public Image Photo { get; set; }
 
-        public IEnumerable<Notification<User>> Notifications { get; set; }
+        public IEnumerable<Notification> Notifications { get; set; }
         public IEnumerable<UserPermission> Permissions { get; set; }
     }
 }

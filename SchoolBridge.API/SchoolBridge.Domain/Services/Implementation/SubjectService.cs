@@ -4,7 +4,7 @@ using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Helpers.AddtionalClases.ValidatingService;
 using SchoolBridge.Helpers.DtoModels;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,54 +18,50 @@ namespace SchoolBridge.Domain.Services.Implementation
     {
         private readonly IGenericRepository<PupilSubject> _subjectGR;
 
-        public SubjectService(IGenericRepository<PupilSubject> subjectGR,
-                               IGenericRepository<User> userGR,
-                               ClientErrorManager clientErrorManager,
-                               IValidatingService validatingService,
-                               SubjectServiceConfiguration configuration)
+        public SubjectService(IGenericRepository<PupilSubject> subjectGR)
         {
             _subjectGR = subjectGR;
+        }
 
-            if (!clientErrorManager.IsIssetErrors("PupilSubject"))
-            {
-                clientErrorManager.AddErrors(new ClientErrors("PupilSubject", new Dictionary<string, ClientError>
+        public static void OnInit(ClientErrorManager manager, IValidatingService validatingService, SubjectServiceConfiguration configuration)
+        {
+            manager.AddErrors(new ClientErrors("PupilSubject", new Dictionary<string, ClientError>
                 {
                     { "u-inc-subject-id" , new ClientError ("Incorrect subject id!")}
                 }));
 
-                validatingService.AddValidateFunc("str-sb-name", (string prop, PropValidateContext ctx) => {
-                    if (prop == null) return;
+            validatingService.AddValidateFunc("str-sb-name", (string prop, PropValidateContext ctx) => {
+                if (prop == null) return;
 
-                    if (prop.Length > configuration.MaxCountCharsName)
-                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {255}]");
-                    if (prop.Length < configuration.MinCountCharsName)
-                        ctx.Valid.Add($"[str-too-short, [pn-{ctx.PropName}], {255}]");
-                    if (!Regex.Match(prop, "^[ а-яА-ЯҐґЄєІіЇї]+$").Success)
-                        ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Name musn't have specials chars!"
-                });
-                validatingService.AddValidateFunc("str-sb-comment", (string prop, PropValidateContext ctx) => {
-                    if (prop == null) return;
+                if (prop.Length > configuration.MaxCountCharsName)
+                    ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {255}]");
+                if (prop.Length < configuration.MinCountCharsName)
+                    ctx.Valid.Add($"[str-too-short, [pn-{ctx.PropName}], {255}]");
+                if (!Regex.Match(prop, "^[ а-яА-ЯҐґЄєІіЇї]+$").Success)
+                    ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Name musn't have specials chars!"
+            });
+            validatingService.AddValidateFunc("str-sb-comment", (string prop, PropValidateContext ctx) => {
+                if (prop == null) return;
 
-                    if (prop.Length > configuration.MaxCountCharsComment)
-                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {255}]");
-                    if (!Regex.Match(prop, "^[ а-яА-ЯҐґЄєІіЇї]+$").Success)
-                        ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Comment musn't have specials chars!"
-                });
-                validatingService.AddValidateFunc("number-day-sb", (string prop, PropValidateContext ctx) => {
-                    int value;
-                    if (prop == null || !Int32.TryParse(prop, out value)) return;
+                if (prop.Length > configuration.MaxCountCharsComment)
+                    ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {255}]");
+                if (!Regex.Match(prop, "^[ а-яА-ЯҐґЄєІіЇї]+$").Success)
+                    ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Comment musn't have specials chars!"
+            });
+            validatingService.AddValidateFunc("number-day-sb", (string prop, PropValidateContext ctx) => {
+                int value;
+                if (prop == null || !Int32.TryParse(prop, out value)) return;
 
-                    if (value > configuration.MaxDayNumber || value < configuration.MinDayNumber)
-                        ctx.Valid.Add($"[inc-number-day]");
-                });
-                validatingService.AddValidateFunc("number-lesson-sb", (string prop, PropValidateContext ctx) => {
-                    int value;
-                    if (prop == null || !Int32.TryParse(prop, out value)) return;
+                if (value > configuration.MaxDayNumber || value < configuration.MinDayNumber)
+                    ctx.Valid.Add($"[inc-number-day]");
+            });
+            validatingService.AddValidateFunc("number-lesson-sb", (string prop, PropValidateContext ctx) => {
+                int value;
+                if (prop == null || !Int32.TryParse(prop, out value)) return;
 
-                    if (value > configuration.MaxLessonNumber || value < configuration.MinLessonNumber)
-                        ctx.Valid.Add($"[inc-number-lesson]");
-                });
-            }
+                if (value > configuration.MaxLessonNumber || value < configuration.MinLessonNumber)
+                    ctx.Valid.Add($"[inc-number-lesson]");
+            });
         }
 
         public PupilSubject Get(int id)

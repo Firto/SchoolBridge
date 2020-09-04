@@ -4,7 +4,7 @@ import { LoginRegisterGuard } from './Guard/login-register.guard';
 import { StartComponent } from './Modules/start/main/start.component';
 import { PanelComponent } from './Modules/panel/main/panel.component';
 import { LoginnedGuard } from './Guard/loginned.guard';
-import { EditGlobalizationComponent } from './Modules/edit-globalization/main/edit-globalization.component';
+//import { EditGlobalizationComponent } from './Modules/edit-globalization/main/edit-globalization.component';
 import { DefaultComponent } from './Components/default/default.component';
 
 
@@ -22,10 +22,10 @@ export const routes: Routes = [
     runGuardsAndResolvers: 'always',
     loadChildren: () => import('./Modules/panel/panel.module').then(m => m.PanelModule),
   },
-  { path: 'ed-gb',
+  /*{ path: 'ed-gb',
     component: EditGlobalizationComponent,
     loadChildren: () => import('./Modules/edit-globalization/edit-globalization.module').then(m => m.EditGlobalizationModule),
-  },
+  },*/
   { path: '',
     pathMatch: 'full',
     component: DefaultComponent,

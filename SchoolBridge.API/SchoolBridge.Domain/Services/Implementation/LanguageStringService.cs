@@ -6,16 +6,18 @@ using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Helpers.AddtionalClases.ValidatingService;
 using SchoolBridge.Helpers.Extentions;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
 using System.Text;
 using System.Threading.Tasks;
 using SchoolBridge.Helpers.DtoModels.Globalization;
 using System.Security.Cryptography.X509Certificates;
+using SchoolBridge.Helpers.Managers;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
@@ -26,18 +28,18 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly IGenericRepository<LanguageStringType> _languageStringTypeGR;
         private readonly IGenericRepository<LanguageStringIdType> _languageStringIdTypeGR;
         private readonly IGenericRepository<LanguageStringId> _languageStringIdGR;
-        private readonly LanguageStringServiceConfiguration _configuration;
         private readonly HttpContext _httpContext;
+        private LanguageStringServiceConfiguration _configuration = null;
+
         private string _langAddName = null;
+        
         public LanguageStringService(IGenericRepository<Language> languaesGR,
                                         IGenericRepository<LanguageString> languageStringGR,
                                         IGenericRepository<LanguageStringType> languageStringTypeGR,
                                         IGenericRepository<LanguageStringIdType> languageStringIdTypeGR,
                                         IGenericRepository<LanguageStringId> languageStringIdGR,
-                                        IValidatingService validatingService,
-                                        LanguageStringServiceConfiguration configuration,
-                                        ScopedHttpContext scopedHttpContext,
-                                        ClientErrorManager clientErrorManager)
+                                        LanguageStringServiceConfiguration configuration, 
+                                        ScopedHttpContext scopedHttpContext)
         {
             _languaesGR = languaesGR;
             _languageStringGR = languageStringGR;
@@ -54,9 +56,17 @@ namespace SchoolBridge.Domain.Services.Implementation
             if (_langAddName == null || _languaesGR.CountWhere(x => x.AbbName == _langAddName) == 0)
                 _langAddName = _configuration.DefaultLanguage;
 
-            if (!clientErrorManager.IsIssetErrors("LanguageStringService"))
-            {
-                clientErrorManager.AddErrors(new ClientErrors("LanguageStringService", new Dictionary<string, ClientError>
+
+            /*foreach (var item in arguments)
+                draftBody = draftBody.ReplaceFirstOccurrance("$arg$", item);
+            return draftBody;*/
+
+            // var m = _languageStringGR.GetDbSet().Where((x) => x.Id == Id && x.Language.AbbName == langAddName).Include(x => x.Language).ToArray().FirstOrDefault();
+        }
+
+        public static void OnInit(ClientErrorManager manager, IValidatingService validatingService, LanguageStringServiceConfiguration configuration)
+        {
+            manager.AddErrors(new ClientErrors("LanguageStringService", new Dictionary<string, ClientError>
                 {
                     { "lss-inc-lang-str", new ClientError("Incorrect language string!")},
                     { "lss-lng-ald-reg", new ClientError("Language already registered!")},
@@ -68,42 +78,45 @@ namespace SchoolBridge.Domain.Services.Implementation
                     { "lss-baseupateid-inc", new ClientError("Incorrect base update id!")}
                 }));
 
-                validatingService.AddValidateFunc("lss-lng-name", (string som, PropValidateContext ctx) => {
-                    if (som == null) return;
-                    else if (som.Length != 2)
-                        ctx.Valid.Add($"[lss-inc-lang-str]");
-                });
+            validatingService.AddValidateFunc("lss-lng-name", (string som, PropValidateContext ctx) => {
+                if (som == null) return;
+                else if (som.Length != 2)
+                    ctx.Valid.Add($"[lss-inc-lang-str]");
+            });
 
-                validatingService.AddValidateFunc("lss-lng-type", (string som, PropValidateContext ctx) => {
-                    if (som == null) return;
-                    else if (som.Length > _configuration.MaxTypeNameLength)
-                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {_configuration.MaxTypeNameLength}]"); //"Too long login(max {_configuration.MaxCountCharsLogin} characters)!"
-                });
+            validatingService.AddValidateFunc("lss-lng-type", (string som, PropValidateContext ctx) => {
+                if (som == null) return;
+                else if (som.Length > configuration.MaxTypeNameLength)
+                    ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {configuration.MaxTypeNameLength}]"); //"Too long login(max {_configuration.MaxCountCharsLogin} characters)!"
+            });
 
-                validatingService.AddValidateFunc("lss-str-id-name", (string som, PropValidateContext ctx) => {
-                    if (som == null) return;
-                    else if (som.Length > _configuration.MaxStringIdNameLength)
-                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {_configuration.MaxStringIdNameLength}]");
-                });
+            validatingService.AddValidateFunc("lss-str-id-name", (string som, PropValidateContext ctx) => {
+                if (som == null) return;
+                else if (som.Length > configuration.MaxStringIdNameLength)
+                    ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {configuration.MaxStringIdNameLength}]");
+            });
 
-                validatingService.AddValidateFunc("lss-str-name", (string som, PropValidateContext ctx) => {
-                    if (som == null) return;
-                    else if (som.Length > _configuration.MaxStringLength)
-                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {_configuration.MaxStringLength}]");
-                });
+            validatingService.AddValidateFunc("lss-str-name", (string som, PropValidateContext ctx) => {
+                if (som == null) return;
+                else if (som.Length > configuration.MaxStringLength)
+                    ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {configuration.MaxStringLength}]");
+            });
 
-                validatingService.AddValidateFunc("lss-lng-full-name", (string som, PropValidateContext ctx) => {
-                    if (som == null) return;
-                    else if (som.Length > _configuration.MaxLangFullNameLength)
-                        ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {_configuration.MaxLangFullNameLength}]");
-                });
-            }
+            validatingService.AddValidateFunc("lss-lng-full-name", (string som, PropValidateContext ctx) => {
+                if (som == null) return;
+                else if (som.Length > configuration.MaxLangFullNameLength)
+                    ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {configuration.MaxLangFullNameLength}]");
+            });
+        }
 
-            /*foreach (var item in arguments)
-                draftBody = draftBody.ReplaceFirstOccurrance("$arg$", item);
-            return draftBody;*/
+        public static void OnFirstInit(IGenericRepository<Language> language, IGenericRepository<LanguageStringType> languageStringTypeGR)
+        {
+            languageStringTypeGR.Create(new LanguageStringType { Name = "default" });
 
-            // var m = _languageStringGR.GetDbSet().Where((x) => x.Id == Id && x.Language.AbbName == langAddName).Include(x => x.Language).ToArray().FirstOrDefault();
+            language.Create(new Language[] {
+                    new Language { AbbName = "en", FullName = "English" },
+                    new Language { AbbName = "ua", FullName = "Українська" }
+            });
         }
 
         public string GetCurrentLanguage() {
@@ -149,6 +162,16 @@ namespace SchoolBridge.Domain.Services.Implementation
                 throw new ClientException("lss-lng-no-reg");
 
             _languaesGR.Delete(m);
+        }
+
+        public void EditLanguage(string abbName, string fullName) {
+            var languages = _languaesGR.GetAll(x => x.AbbName == abbName.ToLower());
+            if (languages.Count() == 0)
+                throw new ClientException("lss-lng-no-reg");
+            var language = languages.FirstOrDefault();
+            language.FullName = fullName;
+
+            _languaesGR.Update(language);
         }
 
         public LanguageStringType AddType(string name)

@@ -19,11 +19,6 @@ namespace SchoolBridge.API.Controllers
             _languageStringService = languageStringService;
         }
 
-        [HttpGet, ActionName("language/get"), HasPermission("GetLanguage")]
-        public async Task<ResultDto> GetLanguages() {
-            return ResultDto.Create((await _languageStringService.GetLanguagesAsync()).ToDictionary(k => k.AbbName, v => v.FullName));
-        }
-
         [HttpPost, ActionName("language/add"), HasPermission("CreateLanguage")]
         public async Task<ResultDto> AddLanguage([FromBody, MyValidation]AddLanguageDto entity)
         {
@@ -35,6 +30,13 @@ namespace SchoolBridge.API.Controllers
         public async Task<ResultDto> RemoveLanguage([ArgValid("str-input", "lss-lng-name")]string abbName)
         {
             _languageStringService.RemoveLanguage(abbName);
+            return ResultDto.Create(null);
+        }
+
+        [HttpPost, ActionName("language/edit"), HasPermission("EditLanguage")]
+        public async Task<ResultDto> EditLanguage([FromBody, MyValidation]GetLanguageEditDto entity)
+        {
+            _languageStringService.EditLanguage(entity.AbbName, entity.FullName);
             return ResultDto.Create(null);
         }
 
@@ -56,31 +58,18 @@ namespace SchoolBridge.API.Controllers
             return ResultDto.Create(_languageStringService.GetGlobalizationInfo());
         }
 
-        [HttpPost, 
-            ActionName("string/addorupdate"), 
-            HasPermission(  "CreateLanguageString", 
-                            "EditLanguageString", 
-                            "CreateLanguageStringId",
-                            "EditLanguageStringId"
-            )
-        ]
+        [HttpPost, ActionName("string/addorupdate"), HasPermission("EditGbStrings")]
         public async Task<ResultDto> StringAddOrUpdate([FromBody, MyValidation]AddOrUpdateStringDto entity)
         {
             _languageStringService.AddOrUpdateString(entity.Name, _languageStringService.GetCurrentLanguage(), entity.String);
             return ResultDto.Create(null);
         }
 
-        [HttpPost, ActionName("string/remove"), HasPermission("RemoveLanguageStringId")]
-        public async Task<ResultDto> StringRemove([FromBody, MyValidation]StringRemoveDto entity)
-        {
-            _languageStringService.RemoveStringId(entity.String);
-            return ResultDto.Create(null);
-        }
-
         [HttpGet, ActionName("update-baseupdateid"), HasPermission("UpdateBaseUpdateId")]
         public async Task<ResultDto> UpdateBaseUpdateId() 
         {
-            return ResultDto.Create(_languageStringService.UpdateBaseUpdateId());
+            _languageStringService.UpdateBaseUpdateId();
+            return ResultDto.Create(_languageStringService.GetGlobalizationInfo());
         }
     }
 }

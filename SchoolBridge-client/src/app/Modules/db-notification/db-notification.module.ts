@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { TimeAgoPipe } from 'src/app/PipeTransformers/time-ago.pipe';
 import { DbNtfMessageComponent } from './Components/db-notifications/db-ntf-message/db-ntf-message.component';
 import { CommonModule } from '@angular/common';
 import { NgxMutationObserverDirective } from 'src/app/Directives/ngx-mutation-observer.directive';
@@ -7,6 +6,8 @@ import { SetDbNotificationsComponent } from './Components/set-db-notifications/s
 import { DbNotificationService } from './Services/db-notification.service';
 import { DbNotificationsMapper } from './Mappers/db-notification.mapper';
 import { DbNtfOnLoginComponent } from './Components/db-notifications/db-ntf-on-login/db-ntf-on-login.component';
+import { DbNtfNewChatMessageComponent } from './Components/db-notifications/db-ntf-new-chat-message/db-ntf-new-chat-message.component';
+import { TimeAgoPipeModule } from '../TimeAgoPipe/time-ago-pipe.module';
 
 @NgModule({
     declarations: [
@@ -14,10 +15,11 @@ import { DbNtfOnLoginComponent } from './Components/db-notifications/db-ntf-on-l
         SetDbNotificationsComponent,
         DbNtfMessageComponent,
         DbNtfOnLoginComponent,
-        TimeAgoPipe
+        DbNtfNewChatMessageComponent,
     ],
     imports: [
-        CommonModule
+        CommonModule,
+        TimeAgoPipeModule
     ],
     exports: [
         SetDbNotificationsComponent
