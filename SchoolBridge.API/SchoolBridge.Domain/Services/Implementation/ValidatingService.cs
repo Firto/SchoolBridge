@@ -36,21 +36,13 @@ namespace SchoolBridge.Domain.Services.Implementation
                 AddValidateFunc("not-null", (object prop, PropValidateContext context) =>
                 {
                     if (prop == null)
-                        context.Valid.Add($"[v-d-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
+                        context.Valid.Add($"[v-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
                 });
 
                 AddValidateFunc("str-input", (string prop, PropValidateContext context) =>
                 {
                     if (string.IsNullOrEmpty(prop))
-                        context.Valid.Add($"[v-d-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
-                });
-
-                AddValidateFunc("str-email", (string prop, PropValidateContext context) =>
-                {
-                    if (prop == null) return;
-
-                    if (!Regex.IsMatch(prop, @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"))
-                        context.Valid.Add($"[v-d-str-email, [pn-{context.PropName}]]");
+                        context.Valid.Add($"[v-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
                 });
             }
         }
