@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface IImageService
+    public interface IImageService: IOnInitService, IOnFirstInitService
     {
         Task<string> Add(DataImage base64Image);
         Task<IEnumerable<string>> Add(IEnumerable<DataImage> base64Images);

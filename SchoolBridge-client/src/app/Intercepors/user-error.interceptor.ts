@@ -1,39 +1,59 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector, Inject, forwardRef } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpResponse } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 
 
 import { APIResult } from 'src/app/Models/api.result.model';
-import { tap } from 'rxjs/operators';
+import { tap, map, take } from 'rxjs/operators';
 import { UserService } from '../Services/user.service';
 import { ToastrService } from 'ngx-toastr';
+import { GlobalizationStringService } from '../Modules/globalization/Services/globalization-string.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-    constructor(private userService: UserService,
-                private toastrService: ToastrService) { }
+
+    constructor(private _gbsService: GlobalizationStringService,
+                private _userService: UserService,
+                private _toastrService: ToastrService) {
+    }
 
     intercept(request: HttpRequest<APIResult>, next: HttpHandler): Observable<HttpEvent<APIResult>> {
-        return next.handle(request).pipe(tap((event: HttpEvent<APIResult>) => {
-            if (event instanceof HttpResponse && 
-                event.body.ok == false){
-
-                switch (event.body.result.id){
-                    case "inc-refresh-token":
-                    case "already-login":
-                    case "no-login":
-                    case "base-account-service":
-                    case "inc-uuid":
-                    case "no-uuid":
-                        if (this.userService.user.value != null)
-                            this.userService.localLogout();
-                        break;
-                    case "v-dto-invalid":
-                        return;
+        return next.handle(request).pipe(
+            map((event: HttpEvent<APIResult>) => {
+                if (event instanceof HttpResponse){
+                    if (event.body.ok)
+                        return <any>event.clone({body: event.body.result}); 
+                    event.body.result.message = this._gbsService.convertString(event.body.result.message);
+                    if ("additionalInfo" in event.body.result)
+                        Object.keys(event.body.result.additionalInfo).forEach(x => {
+                            event.body.result.additionalInfo[x].forEach((r, i) => {
+                                console.log(r);
+                                event.body.result.additionalInfo[x][i] = this._gbsService.convertString(r);
+                            })
+                        });
+                    console.log(event.body);
+                    switch (event.body.result.id){
+                        case "inc-refresh-token":
+                        case "already-login":
+                        case "no-login":
+                        case "base-account-service":
+                        case "inc-uuid":
+                        case "no-uuid":
+                            if (this._userService.user)
+                                this._userService.localLogout();
+                            break;
+                        case "v-dto-invalid":
+                        case "inc-token":
+                            throw event.body.result;
+                    }
+                    event.body.result.message.pipe(take(1)).subscribe(x =>{
+                        this._toastrService.error(x, null, {timeOut: 10000});
+                    })
+                    
+                    throw event.body.result;
                 }
-                
-                this.toastrService.error(event.body.result.message, null, {timeOut: 10000});
+                return event;
             }
-        }));
+        ));
     }
 }

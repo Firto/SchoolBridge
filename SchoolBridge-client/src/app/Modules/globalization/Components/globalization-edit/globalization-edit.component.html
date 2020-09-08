@@ -1,19 +1,38 @@
-<ng-template [ngIf]="(this.globalizationService.changeEditing | async) === true">
-	<button (click)="disableEditing()" class="col-12 btn btn-custom text-uppercase rounded-0" >Exit from editing mode</button>
-	<div *ngIf="(cur | async) != null" class="overlay">
+<ng-template [ngIf]="(gbeService.stateObs | async) === true">
+	<div class="col-12 p-0">
+        <button (click)="disableEditing()" class="col-8 btn btn-custom text-uppercase rounded-0">Exit from editing mode</button>
+		<button (click)="updateBaseupdateid()" class="col-4 btn btn-custom text-uppercase rounded-0">Update baseupdateid</button>
+    </div>
+	<div *ngIf="(gbeService.editingObs | async) != null" class="overlay">
 		<div class="popup">
 			<h2>Change strings</h2>
 			<a class="close" (click)="close()" >&times;</a>
 			
 			<div class="content container">
-				<div *ngFor="let item of (cur | async).getUsedStrings();" class="row" >
+				<div *ngFor="let item of (gbeService.editingObs | async).getUsedStrings();" class="row mt-2" >
 					<div class="col-10">
-						<input (keyup)="change(item)" type="text" class="form-control rounded-pill" id="{{item}}" placeholder="{{item}}" value="{{(cur | async).getString(item)}}">
+						<input (keyup)="change(item)" type="text" class="form-control rounded-pill" id="{{item}}" placeholder="{{item}}" value="{{(gbeService.editingObs | async).getString(item)}}">
 					</div>
 					<button (click)="edit(item)" type="submit" title="Save {{item}} string" class="col-2 btn rounded-pill btn-custom text-uppercase">
 						Save
 					</button>
-					<p id="p-{{item}}" class="text-danger font-weight-bold text-center col-12" ></p>
+					<p *ngFor="let it of errors[item];" 
+						class="text-danger font-weight-bold text-center col-12 ng-invalid">
+						{{it | async}}
+					</p>
+				</div>
+				<hr>
+				<div *ngFor="let item of (gbeService.editingObs | async).constStrings();" class="row mt-2" >
+					<div class="col-10">
+						<input (keyup)="change(item)" type="text" class="form-control rounded-pill" id="{{item}}" placeholder="{{item}}" value="{{(gbeService.editingObs | async).getString(item)}}">
+					</div>
+					<button (click)="edit(item)" type="submit" title="Save {{item}} string" class="col-2 btn rounded-pill btn-custom text-uppercase">
+						Save
+					</button>
+					<p *ngFor="let it of errors[item];" 
+						class="text-danger font-weight-bold text-center col-12 ng-invalid">
+						{{it | async}}
+					</p>
 				</div>
 			</div>
 		</div>

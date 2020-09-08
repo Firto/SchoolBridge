@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SchoolBridge.DataAccess.Entities;
 using SchoolBridge.Domain.Services.Abstraction;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 
 namespace SchoolBridge.API.Controllers.Attributes
 {
@@ -12,7 +12,7 @@ namespace SchoolBridge.API.Controllers.Attributes
         {
             try
             {
-                context.HttpContext.RequestServices.GetService<ITokenService<User>>().GetUser(context.HttpContext);
+                context.HttpContext.RequestServices.GetService<ITokenService>().GetUser(context.HttpContext);
                 throw new ClientException("already-login");
             }
             catch (ClientException)

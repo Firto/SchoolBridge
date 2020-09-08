@@ -3,11 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using SchoolBridge.DataAccess.Entities;
 using SchoolBridge.DataAccess.Interfaces;
 using SchoolBridge.Domain.Services.Abstraction;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
@@ -18,73 +19,128 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly IGenericRepository<Permission> _permissionGR;
         public PermissionService(IGenericRepository<UserPermission> userPermissionGR,
                                 IGenericRepository<DefaultRolePermission> defaultRolePermissionGR,
-                                IGenericRepository<Permission> permissionGR,
-                                ClientErrorManager clientErrorManager)
+                                IGenericRepository<Permission> permissionGR)
         {
             _userPermissionGR = userPermissionGR;
             _defaultRolePermissionGR = defaultRolePermissionGR;
-            _permissionGR = permissionGR;
+            _permissionGR = permissionGR; 
+        }
 
-            if (!clientErrorManager.IsIssetErrors("Permission"))
-                clientErrorManager.AddErrors(new ClientErrors("Permission", new Dictionary<string, ClientError>
+        public static void OnInit(ClientErrorManager manager)
+        {
+            manager.AddErrors(new ClientErrors("Permission", new Dictionary<string, ClientError>
                 {
                     { "inc-perm-name", new ClientError("Incorrect permission name!") },
                     { "no-access", new ClientError("No access to this action!") }
                 }));
         }
 
-        public async Task<IEnumerable<Permission>> GetAllPermissions()
+        public static void OnFirstInit(IPermissionService permissionService, IGenericRepository<Role> roleGR)
+        {
+            var pupilPerms = new Permission[] {
+                new Permission { Name = "GetPupilPanel" },
+                    new Permission { Name = "EditSubject" },
+            };
+
+            var adminPerms = new Permission[] {
+                new Permission { Name = "GetAdminPanel"},
+                    new Permission { Name = "GetGlobalizationTab" },
+
+                        new Permission { Name = "GetLanguagesEditTab" },
+                            new Permission { Name = "CreateLanguage" },
+                            new Permission { Name = "RemoveLanguage" },
+                            new Permission { Name = "EditLanguage" },
+
+                        new Permission { Name = "GetStringsEditTab" },
+                            new Permission { Name = "UpdateBaseUpdateId" },
+                            new Permission { Name = "ToggleEditGbStringsMode" },
+                            new Permission { Name = "EditGbStrings" },
+            };
+
+            permissionService.AddPermissions(adminPerms.Concat(pupilPerms));
+
+            var admRole = roleGR.GetAll(x => x.Name == "Admin").FirstOrDefault();
+            admRole.DefaultPermissions = adminPerms.Select(x => new DefaultRolePermission { Permission = x }).ToList();
+            roleGR.Update(admRole);
+
+            var pupilRole = roleGR.GetAll(x => x.Name == "Pupil").FirstOrDefault();
+            pupilRole.DefaultPermissions = pupilPerms.Select(x => new DefaultRolePermission { Permission = x }).ToList();
+            roleGR.Update(pupilRole);
+
+            permissionService.AddUserPermissions(new User { Id = "admin" }, adminPerms.Concat(pupilPerms));
+        }
+
+        public Permission AddPermission(Permission permission) 
+            => _permissionGR.Create(permission);
+        public void RemovePermission(Permission permission)
+            => _permissionGR.Delete(permission);
+
+        public IEnumerable<Permission> AddPermissions(IEnumerable<Permission> permissions)
+            => _permissionGR.Create(permissions);
+        public void RemovePermissions(IEnumerable<Permission> permissions)
+            => _permissionGR.Delete(permissions);
+
+        public UserPermission AddUserPermission(User user, Permission permission)
+        {
+            return _userPermissionGR.Create(new UserPermission { UserId = user.Id, PermissionId = permission.Id });
+        }
+
+        public IEnumerable<UserPermission> AddUserPermissions(User user, IEnumerable<Permission> permissions)
+        {
+            return _userPermissionGR.Create(permissions.Select(x => new UserPermission { UserId = user.Id, PermissionId = x.Id }));
+        }
+
+        public async Task<IEnumerable<Permission>> GetAllPermissionsAsync()
         {
             return await _permissionGR.GetAllAsync();
         }
 
-        public async Task<IEnumerable<Permission>> GetDefaultPermissions(Role role)
+        public async Task<IEnumerable<Permission>> GetDefaultPermissionsAsync(Role role)
         {
             return (await _defaultRolePermissionGR.GetAllIncludeAsync((x) => x.RoleId == role.Id, (x) => x.Permission)).Select(x => new Permission { Id = x.PermissionId });
         }
 
-        public async Task<IEnumerable<Permission>> GetPermissions(User user)
+        public async Task<IEnumerable<Permission>> GetPermissionsAsync(User user)
         {
             return (await _userPermissionGR.GetAllIncludeAsync((x) => x.UserId == user.Id, (x) => x.Permission)).Select(x => new Permission { Id = x.PermissionId });
         }
 
-        public async Task<DefaultRolePermission> AddDefaultPermission(Role role, Permission permission)
+        public async Task<DefaultRolePermission> AddDefaultPermissionAsync(Role role, Permission permission)
         {
             return await _defaultRolePermissionGR.CreateAsync(new DefaultRolePermission { RoleId = role.Id, PermissionId = permission.Id });
         }
 
-        public async Task<IEnumerable<DefaultRolePermission>> AddDefaultPermissions(Role role, IEnumerable<Permission> permissions)
+        public async Task<IEnumerable<DefaultRolePermission>> AddDefaultPermissionsAsync(Role role, IEnumerable<Permission> permissions)
         {
             return await _defaultRolePermissionGR.CreateAsync(permissions.Select(x => new DefaultRolePermission { RoleId = role.Id, PermissionId = x.Id }));
         }
 
-        public async Task<UserPermission> AddPermission(User user, Permission permission)
+        public async Task<UserPermission> AddUserPermissionAsync(User user, Permission permission)
         {
             return await _userPermissionGR.CreateAsync(new UserPermission { UserId = user.Id, PermissionId = permission.Id });
         }
 
-        public async Task<IEnumerable<UserPermission>> AddPermissions(User user, IEnumerable<Permission> permissions)
+        public async Task<IEnumerable<UserPermission>> AddUserPermissionsAsync(User user, IEnumerable<Permission> permissions)
         {
             return await _userPermissionGR.CreateAsync(permissions.Select(x => new UserPermission { UserId = user.Id, PermissionId = x.Id }));
         }
 
-
-        public async Task RemoveDefaultPermission(Role role, Permission permission)
+        public async Task RemoveDefaultPermissionAsync(Role role, Permission permission)
         {
             await _defaultRolePermissionGR.DeleteAsync((x) => x.RoleId == role.Id && x.PermissionId == permission.Id);
         }
 
-        public async Task RemoveDefaultPermissions(Role role, IEnumerable<Permission> permissions)
+        public async Task RemoveDefaultPermissionsAsync(Role role, IEnumerable<Permission> permissions)
         {
             await _defaultRolePermissionGR.DeleteAsync((x) => x.RoleId == role.Id && permissions.FirstOrDefault((s) => s.Id == x.PermissionId) != null);
         }
 
-        public async Task RemovePermission(User user, Permission permission)
+        public async Task RemovePermissionAsync(User user, Permission permission)
         {
             await _userPermissionGR.DeleteAsync((x) => x.UserId == user.Id && x.PermissionId == permission.Id);
         }
 
-        public async Task RemovePermissions(User user, IEnumerable<Permission> permissions)
+        public async Task RemovePermissionsAsync(User user, IEnumerable<Permission> permissions)
         {
             await _userPermissionGR.DeleteAsync((x) => x.UserId == user.Id && permissions.FirstOrDefault((s) => s.Id == x.PermissionId) != null);
         }
@@ -118,6 +174,6 @@ namespace SchoolBridge.Domain.Services.Implementation
                                     .Count() != pNames.Count();
         }
 
-        
+
     }
 }

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SchoolBridge.Domain.Services.Abstraction;
 
 namespace SchoolBridge.Domain.Services.Configuration
 {
-    public class SubjectServiceConfiguration
+    public class SubjectServiceConfiguration: IMyService
     {
         public short MaxCountCharsName { get; set; } = 25;
         public short MinCountCharsName { get; set; } = 1;

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolBridge.DataAccess.Entities.Authorization
 {
-    public class ActiveRefreshToken<AUser> where AUser : AuthUser
+    public class ActiveRefreshToken
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -13,7 +13,7 @@ namespace SchoolBridge.DataAccess.Entities.Authorization
 
         [ForeignKey("User")]
         public string UserId { get; set; }
-        public AUser User { get; set; }
+        public User User { get; set; }
         public DateTime Expire { get; set; }
     }
 }

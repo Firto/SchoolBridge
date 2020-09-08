@@ -10,7 +10,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Medium,
         Low
     }
-    public interface IEmailService
+    public interface IEmailService: IOnInitService
     {
         PriorityQueue<EmailEntity> EmailQueue { get; }
         void Send(string toEmail, string FromEmail, string subject, string body, SendCompleatedEventHandler eventHandler, EmailEntityPriority priority, object AddtionalInfo);

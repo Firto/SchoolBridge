@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SchoolBridge.DataAccess.Entities;
 using SchoolBridge.Domain.Services.Abstraction;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 
 namespace SchoolBridge.API.Controllers.Attributes
 {

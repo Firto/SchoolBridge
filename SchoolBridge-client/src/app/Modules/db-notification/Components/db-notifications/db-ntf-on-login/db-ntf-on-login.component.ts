@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { DBNMessageSource } from 'src/app/Modules/db-notification/Sources/DataBaseSources/DBN-message-source';
 import { DbNtfComponent } from '../db-ntf-component.iterface';
 import { DataBaseSource } from 'src/app/Modules/notification/Models/NotificationSources/database-source';
 import { Router } from '@angular/router';
+import { DBNMessageSource } from '../db-ntf-message/db-ntf-message.component';
 
 @Component({
     selector: "db-ntf-on-login",

@@ -4,8 +4,11 @@ using SchoolBridge.DataAccess.Entities.Files;
 using SchoolBridge.DataAccess.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
@@ -15,17 +18,24 @@ namespace SchoolBridge.Domain.Services.Implementation
         private readonly FileServiceConfiguration _configuration;
 
         public FileService(IGenericRepository<File> fileGR,
-                            FileServiceConfiguration configuration,
-                            ClientErrorManager clientErrorManager)
+                            FileServiceConfiguration configuration)
         {
             _fileGR = fileGR;
-            _configuration = configuration;
+            _configuration = configuration;      
+        }
 
-            if (clientErrorManager.IsIssetErrors("Files")) 
-                clientErrorManager.AddErrors(new ClientErrors("Files", new Dictionary<string, ClientError>() {
+        public static void OnInit(ClientErrorManager manager, FileServiceConfiguration configuration)
+        {
+            manager.AddErrors(new ClientErrors("FileService", new Dictionary<string, ClientError>() {
                     {"too-big-file", new ClientError($"Too big file > {configuration.MaxSize} byte" ) },
                     {"file-load-err", new ClientError("File loading error") }
-                }));
+            }));
+        }
+
+        public static void OnFirstInit(IGenericRepository<File> fileGR) {
+            fileGR.Create(
+              new File { Id = "default-user-photo" }
+            );
         }
 
         public string CreatePath(string fileName) 

@@ -6,7 +6,7 @@ using SchoolBridge.Helpers.DtoModels.Authefication;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface ILoginService
+    public interface ILoginService: IOnInitService
     {
         //security
         Task<LoggedTokensDto> RefreshToken(RefreshTokenDto entity, string uuid);

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using SchoolBridge.Domain.Services.Abstraction;
 
 namespace SchoolBridge.Domain.Services.Configuration
 {
-    public class LanguageStringServiceConfiguration
+    public class LanguageStringServiceConfiguration: IMyService
     {
         public string DefaultLanguage { get; set; }
         public int MaxLangFullNameLength { get; set; } = 40;

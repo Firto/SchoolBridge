@@ -4,27 +4,31 @@ import { LoginRegisterGuard } from './Guard/login-register.guard';
 import { StartComponent } from './Modules/start/main/start.component';
 import { PanelComponent } from './Modules/panel/main/panel.component';
 import { LoginnedGuard } from './Guard/loginned.guard';
-import { Route } from '@angular/compiler/src/core';
-import { appInjector } from 'src/main';
-import { UserService } from './Services/user.service';
+//import { EditGlobalizationComponent } from './Modules/edit-globalization/main/edit-globalization.component';
 import { DefaultComponent } from './Components/default/default.component';
 
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: 'start',
     component: StartComponent, 
     canActivate: [LoginRegisterGuard],
+    runGuardsAndResolvers: 'always',
     loadChildren: () => import('./Modules/start/start.module').then(m => m.StartModule),
     
   },
   { path: 'panel',
     component: PanelComponent, 
     canActivate: [LoginnedGuard],
+    runGuardsAndResolvers: 'always',
     loadChildren: () => import('./Modules/panel/panel.module').then(m => m.PanelModule),
   },
+  /*{ path: 'ed-gb',
+    component: EditGlobalizationComponent,
+    loadChildren: () => import('./Modules/edit-globalization/edit-globalization.module').then(m => m.EditGlobalizationModule),
+  },*/
   { path: '',
     pathMatch: 'full',
-    component: DefaultComponent
+    component: DefaultComponent,
   }
   /*{ path: 'login', component: LoginComponent, canActivate: [LoginRegisterGuard] },
   { path: 'admin-panel', 

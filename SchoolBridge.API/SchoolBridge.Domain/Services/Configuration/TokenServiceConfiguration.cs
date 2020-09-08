@@ -1,10 +1,11 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using SchoolBridge.Domain.Services.Abstraction;
 
 namespace SchoolBridge.Domain.Services.Configuration
 {
-    public class TokenServiceConfiguration
+    public class TokenServiceConfiguration: IMyService
     {
         public SecurityTokenHandler TokenHandler { get; set; } = new JwtSecurityTokenHandler();
 

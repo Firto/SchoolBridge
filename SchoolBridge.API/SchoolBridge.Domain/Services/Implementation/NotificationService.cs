@@ -1,199 +1,61 @@
 ﻿using System.Threading.Tasks;
 using SchoolBridge.Domain.Services.Abstraction;
-using SchoolBridge.Domain.SignalR.Clients;
 using SchoolBridge.Domain.SignalR.Hubs;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
 using Microsoft.AspNetCore.SignalR;
-using SchoolBridge.DataAccess.Entities.Authorization;
-using System.IdentityModel.Tokens.Jwt;
-using System.Collections.Concurrent;
-using System.Linq;
-using System;
-using Microsoft.Extensions.DependencyInjection;
 using SchoolBridge.Helpers.DtoModels;
 using SchoolBridge.Helpers.AddtionalClases.NotificationService;
-using SchoolBridge.Domain.Services.Configuration;
-using System.Collections.Generic;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
-    public class NotificationService<AUser> : INotificationService<AUser> where AUser : AuthUser
+    public class NotificationService : INotificationService
     {
-        private readonly IHubContext<NotificationHub<AUser>, INotificationClient> _hubContext;
-        private readonly NotificationServiceConfiguration _configuration;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IHubContext<ServerHub> _hubContext;
+        private readonly IUserConnectionService _userConnectionService;
+        private readonly IPermanentConnectionService _permanentConnectionService;
 
-        private readonly ConcurrentDictionary<string, JwtSecurityToken> _users = new ConcurrentDictionary<string, JwtSecurityToken>();
-        private readonly ConcurrentDictionary<string, JwtSecurityToken> _permanentUsers = new ConcurrentDictionary<string, JwtSecurityToken>();
+        private readonly string methodNotificationName = "Notification";
 
-        public NotificationService(IHubContext<NotificationHub<AUser>, INotificationClient> hubContext,
-                                    NotificationServiceConfiguration configuration,
-                                    IServiceProvider serviceProvider,
-                                    ClientErrorManager clientErrorManager) {
+        public NotificationService(IHubContext<ServerHub> hubContext,
+                                    IUserConnectionService userConnectionService,
+                                    IPermanentConnectionService permanentConnectionService) {
             _hubContext = hubContext;
-            _serviceProvider = serviceProvider;
-            _configuration = configuration;
-
-            if (!clientErrorManager.IsIssetErrors("Notification"))
-                clientErrorManager.AddErrors(new ClientErrors("Notification",
-                    new Dictionary<string, ClientError>
-                    {
-                        {"inc-permanent-token", new ClientError("Incorrect permanent token!")}
-                    }
-                ));
+            _userConnectionService = userConnectionService;
+            _permanentConnectionService = permanentConnectionService;
         }
 
-        public PermanentSubscribeDto CreatePermanentToken(TimeSpan ?exp, out string guid) {
-            DateTime expires = DateTime.Now;
-            if (!exp.HasValue)
-                expires = expires.Add(_configuration.PermanentTokenExpires);
-            else expires = expires.Add(exp.Value);
-            guid = Guid.NewGuid().ToString();
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Jti, guid)
-            };
-
-            var creds = new SigningCredentials(_configuration.PermanentTokenValidation.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration.PermanentTokenValidation.ValidIssuer,
-                claims: claims,
-                expires: expires,
-                signingCredentials: creds
-            );
-
-            return new PermanentSubscribeDto { Token = _configuration.TokenHandler.WriteToken(token), Expires = expires.ToUnixTimestamp() };
-        }
-
-        public JwtSecurityToken ValidatePermanentToken(string token)
-        {
-            SecurityToken validatedToken = null;
-            try
-            {
-                _configuration.TokenHandler.ValidateToken(token, _configuration.PermanentTokenValidation, out validatedToken);
-            }
-            catch (Exception)
-            {
-                throw new ClientException("inc-permanent-token");
-            }
-
-            return validatedToken as JwtSecurityToken;
-        }
-
-        private string[] GetConns(AUser usr, string tokenId = null)
-        {
-            return _users.Where((x) => x.Value.Subject == usr.Id && (tokenId == null || x.Value.Id != tokenId) && x.Value.Payload.Exp > DateTime.Now.ToUnixTimestamp()).Select((x) => x.Key).ToArray();
-        }
-
-        private string[] GetConns(AUser[] usr, string tokenId = null)
-        {
-            return _users.Where((x) => usr.FirstOrDefault((s) => s.Id == x.Value.Subject) != null && (tokenId == null || x.Value.Id != tokenId) && x.Value.Payload.Exp > DateTime.Now.ToUnixTimestamp()).Select((x) => x.Key).ToArray();
-        }
-
-        private string[] GetPermanentConns(string tokenId)
-        {
-            return _permanentUsers.Where((x) => x.Value.Id == tokenId && x.Value.Payload.Exp > DateTime.Now.ToUnixTimestamp()).Select((x) => x.Key).ToArray();
-        }
-
-        private string[] GetPermanentConns(string[] tokenIds)
-        {
-            return _permanentUsers.Where((x) => tokenIds.FirstOrDefault((s) => s == x.Value.Id) != null && x.Value.Payload.Exp > DateTime.Now.ToUnixTimestamp()).Select((x) => x.Key).ToArray();
-        }
-
-        public void OnConnected(HubCallerContext hubCallerContext, string token)
-        {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var tokenService = scope.ServiceProvider.GetService<ITokenService<AUser>>();
-                JwtSecurityToken tkn = null;
-                try
-                {
-                    tkn = tokenService.ValidateToken(token);
-                }
-                catch (ClientException)
-                {
-                    return;
-                }
-                catch (Exception)
-                {
-                    return;
-                }
-                _permanentUsers.TryRemove(hubCallerContext.ConnectionId, out var sor);
-                _users.AddOrUpdate(hubCallerContext.ConnectionId, tkn, (x, s) => tkn);
-            }
-        }
-
-        public void OnPermanentConnected(HubCallerContext hubCallerContext, string token)
-        {
-            JwtSecurityToken tkn = null;
-            try
-            {
-                tkn = ValidatePermanentToken(token);
-            }
-            catch (ClientException)
-            {
-                return;
-            }
-            catch (Exception)
-            {
-                return;
-            }
-            _users.TryRemove(hubCallerContext.ConnectionId, out var sor);
-            _permanentUsers.AddOrUpdate(hubCallerContext.ConnectionId, tkn, (x, s) => tkn);
-        }
-
-        public void OnDisconnected(HubCallerContext hubCallerContext)
-        {
-            JwtSecurityToken sor;
-            _users.TryRemove(hubCallerContext.ConnectionId, out sor);
-            _permanentUsers.TryRemove(hubCallerContext.ConnectionId, out sor);
-        }
-
-        public async Task Notify(string type, INotificationSource sourse)
-           => await _hubContext.Clients.All.Notification(new NotificationDto {
+        public async Task NotifyAsync(string type, INotificationSource sourse)
+           => await _hubContext.Clients.All.SendAsync(methodNotificationName, new NotificationDto {
                Type = type,
                Source = sourse
            });
-        public async Task Notify(string conn, string type, INotificationSource sourse)
-            => await _hubContext.Clients.Client(conn).Notification(new NotificationDto
+        public async Task NotifyAsync(string conn, string type, INotificationSource sourse)
+            => await _hubContext.Clients.Client(conn).SendAsync(methodNotificationName, new NotificationDto
             {
                 Type = type,
                 Source = sourse
             });
 
-        public async Task Notify(string[] conns, string type, INotificationSource sourse)
-            => await _hubContext.Clients.Clients(conns).Notification(new NotificationDto
+        public async Task NotifyAsync(string[] conns, string type, INotificationSource sourse)
+            => await _hubContext.Clients.Clients(conns).SendAsync(methodNotificationName, new NotificationDto
             {
                 Type = type,
                 Source = sourse
             });
 
-        public async Task Notify(AUser usr, string type, INotificationSource sourse)
-            => await Notify(GetConns(usr), type, sourse);
+        public async Task NotifyAsync(string userId, INotificationSource sourse, string type)
+            => await NotifyAsync(_userConnectionService.GetUserConnections(userId), type, sourse);
 
-        public async Task Notify(AUser usr, string tokenId, string type, INotificationSource sourse)
-           => await Notify(GetConns(usr, tokenId), type, sourse);
+        public async Task NotifyAsync(string userId, string tokenId, string type, INotificationSource sourse)
+           => await NotifyAsync(_userConnectionService.GetUserConnections(userId, tokenId), type, sourse);
 
-        public async Task Notify(AUser[] usrs, string type, INotificationSource sourse)
-            => await Notify(GetConns(usrs), type, sourse);
+        public async Task NotifyAsync(string[] userIds, INotificationSource sourse, string type)
+            => await NotifyAsync(_userConnectionService.GetUserConnections(userIds), type, sourse);
 
-        public async Task PermanentNotify(string tokenId, string type, INotificationSource sourse)
-            => await Notify(GetPermanentConns(tokenId), type, sourse);
+        public async Task PermanentNotifyAsync(string tokenId, string type, INotificationSource sourse)
+            => await NotifyAsync(_permanentConnectionService.GetConnections(tokenId), type, sourse);
 
-        public async Task PermanentNotify(string[] tokenIds, string type, INotificationSource sourse)
-           => await Notify(GetPermanentConns(tokenIds), type, sourse);
+        public async Task PermanentNotifyAsync(string[] tokenIds, string type, INotificationSource sourse)
+           => await NotifyAsync(_permanentConnectionService.GetConnections(tokenIds), type, sourse);
 
-        public async Task Read(AUser usr, string last, int count)
-            => await _hubContext.Clients.Clients(GetConns(usr)).Notification(
-                    new NotificationDto
-                    {
-                        Type = "onReadNtf",
-                        Source = new OnReadSource { Last = last, Count = count }
-                    }
-                );
     }
 }

@@ -9,6 +9,7 @@ namespace SchoolBridge.DataAccess.Interfaces
     public interface IGenericRepository<TEntity> where TEntity : class
     {
         TEntity Create(TEntity entity);
+        IEnumerable<TEntity> Create(IEnumerable<TEntity> entities);
         Task<TEntity> CreateAsync(TEntity entity);
         Task<IEnumerable<TEntity>> CreateAsync(IEnumerable<TEntity> entities);
         Task UpdateAsync(TEntity entity);

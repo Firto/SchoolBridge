@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface ISubjectService
+    public interface ISubjectService: IOnInitService
     {
         PupilSubject Get(int id);
         PupilSubject GetByName(string name);

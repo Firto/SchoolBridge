@@ -10,10 +10,19 @@ import { UserPermissionService } from './user-permission.service';
         
     ],
     providers: [
-        UserPermissionService
+        
     ],
     exports: [
         UserPermissionPipe
     ]
 })
-export class UserPermissionModule  {}
+export class UserPermissionModule  {
+    static forRoot() {
+        return {
+            ngModule: UserPermissionModule,
+            providers: [
+                UserPermissionService
+            ]
+        };
+    }
+}

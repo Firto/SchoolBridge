@@ -10,7 +10,7 @@ namespace SchoolBridge.API.Controllers.Attributes
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            JwtSecurityToken token = context.HttpContext.RequestServices.GetService<ITokenService<User>>().ValidateToken(context.HttpContext);
+            JwtSecurityToken token = context.HttpContext.RequestServices.GetService<ITokenService>().ValidateToken(context.HttpContext);
             context.ActionArguments["token"] = token;
             context.ActionArguments["user"] = new User { Id = token.Subject };
         }

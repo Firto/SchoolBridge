@@ -1,8 +1,16 @@
 import * as some from './device-uuid.js';
+import { Injectable } from '@angular/core';
+
+@Injectable()
 export class DeviceUUIDService{
     private du: any = new some.DeviceUUID().parse();
+    private _uuid: string = this.get();
     
-    get():string{
+    public get uuid(){
+        return this._uuid;
+    }
+
+    private get():string{
         const dua = [
             this.du.version,
             this.du.language,

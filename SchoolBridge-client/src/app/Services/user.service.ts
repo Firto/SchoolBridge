@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { User } from '../Models/user.model';
 import { Injectable, Injector } from '@angular/core';
 import { ActivatedRoute, RouterStateSnapshot } from '@angular/router';
@@ -7,63 +7,60 @@ import { Loginned } from '../Models/loginned.model';
 import { LoginnedTokens } from '../Models/loginned-tokens';
 import { CryptService } from './crypt.service';
 import { DeviceUUIDService } from './device-uuid.service';
+import { ClientConnectionService } from './client-connection.service';
+import { MyLocalStorageService } from './my-local-storage.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class UserService {
-    public user: BehaviorSubject<User> = new BehaviorSubject<User>(null);
-
-    public uuid: string;
-
-    constructor(private crypt: CryptService,
-                private route: ActivatedRoute,
-                private injector: Injector,
-                private notificationService: NotificationService,
-                uuidService: DeviceUUIDService) {
-        this.uuid = uuidService.get(); 
-
-        if (localStorage.getItem('user')){
-            try {
-                this.user.next(JSON.parse(this.crypt.decode(localStorage.getItem('user'), this.uuid)));
-                this.notificationService.subscribe(this.user.value.login.tokens.token);
-            }
-            catch{
-                this.localLogout();
-            }
+    private _user: BehaviorSubject<User> = new BehaviorSubject<User>(null);
+    public get userObs(): Observable<User> {return this._user;};
+    
+    public get user(): User {return this._user.value};
+    public set user(usr: User) {
+        this._localStorage.write("user", usr);
+        this._user.next(usr);
+    };
+    constructor(private _clientConnectionService: ClientConnectionService,
+                private _localStorage: MyLocalStorageService,
+                private _uuidService: DeviceUUIDService){
+        if (_localStorage.isIssetKey('user')){
+            this._user.next(_localStorage.read('user'));
+            this._clientConnectionService.subscribe(this.user.login.tokens.token).subscribe();
         }
     }
 
+    
+
     forceRunAuthGuard(): void {
-        if (this.route.root.children.length && this.route.root.children['0'].snapshot.routeConfig.canActivate) {
-            const curr_route = this.route.root.children[ '0' ];
-            const AuthGuard = curr_route.snapshot.routeConfig.canActivate[ '0' ];
-            const authGuard = this.injector.get(AuthGuard);
-            const routerStateSnapshot: RouterStateSnapshot = Object.assign({}, curr_route.snapshot, {url: "/"+curr_route.snapshot.url[0]});
-            authGuard.canActivate(curr_route.snapshot, routerStateSnapshot);
-        }
+        /*console.log(this._route);
+        if (this._route.children.length && this._route.children['0'].snapshot._routeConfig.canActivate) {
+            const curr__route = this._route.children[ '0' ];
+            const AuthGuard = curr__route.snapshot._routeConfig.canActivate[ '0' ];
+            const authGuard = this._injector.get(AuthGuard);
+            const _routerStateSnapshot: RouterStateSnapshot = Object.assign({}, curr__route.snapshot, {url: "/"+curr__route.snapshot.url[0]});
+            authGuard.canActivate(curr__route.snapshot, _routerStateSnapshot);
+        }*/
     }
 
     // local
 
     localLogout(): void {
-        localStorage.removeItem('user');
-        this.user.next(null);
-        this.notificationService.unsubscribe();
-        this.forceRunAuthGuard();
+        this.user = null;
+        this._clientConnectionService.unsubscribe().subscribe();
+        //this.forceRunAuthGuard();
     }
 
     localLogin(login: Loginned): void {
         const user = new User();
         user.login = login;
-        this.user.next(user);
-        localStorage.setItem('user', this.crypt.encode(JSON.stringify(this.user.value), this.uuid));
-        this.notificationService.subscribe(login.tokens.token);
+        this.user = user;
+        this._clientConnectionService.subscribe(login.tokens.token).subscribe();
     }
 
     localSetLoginTokens(tokens: LoginnedTokens): void {
-        const user = this.user.value;
+        const user = this.user;
         user.login.tokens = tokens;
-        this.user.next(user);
-        localStorage.setItem('user', this.crypt.encode(JSON.stringify(this.user.value), this.uuid));
-        this.notificationService.subscribe(user.login.tokens.token);
+        this.user = user;
+        this._clientConnectionService.subscribe(user.login.tokens.token).subscribe();
     }
 }

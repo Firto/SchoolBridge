@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using SchoolBridge.DataAccess.Entities;
+using SchoolBridge.DataAccess.Entities.Chat;
 using SchoolBridge.Helpers.AddtionalClases.NotificationService;
 using SchoolBridge.Helpers.DtoModels;
+using SchoolBridge.Helpers.DtoModels.Chat;
 
 namespace SchoolBridge.Domain.Profiles
 {
@@ -16,9 +18,20 @@ namespace SchoolBridge.Domain.Profiles
                 }
             );
 
-            CreateMap(typeof(Notification<>), typeof(DataBaseSourse));
+            CreateMap<Notification, DataBaseSourse>();
 
-            CreateMap(typeof(Notification<>), typeof(NotificationDto));
+            CreateMap<Notification, NotificationDto>();
+            CreateMap<DirectChat, DirectChatDto>();
+            CreateMap<DirectMessage, MessageDto>().ConvertUsing(t =>
+                new MessageDto
+                {
+                    Id = t.Id,
+                    Date = t.Date,
+                    Type = t.Type,
+                    Base64Source = t.Base64Source,
+                    Sender = new ShortUserDto { Id = t.SenderId}
+                }
+            );
         }
     }
 }

@@ -10,6 +10,8 @@ import { SelectPanelComponent } from './Components/select-panel/select-panel.com
 import { SettingsComponent } from './Components/settings/settings.component';
 import { GlobalizationModule } from '../globalization/globalization.module';
 import { ProfileService } from './Services/profile.service';
+import { UsersService } from './Services/users.service';
+import { OnlineService } from './Services/online.service';
 
 @NgModule({
     declarations: [
@@ -23,12 +25,14 @@ import { ProfileService } from './Services/profile.service';
         ReactiveFormsModule,
         FormsModule,
         DbNotificationModule,
-        UserPermissionModule,
+        UserPermissionModule.forRoot(),
         PanelRoutingModule,
         GlobalizationModule
     ],
     providers: [
-        ProfileService
+        ProfileService,
+        OnlineService,
+        UsersService,
     ],
     exports: [
         PanelComponent

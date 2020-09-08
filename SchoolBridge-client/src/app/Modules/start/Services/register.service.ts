@@ -1,6 +1,6 @@
 import { Injectable, Injector } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, takeUntil, tap } from 'rxjs/operators';
 
 import { apiConfig } from 'src/app/Const/api.config';
 import { APIResult } from 'src/app/Models/api.result.model';
@@ -15,48 +15,51 @@ import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/Services/user.service';
 import { LoaderService } from 'src/app/Services/loader.service';
+import { PermanentConnectionService } from 'src/app/Modules/start/Services/permanent-connection.service';
+import { DeviceUUIDService } from 'src/app/Services/device-uuid.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class RegisterService {
     private ser: Service;
 
-    constructor(private baseService: BaseService,
-                private userService: UserService,
-                private notificationService: NotificationService,
-                private loaderService: LoaderService,
-                private toastrService: ToastrService,
-                private router:Router) {
+    constructor(private _baseService: BaseService,
+                private _userService: UserService,
+                private _permanentConnectionService: PermanentConnectionService,
+                private _notificationService: NotificationService,
+                private _loaderService: LoaderService,
+                private _toastrService: ToastrService,
+                private _uuidService: DeviceUUIDService) {
         this.ser = apiConfig["register"];
 
-        this.notificationService.reciveNotification.subscribe(x => {
+        this._notificationService.reciveNotification.subscribe(x => {
             
             if (x.type == "onSendEmail"){
-                this.loaderService.hide();
+                this._loaderService.hide();
                 if ((<OnSendEmailSource>x.source).ok)
                 {
-                    this.toastrService.success("Succesful sending email to "+ (<OnSendEmailSource>x.source).email +"!");
-                    this.router.navigate(["/login"]);
+                    this._toastrService.success("Succesful sending email to "+ (<OnSendEmailSource>x.source).email +"!");
+                    //this._router.navigateByUrl("/start");
                 }
-                else this.toastrService.error("Error while sending email to "+ (<OnSendEmailSource>x.source).email +", try again!");
+                else this._toastrService.error("Error while sending email to "+ (<OnSendEmailSource>x.source).email +", try again!");
             }
         })
     }
 
-    start(email: string): Observable<APIResult> {
-        return this.baseService.send(this.ser, "start", null, { headers: {'UUID':this.userService.uuid}, params: { email: email}}).pipe(map(res => {
-            if (res.ok == true){
-                this.notificationService.permanentSubscribe((<PermanentSubscribe>res.result).token);
-                this.loaderService.show("Wait sending email...");
-            }
-            return res;
-        }));
+    start(email: string): Observable<PermanentSubscribe> {
+        return this._baseService.send<PermanentSubscribe>(this.ser, "start", null, { headers: {'UUID':this._uuidService.uuid}, params: { email: email}}).pipe(
+            tap(res => {
+                //this.router.navigateByUrl("/start");
+                this._permanentConnectionService.subscribe(res.token).subscribe();
+                this._loaderService.show("Wait sending email...");
+            })
+        );
     }
 
-    end(model: EndRegister): Observable<APIResult> {
-        return this.baseService.send(this.ser, "end", model, {headers: {'UUID':this.userService.uuid}}).pipe(map(res => {
-            if (res.ok == true)
-                this.userService.localLogin(<Loginned>res.result);
-            return res;
-        }));
+    end(model: EndRegister): Observable<Loginned> {
+        return this._baseService.send<Loginned>(this.ser, "end", model, {headers: {'UUID':this._uuidService.uuid}}).pipe(
+            tap(res => {
+                this._userService.localLogin(<Loginned>res);
+            })
+        );
     }
 }

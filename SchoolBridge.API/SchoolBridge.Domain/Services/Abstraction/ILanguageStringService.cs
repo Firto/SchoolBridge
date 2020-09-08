@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface ILanguageStringService
+    public interface ILanguageStringService: IOnInitService, IOnFirstInitService
     {
         GlobalizationInfoDto GetGlobalizationInfo();
         string GetUpdateId();
@@ -16,6 +16,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Language AddLanguage(string abbName, string fullName);
         void RemoveLanguage(string abbName);
         void RemoveLanguage(int id);
+        void EditLanguage(string abbName, string fullName);
 
         LanguageStringType AddType(string name);
         void RemoveType(string name);

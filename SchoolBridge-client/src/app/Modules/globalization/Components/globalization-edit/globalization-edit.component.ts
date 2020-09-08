@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { DbStringDirective } from '../../Directives/dbstring.directive';
-import { GlobalizationService } from '../../services/globalization.service';
 import { OnUnsubscribe } from 'src/app/Services/super.controller';
 import { takeWhile, takeUntil } from 'rxjs/operators';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { GlobalizationEditService } from '../../Services/globalization-edit.service';
 
 
 @Component({
@@ -12,40 +12,38 @@ import { FormBuilder, FormGroup } from '@angular/forms';
   templateUrl: './globalization-edit.component.html',
   styleUrls: ['./globalization-edit.component.css']
 })
-export class GlobalizationEdit extends OnUnsubscribe implements OnInit {
-  public cur: BehaviorSubject<DbStringDirective> = new BehaviorSubject<DbStringDirective>(null);
-  constructor(public globalizationService: GlobalizationService) {
-    super();
-  }
-
-  ngOnInit(){
-    this.globalizationService.onStringEditWindow.pipe(takeUntil(this._destroy)).subscribe(x => {
-        this.cur.next(x);
-    });
+export class GlobalizationEdit {
+  public errors: Record<string, Observable<string>> = {}
+  constructor(public gbeService: GlobalizationEditService) {
+    
   }
 
   edit(name: string){
+  
     if (document.getElementById(name).classList.contains("ng-invalid")) return;
 
-    this.globalizationService.setString(name, (<HTMLInputElement>document.getElementById(name)).value).subscribe(null, err => {
-        if (!('id' in err) || err.id !== 'v-dto-invalid') return;
+    this.gbeService.setString(name, (<HTMLInputElement>document.getElementById(name)).value).subscribe(null, err => {
+        if (err.id !== 'v-dto-invalid') return;
         
-        document.getElementById('p-'+name).innerHTML = JSON.stringify(err.additionalInfo['string']);
-        document.getElementById(name).classList.add("ng-invalid");
+        this.errors[name] = err.additionalInfo['string'];
     });
   }
 
   change(name: string){
-    document.getElementById('p-'+name).innerHTML = '';
-    document.getElementById(name).classList.remove("ng-invalid");
+    if (Object.keys(this.errors).includes(name))
+      delete this.errors[name];
   }
 
   disableEditing(){
-    this.globalizationService.setEditingState(false);
+    this.gbeService.state = false;
+  }
+
+  updateBaseupdateid(){
+    this.gbeService.updateBaseUpdateId().subscribe();
   }
 
   close(){
-    this.cur.next(null);
+    this.gbeService.changeEditing(null);
   }
 
 }

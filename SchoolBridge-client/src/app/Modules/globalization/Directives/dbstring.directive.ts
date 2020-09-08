@@ -1,34 +1,74 @@
-import { Directive, ElementRef, Input, ViewContainerRef, OnInit, Renderer2, HostListener, OnDestroy } from '@angular/core'
-import { GlobalizationService } from '../services/globalization.service'
+import { Directive, ElementRef, Input, ViewContainerRef, OnInit, Renderer2, HostListener, OnDestroy, Optional, Inject } from '@angular/core'
 import { Subscription, Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OnUnsubscribe } from 'src/app/Services/super.controller';
+import { GlobalizationService } from '../Services/globalization.service';
+import { GlobalizationEditService } from '../Services/globalization-edit.service';
+import { GlobalizationStringService } from '../Services/globalization-string.service';
+import { ParentComponent } from 'src/app/Services/parent.component';
+
+class DbString{
+    private _obs: Observable<string>;  
+
+    public set obs(val: Observable<string>) {
+      this._obs = val;
+      if (this._obs) 
+        this._obs.subscribe(x => {
+          if (this._type !== 'html')
+            this._renderer.setAttribute(this._elementRef.nativeElement, this._attr, x);
+          else this._elementRef.nativeElement.innerHTML = x;
+        });
+    }
+
+    public get key(): string{
+      return this._key;
+    }
+    public get type(): string{
+      return this._type;
+    }
+    public get obs(): Observable<string>{
+      return this._obs;
+    }
+    public get attr(): string{
+      return this._attr;
+    }
+
+    constructor ( private _elementRef: ElementRef,
+                  private _renderer: Renderer2,
+                  private _key: string,
+                  private _type: "html" | "attr",
+                  private _attr: string = ""){
+      
+    }
+}
 
 @Directive({
   selector: '[dbstring]',
 })
 export class DbStringDirective extends OnUnsubscribe implements OnInit {
-  private static __noneStringDef: string = "-none-";
-
   @Input('attrString') arg: {str: string, arg: string};
   @Input('dbPrefix') prefix: boolean = true;
 
-  private _strings: Record<string, {type: string | 'html', value: string}> = {};
+  private _strings: Record<string, DbString> = {};
+  private _componentInfo: {prefix: string, constStrings: string[]};
 
-  private _defBackStringPrefix: string = 'cm';
-  private _obs: Observable<Record<string, string>> = null;
+  get componentInfo(): {prefix: string, constStrings: string[]}{
+    return this._componentInfo;
+  }
 
   constructor(private _elementRef: ElementRef,
                 private _renderer: Renderer2,
                 private _viewContainerRef: ViewContainerRef,
-                private _globalizationService: GlobalizationService) {
-    super(); 
-    if ((<any>this._viewContainerRef)._hostView[8]._defBackStringPrefix)
-      this._defBackStringPrefix = (<any>this._viewContainerRef)._hostView[8]._defBackStringPrefix;
-
-    /*document.addEventListener('contextmenu', function (e) {
-      console.log(e);
-    }, false);*/
+                private _gbService: GlobalizationService,
+                private _gbsService: GlobalizationStringService,
+                private _gbeService: GlobalizationEditService) {
+    super();
+    console.log(_viewContainerRef);
+    this._componentInfo = this._gbService.getComponent((<any>this._viewContainerRef)._hostView[8].__proto__.constructor.__proto__.name)
+    if (!this._componentInfo)
+      this._componentInfo = this._gbService.getComponent((<string>(<any>this._viewContainerRef)._hostView[1].template.name).split('_')[0])              
+    if (!this._componentInfo) 
+      this._componentInfo = {prefix: 'cm', constStrings: []};
   }
 
   getUsedStrings(): string[]{
@@ -42,56 +82,45 @@ export class DbStringDirective extends OnUnsubscribe implements OnInit {
   }
 
   ngOnInit(){
-    this._globalizationService.changeEditing.pipe(takeUntil(this._destroy)).subscribe(x => {
+    this._gbeService.stateObs.pipe(takeUntil(this._destroy)).subscribe(x => {
       this.changeState(x);
     });
 
     if (this.arg){
-      if (this.prefix)
-        this.arg.str = this._defBackStringPrefix + '-' + this.arg.str;
-      this._strings[this.arg.str] = {type: this.arg.arg, value: ''};
+      if (this.prefix === true)
+        this.arg.str = this._componentInfo.prefix + '-' + this.arg.str;
+      this._strings[this.arg.str] = new DbString(this._elementRef, this._renderer, this.arg.str, "attr", this.arg.arg);
       //this._renderer.setAttribute(this._elementRef.nativeElement, this.arg.arg, DbStringDirective.__noneStringDef);
     }
     
     if (this._elementRef.nativeElement.innerHTML){
-      this._strings[this.prefix ? this._defBackStringPrefix + '-' + this._elementRef.nativeElement.innerHTML : this._elementRef.nativeElement.innerHTML] = {type: 'html', value: ''};
+      let key = this._elementRef.nativeElement.innerHTML;
+      if (this.prefix === true) 
+        key = this._componentInfo.prefix + '-' + key;
+      this._strings[key] =  new DbString(this._elementRef, this._renderer, key, "html");
     }
     
-    console.log(this._strings);
+    
 
-    this._obs = this._globalizationService.initLocalStrings(...Object.keys(this._strings));
-
-    this._obs.subscribe(k => {
-      this.setStrings(k);
-      this.updateStrings();
-    });
-
-    if(this._globalizationService.isIssetDataForCurrentLanguage())
-      this.setStrings(this._globalizationService.getLocalStrings(this.getUsedStrings()));
-    this.updateStrings();
-  }
-
-  private setStrings(strings: Record<string, string>){
-    for (const [key, value] of Object.entries(strings))
-      this._strings[key].value = value;
-  }
-
-  private updateStrings(){
-    for (const [key, value] of Object.entries(this._strings)){
-      if (value.type !== 'html')
-        this._renderer.setAttribute(this._elementRef.nativeElement, value.type, value.value.length == 0 ? DbStringDirective.__noneStringDef : value.value);
-      else this._elementRef.nativeElement.innerHTML = value.value.length == 0 ? DbStringDirective.__noneStringDef : value.value;
-    }
+    const som = this._gbsService.getStringsObs(Object.keys(this._strings))
+    //console.log(som);
+    Object.keys(som).forEach(x => {
+      this._strings[x].obs = som[x];
+    })
   }
 
   public getString(name: string): string {
-    return this._strings[name].value;
+    return this._gbsService.getLoadedStringSave(name, "");
   }
 
+  public constStrings(): string[]{
+      return this._componentInfo.constStrings.filter(x => !Object.keys(this._strings).includes(x));
+  }
+  
   @HostListener('contextmenu', ['$event']) onClick(ev: MouseEvent) {
-    if (ev.button != 2) return true;
+    if (ev.button != 2 || !this._gbeService.state) return true;
     ev.preventDefault();
-    this._globalizationService.showStringEditWindow(this);
+    this._gbeService.changeEditing(this);
     return false;
   }
 }

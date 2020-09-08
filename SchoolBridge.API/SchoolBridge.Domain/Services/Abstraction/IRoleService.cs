@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface IRoleService
+    public interface IRoleService: IOnInitService, IOnFirstInitService
     {
-        Task<Role> Get(string name);
-        Task<Role> Get(int Id);
-        Task<IEnumerable<Role>> GetAll();
+        Role Get(string name);
+        Role Get(int Id);
+        IEnumerable<Role> GetAll();
+
+        Task<Role> GetAsync(string name);
+        Task<Role> GetAsync(int Id);
+        Task<IEnumerable<Role>> GetAllAsync();
     }
 }

@@ -1,6 +1,6 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterContentChecked, AfterViewChecked, AfterViewInit } from '@angular/core';
 import { ToastContainerDirective, ToastrService } from 'ngx-toastr';
-import { GlobalizationService } from './Modules/globalization/services/globalization.service';
+import { GlobalizationEditService } from './Modules/globalization/Services/globalization-edit.service';
 
 @Component({
   selector: 'app-root',
@@ -8,15 +8,19 @@ import { GlobalizationService } from './Modules/globalization/services/globaliza
   styleUrls: ['./app.component.css']
 })
 
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
   title = 'SchoolBridge-client';
 
   @ViewChild(ToastContainerDirective, {static: true}) toastContainer: ToastContainerDirective;
  
   constructor(private toastrService: ToastrService,
-              languageStringService: GlobalizationService) {}
+              public gbeService: GlobalizationEditService) {}
 
   ngOnInit() {
     this.toastrService.overlayContainer = this.toastContainer;
+  }
+
+  ngAfterViewInit(){
+      console.log("mm");
   }
 }
