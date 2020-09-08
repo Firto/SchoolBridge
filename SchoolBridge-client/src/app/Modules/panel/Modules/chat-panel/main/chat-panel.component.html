@@ -1,6 +1,6 @@
 <div class="messaging">
     <div class="inbox_msg">
-      <div class="inbox_people">
+      <div class="inbox_people" [ngClass]="{'mclose' : curChat | async}" >
         <div class="headind_srch">
           <div class="recent_heading">
             <h4>Recent</h4>
@@ -13,9 +13,9 @@
         </div>
         <div class="inbox_chat scroll"  >
           <div *ngFor="let item of (chatService.chats | async) | keyvalue;" class="chat_list active_chat">
-            <div class="chat_people" *ngIf="item.value.direct; else elseBlock">
+            <div class="chat_people" *ngIf="item.value.direct; else elseBlock" (click)="onSelectChat(item.value)">
               <div class="chat_img">
-                <img src="{{(item.value.user | async)?.photo}}" alt="sunil">
+                <img src="{{(item.value.user | async)?.photo}}" alt="{{(item.value.user | async)?.login}}">
                 <i *ngIf="((item.value.user | async)?.onlineStatus | async) !== 2" class="fa fa-circle onl-status" 
                 [ngClass]="{'online' : ((item.value.user | async)?.onlineStatus | async) === 1,
                             'offline' : ((item.value.user | async)?.onlineStatus | async) === 0 }" ></i>
@@ -31,7 +31,12 @@
           </div>
         </div>
       </div>
-      <div class="mesgs mclose">
+      <div class="mesgs" [ngClass]="{'mclose' : curChat | async}" >
+        <div class="msg_bar p-2" *ngIf="curChat | async" >
+          <button type="button" class="btn rounded-circle text-white">
+            <i class="fa fa-angle-left"></i>
+          </button>
+        </div>
         <div class="msg_history">
           <div class="incoming_msg">
             <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>

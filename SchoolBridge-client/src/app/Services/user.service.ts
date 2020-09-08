@@ -26,7 +26,7 @@ export class UserService {
         if (_localStorage.isIssetKey('user')){
             this._user.next(_localStorage.read('user'));
             this._clientConnectionService.subscribe(this.user.login.tokens.token).subscribe();
-        }else this.localLogout();
+        }
     }
 
     

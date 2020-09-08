@@ -40,6 +40,15 @@ namespace SchoolBridge.Domain.Services.Implementation
                 if (string.IsNullOrEmpty(prop))
                     context.Valid.Add($"[v-d-not-null, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
             });
+
+            validatingService.AddValidateFunc("str-guid", (string prop, PropValidateContext context) =>
+            {
+                if (prop == null) return;
+
+                Guid x;
+                if (!Guid.TryParse(prop, out x))
+                    context.Valid.Add($"[v-inc-id, [pn-{context.PropName}]]");// $"Please input {context.PropName}!"
+            });
         }
 
         public void Validate(string[] attrs, object obj, string objName)

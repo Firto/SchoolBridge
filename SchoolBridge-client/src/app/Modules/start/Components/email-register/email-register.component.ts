@@ -12,34 +12,30 @@ import { GlobalizationService } from 'src/app/Modules/globalization/Services/glo
 })
 @Globalization('cm-st-reg', {
   errors: [],
-  validating: ["v-str-email"],
+  validating: [
+    "v-d-not-null",
+    "v-str-email"
+  ],
   args: [
     'email'
   ]
 })
-export class EmailRegisterComponent implements OnInit {
-  registerForm: FormGroup;
-  
-  constructor(private gbService: GlobalizationService,
-              private registerService: RegisterService,
-              private fb: FormBuilder) { 
-    
-  }
+export class EmailRegisterComponent {
+  [x: string]: any;
+  public form: any;
 
-  ngOnInit(): void {
-    this.registerForm = this.fb.group({
-      email: ['']
-    });
-  }
+  constructor(_gb: GlobalizationService,
+              _fb: FormBuilder,
+              private registerService: RegisterService) {}
               
-
   public register(): void {
-    this.registerService.start(this.registerForm.controls.email.value).subscribe(
+    if (!this.form.valid) return;
+    
+    this.registerService.start(this.form.controls.email.value).subscribe(
       res => {}, 
       (err: UserError) =>{
-        if (err.id != "v-dto-invalid") return;
-        for (const [key, value] of Object.entries(err.additionalInfo)) 
-          this.registerForm.controls[key].setErrors({"err":value});
+        if (err.id == "v-dto-invalid") 
+          this.validate(err);
       }
     );
   }

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ChatService } from '../Services/chat.service';
-import { environment } from 'src/environments/environment';
 import { ChatMessageService } from '../Services/chat-message.service';
+import { Chat } from '../Classes/chat.class';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: "chat-panel",
@@ -10,9 +11,14 @@ import { ChatMessageService } from '../Services/chat-message.service';
 })
 
 export class ChatPanelComponent {
-    public apiUrl: string = environment.apiUrl;
+    public curChat: BehaviorSubject<Chat> = new BehaviorSubject<Chat>(null);
+
     constructor(public chatService: ChatService,
                 public CMService: ChatMessageService){
 
+    }
+
+    public onSelectChat(chat: Chat){
+        this.curChat.next(chat); 
     }
 }

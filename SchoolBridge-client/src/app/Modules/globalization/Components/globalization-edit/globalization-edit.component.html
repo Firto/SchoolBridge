@@ -9,24 +9,30 @@
 			<a class="close" (click)="close()" >&times;</a>
 			
 			<div class="content container">
-				<div *ngFor="let item of (gbeService.editingObs | async).getUsedStrings();" class="row" >
+				<div *ngFor="let item of (gbeService.editingObs | async).getUsedStrings();" class="row mt-2" >
 					<div class="col-10">
 						<input (keyup)="change(item)" type="text" class="form-control rounded-pill" id="{{item}}" placeholder="{{item}}" value="{{(gbeService.editingObs | async).getString(item)}}">
 					</div>
 					<button (click)="edit(item)" type="submit" title="Save {{item}} string" class="col-2 btn rounded-pill btn-custom text-uppercase">
 						Save
 					</button>
-					<p id="p-{{item}}" class="text-danger font-weight-bold text-center col-12" ></p>
+					<p *ngFor="let it of errors[item];" 
+						class="text-danger font-weight-bold text-center col-12 ng-invalid">
+						{{it | async}}
+					</p>
 				</div>
 				<hr>
-				<div *ngFor="let item of (gbeService.editingObs | async).constStrings();" class="row" >
+				<div *ngFor="let item of (gbeService.editingObs | async).constStrings();" class="row mt-2" >
 					<div class="col-10">
 						<input (keyup)="change(item)" type="text" class="form-control rounded-pill" id="{{item}}" placeholder="{{item}}" value="{{(gbeService.editingObs | async).getString(item)}}">
 					</div>
 					<button (click)="edit(item)" type="submit" title="Save {{item}} string" class="col-2 btn rounded-pill btn-custom text-uppercase">
 						Save
 					</button>
-					<p id="p-{{item}}" class="text-danger font-weight-bold text-center col-12" ></p>
+					<p *ngFor="let it of errors[item];" 
+						class="text-danger font-weight-bold text-center col-12 ng-invalid">
+						{{it | async}}
+					</p>
 				</div>
 			</div>
 		</div>

@@ -62,6 +62,7 @@ export const apiConfig: Record<string, Service> = {
             "info": {
                 url: "info",
                 type: "GET",
+                loader: false
             },
             "strings": {
                 url: "strings",

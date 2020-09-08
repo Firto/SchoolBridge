@@ -2,18 +2,18 @@
     <div *ngIf="'GetAdminPanel' | userPerm" class="mb-3 col-12 col-sm-6 col-lg-4">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Admin Panel</h5>
-          <p class="card-text">Administrating panel</p>
-          <a routerLink="./admin" class="btn btn-primary text-white">Go</a>
+          <h5 class="card-title" dbstring >ad-panel</h5>
+          <p class="card-text" dbstring >ad-panel-desc</p>
+          <a routerLink="./admin" class="btn btn-primary text-white" dbstring >go</a>
         </div>
       </div>
     </div>
     <div *ngIf="'GetPupilPanel' | userPerm" class="pl-sm-0 mb-3 col-12 col-sm-6 col-lg-4">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Pupil panel</h5>
-          <p class="card-text">Panel for pupils</p>
-          <a href="#" class="btn btn-primary">Go</a>
+          <h5 class="card-title" dbstring >pl-panel</h5>
+          <p class="card-text" dbstring  >pl-panel-desc</p>
+          <a href="#" class="btn btn-primary" dbstring >go</a>
         </div>
       </div>
     </div>

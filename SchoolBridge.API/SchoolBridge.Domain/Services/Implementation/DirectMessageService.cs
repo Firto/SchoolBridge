@@ -120,18 +120,48 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         public IEnumerable<DirectChatDto> GetDirectMessages(string userId, string chatId, string last, int count = 20)
         {
-            DirectMessage message = last != null ? _directMessageGR.Find(last) : null;
-            if (last != null && message == null)
-                throw new ClientException("inc-message-id", last);
-            return _mapper.Map<IEnumerable<DirectMessage>, IEnumerable<DirectChatDto>>(_directMessageGR.GetDbSet().Where((x) => x.ChatId == chatId && (message == null || x.Date < message.Date)).OrderByDescending((x) => x.Date).Take(count).ToArray());
+            var chat = _directChatGR.GetDbSet().Where(x => x.Id == chatId && (x.User1Id == userId || x.User2Id == userId)).FirstOrDefault();
+            if (chat == null)
+                throw new ClientException("inc-chatid");
+
+            DirectMessage message = null;
+            if (last != null)
+            {
+                message =  _directMessageGR.GetDbSet().Where(x => x.Id == last && x.ChatId == chatId).FirstOrDefault();
+                if (message == null)
+                    throw new ClientException("inc-message-id", last);
+            }
+
+            return _mapper.Map<IEnumerable<DirectMessage>, IEnumerable<DirectChatDto>>(
+                _directMessageGR.GetDbSet()
+                .Where((x) => x.ChatId == chatId && (message == null || x.Date < message.Date))
+                .OrderBy((x) => x.Date)
+                .Take(count)
+                .ToArray()
+           );
         }
 
         public async Task<IEnumerable<DirectChatDto>> GetDirectMessagesAsync(string userId, string chatId, string last, int count = 20)
         {
-            DirectMessage message = last != null ? await _directMessageGR.GetDbSet().Where(x => x.Id == last).Include(x => x.Chat).FirstOrDefaultAsync() : null;
-            if (last != null && message == null && (message.Chat.User1Id == userId || message.Chat.User2Id == userId))
-                throw new ClientException("inc-message-id", last);
-            return _mapper.Map<IEnumerable<DirectMessage>, IEnumerable<DirectChatDto>>(await _directMessageGR.GetDbSet().Where((x) => x.ChatId == chatId && (message == null || x.Date < message.Date)).OrderByDescending((x) => x.Date).Take(count).ToArrayAsync());
+            var chat = _directChatGR.GetDbSet().Where(x => x.Id == chatId && (x.User1Id == userId || x.User2Id == userId)).FirstOrDefault();
+            if (chat == null)
+                throw new ClientException("inc-chatid");
+
+            DirectMessage message = null;
+            if (last != null)
+            {
+                message = await _directMessageGR.GetDbSet().Where(x => x.Id == last && x.ChatId == chatId).FirstOrDefaultAsync();
+                if (message == null)
+                    throw new ClientException("inc-message-id", last);
+            }
+            
+            return _mapper.Map<IEnumerable<DirectMessage>, IEnumerable<DirectChatDto>>(
+                await _directMessageGR.GetDbSet()
+                .Where((x) => x.ChatId == chatId && (message == null || x.Date < message.Date))
+                .OrderBy((x) => x.Date)
+                .Take(count)
+                .ToArrayAsync()
+           );
         }
 
         public MessageDto SendMessage(JwtSecurityToken token, string chatId, string type, IMessageSource message)

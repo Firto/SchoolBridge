@@ -9,6 +9,8 @@ import { UsersService } from 'src/app/Modules/panel/Services/users.service';
 import { apiConfig } from 'src/app/Const/api.config';
 import { environment } from 'src/environments/environment';
 import { User } from 'src/app/Modules/panel/Clases/user.class';
+import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
+import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
 
 export interface DBNNewChatMessageSource extends IDBNSource{
     sender: ShortUserModel;
@@ -34,7 +36,7 @@ export interface DBNNewChatMessageSource extends IDBNSource{
                                 </span>
                             </div>
                         </div>
-                        <p class="top-text-light">new message: {{messageSource.text}}</p>
+                        <p class="top-text-light" ><span dbstring >new-msg</span>: {{messageSource.text}}</p>
                         <p class="top-text-light">{{baseSource.date | timeAgo}}</p>
                     </div>
                     <div *ngSwitchDefault>
@@ -42,7 +44,7 @@ export interface DBNNewChatMessageSource extends IDBNSource{
                     </div>
                 </li>`
 })
-
+@Globalization('cm-db-ntf-on-new-chat-msg', [])
 export class DbNtfNewChatMessageComponent implements DbNtfComponent {
     private _sender: Observable<User>;
 
@@ -67,6 +69,7 @@ export class DbNtfNewChatMessageComponent implements DbNtfComponent {
 
     public messageSource: any;
 
-    constructor (private _usersService: UsersService){
+    constructor (_gb: GlobalizationService,
+                private _usersService: UsersService){
     }
 }

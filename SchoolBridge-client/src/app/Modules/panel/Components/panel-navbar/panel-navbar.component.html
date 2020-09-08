@@ -8,16 +8,16 @@
     </label>
     <ul class="menu align-middle">
         <li (click)="onClickMenuItem()" >
-            <a routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" >panels</a>
+            <a routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" dbstring >panels</a>
         </li>
         <li (click)="onClickMenuItem()" >
-            <a routerLink="./settings" routerLinkActive="active" >settings</a>
+            <a routerLink="./settings" routerLinkActive="active" dbstring >settings</a>
         </li>
         <li (click)="onClickMenuItem()" >
-            <a routerLink="./chat" routerLinkActive="active" >chat</a>
+            <a routerLink="./chat" routerLinkActive="active" dbstring >chat</a>
         </li>
         <li (click)="onClickMenuItem()" >
-            <a class="cancel" (click)="logout()" >logout</a>
+            <a class="cancel" (click)="logout()" dbstring >logout</a>
         </li>
         <li>
             <app-language-selector ></app-language-selector>

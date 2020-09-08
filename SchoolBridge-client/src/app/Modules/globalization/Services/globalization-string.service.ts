@@ -37,21 +37,18 @@ export class GlobalizationStringService {
             bufferWhen(() => this._toggleMainGetBuffer),
             mergeMap(x => {
                 return this._httpGbService.getStrings(x).pipe(map(r => {
+                    Object.assign(this._stringD, r);
+                    this._localStorage.write("gbdata", this._stringDATA);
                     x.forEach(m => {
                         if (!Object.keys(r).includes(m))
                             r[m] = this.getLoadedStringSave(m, "-none-");
                     })
-                    return r;
+                    Object.keys(r).forEach(m => {
+                        if (Object.keys(this._initializedStrings).includes(m) && this._initializedStrings[m]) 
+                            this._initializedStrings[m].next(r[m]);
+                    });
+                    return "";
                 }));
-            }),
-            map((x) => {
-                Object.assign(this._stringD, x);
-                this._localStorage.write("gbdata", this._stringDATA);
-                Object.keys(x).forEach(r => {
-                    if (Object.keys(this._initializedStrings).includes(r) && this._initializedStrings[r]) 
-                        this._initializedStrings[r].next(x[r]);
-                });
-                return "";
             })
         )
 
@@ -98,31 +95,43 @@ export class GlobalizationStringService {
 
     public getStringsObs(str: string[]): Record<string, Observable<string>>{
         const obss: Record<string, Observable<string>> = {};
-        str.forEach(x => {
-            if (!this.isInitializedString(x) || this._initializedStrings[x] == null)
-                this._initializedStrings[x] = new BehaviorSubject<string>(this.getLoadedStringHttp(x, "-loading-")); 
-            obss[x] = this._initializedStrings[x];
-        })
+        str.forEach(x => obss[x] = this.getStringObs(x))
         return obss;
     }
 
-    public convertString(str: string){
-        const regex = /\[([a-z-]+)(\s?\,\s?.+)?\]/;
-        const match = str.match(regex);
-        console.log(match);
-        if (!match || match.length === 0) return str;
-        str = this.getLoadedStringSave(match[1], match[1]);
-        if (match[2]){
-            const mt = match[2].match(/\[([^\]\[]+)+\]/);
-            if (mt[1])
-                str = str.replace("$arg$", this.getLoadedStringSave(mt[1], mt[1]).toLowerCase());
-        }
+    public getStringObs(str: string): Observable<string>{
+        if (!this.isInitializedString(str) || this._initializedStrings[str] == null)
+            this._initializedStrings[str] = new BehaviorSubject<string>(this.getLoadedStringHttp(str, "-loading-"));
+        return this._initializedStrings[str];
+    }
 
-        return str;
+    public convertString(str: string): Observable<string>{
+        const regex = /\[([a-z-0-9]+)(\s?\,\s?.+)?\]/;
+        const match = str.match(regex);
+        if (!match || match.length === 0) 
+            return Observable.throw("Error string "+ str);
+
+        return this.getStringObs(match[1]).pipe(map(x => {
+            if (match[2]){
+                match[2].split(/\s?\,\s?/).forEach(r => {
+                    if (!r || r.length === 0) return;
+
+                    const match = r.match(regex);
+                    if (!match || match.length === 0)
+                        x = x.replace("$arg$", r);
+                    else {
+                        const m = this.getLoadedStringHttp(match[1], match[1]);
+                        x = x.replace("$arg$", m.charAt(0).toLowerCase() + m.slice(1));
+                    }
+                })
+            }
+            return x.charAt(0).toUpperCase() + x.slice(1);
+        }));
     }
 
     public setString(name: string, str: string){
         this._stringD[name] = str;
+        this._localStorage.write("gbdata", this._stringDATA);
         if (Object.keys(this._initializedStrings).includes(name) && this._initializedStrings[name]) 
             this._initializedStrings[name].next(str);
     }

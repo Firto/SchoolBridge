@@ -180,14 +180,12 @@
 }
 
 .mesgs{
-	padding: 30px 15px 0 25px;
     float: left;
     overflow: hidden;
     width: 70%;
 	height: inherit;
 	display: flex;
 	flex-direction: column;
-	margin-top: -8px;
 }
 
 .sent_msg p {
@@ -242,6 +240,10 @@
 .msg_history {
 	overflow-y: auto;
 	flex-grow: 12;
+}
+
+.msg_bar{
+
 }
 
 @media screen and (max-width:800px) {

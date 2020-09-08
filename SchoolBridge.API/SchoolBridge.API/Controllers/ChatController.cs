@@ -37,21 +37,30 @@ namespace SchoolBridge.API.Controllers
 
         [HttpGet]
         [MyAutorize]
-        public async Task<ResultDto> GetMessages([BindNever] JwtSecurityToken token, [FromQuery, ArgValid("str-input")]string chatId, [FromQuery]string last)
+        public async Task<ResultDto> GetMessages(
+            [BindNever] User user, 
+            [FromQuery, ArgValid("str-input", "str-guid")]string chatId, 
+            [FromQuery, ArgValid("str-guid")]string last)
         {
-            return ResultDto.Create(await _directMessagesService.GetDirectMessagesAsync(token.Subject, chatId, last));
+            return ResultDto.Create(await _directMessagesService.GetDirectMessagesAsync(user.Id, chatId, last));
         }
 
         [HttpGet]
         [MyAutorize]
-        public async Task<ResultDto> SendMessage([BindNever] JwtSecurityToken token, [FromQuery, ArgValid("str-input")]string chatId, [FromQuery, ArgValid("str-input", "dr-text-message")]string text)
+        public async Task<ResultDto> SendMessage(
+            [BindNever] JwtSecurityToken token, 
+            [FromQuery, ArgValid("str-input", "str-guid")]string chatId, 
+            [FromQuery, ArgValid("str-input", "dr-text-message")]string text)
         {
             return ResultDto.Create(await _directMessagesService.SendMessageAsync(token, chatId, "text", new TextMessage { Text = text }));
         }
 
         [HttpGet]
         [MyAutorize]
-        public async Task<ResultDto> SendFirstMessage([BindNever] JwtSecurityToken token, [FromQuery, ArgValid("str-input")]string userId, [FromQuery, ArgValid("str-input", "dr-text-message")]string text)
+        public async Task<ResultDto> SendFirstMessage(
+                [BindNever] JwtSecurityToken token, 
+                [FromQuery, ArgValid("str-input", "str-guid")]string userId, 
+                [FromQuery, ArgValid("str-input", "dr-text-message")]string text)
         {
             return ResultDto.Create(await _directMessagesService.SendFirstMessageAsync(token, userId, "text", new TextMessage { Text = text }));
         }

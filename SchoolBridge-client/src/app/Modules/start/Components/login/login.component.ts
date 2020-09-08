@@ -4,6 +4,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormGroup, FormBuilder} from '@angular/forms';
 import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
 import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
+import { GlobalizationStringService } from 'src/app/Modules/globalization/Services/globalization-string.service';
+import { ParentComponent } from 'src/app/Services/parent.component';
 
 @Component({
   selector: 'app-login',
@@ -17,46 +19,43 @@ import { GlobalizationService } from 'src/app/Modules/globalization/Services/glo
     'l-too-many-devices',
     'v-dto-invalid'
   ],
-  validating:[ 'v-d-not-null'],
+  validating:[ 
+    'v-d-not-null'
+  ],
   args: [
     'login',
     'password'
   ]
 })
-export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
-
+export class LoginComponent extends ParentComponent implements OnInit {
+  [x: string]: any;
+  public form: any;
+  
   private returnUrl: string;
-  constructor(private gbService: GlobalizationService,
+  constructor(gbService: GlobalizationService,
+              fb: FormBuilder,
               private authService: LoginService, 
               private router:Router,
               private route: ActivatedRoute,
-              private fb: FormBuilder) { }
+              ) {super();}
 
   ngOnInit(): void {
     if (this.route.snapshot.queryParams['returnUrl'])
       this.returnUrl = this.route.snapshot.queryParams['returnUrl'];
     else this.returnUrl = "/panel";
-    
-    this.loginForm = this.fb.group({
-      login: [''],
-      password: ['']
-    });
-
-    //console.log((<any>this).__proto__.constructor._usedBackendStrings, this);
   }
               
   logon(){
-    this.authService.login(this.loginForm.controls.login.value, this.loginForm.controls.password.value).subscribe(
-      val => {
-        this.router.navigateByUrl(this.returnUrl);
-      },
-      err => {
-        if (err.id == "v-dto-invalid")
-          for (const [key, value] of Object.entries(err.additionalInfo)) 
-            this.loginForm.controls[key].setErrors({"err":value});
-      }
-    );
+    if (this.form.valid)
+      this.authService.login(this.form.controls.login.value, this.form.controls.password.value).subscribe(
+        val => {
+          this.router.navigateByUrl(this.returnUrl);
+        },
+        err => {
+          if (err.id == "v-dto-invalid")
+            this.validate(err);
+        }
+      );
   }
 
 }

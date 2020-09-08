@@ -14,25 +14,25 @@ export class GlobalizationService {
     constructor(private _localStorage: MyLocalStorageService,
                 private _httpGbService: HttpGlobalizationService,
                 private _gbiService: GlobalizationInfoService,
-                public gbStringService: GlobalizationStringService){
+                private _gbsService: GlobalizationStringService){
 
         this._httpGbService.getInfo().subscribe(x => {
             if (this._gbiService.info && x.baseUpdateId != this._gbiService.info.baseUpdateId)
-                this.gbStringService.clearAllData();
+                this._gbsService.clearAllData();
             this._gbiService.info = x;
         });
     }
 
     public localSetInfo(info: GlobalizationInfo){
         if (info.baseUpdateId != this._gbiService.info.baseUpdateId)
-            this.gbStringService.clearAllData();
+            this._gbsService.clearAllData();
         this._gbiService.info = info;
     }
 
     public initComponent(name: string, prefix: string, constStrings: string[]){
         if (!Object.keys(this._initedComponents).includes(name)){
             this._initedComponents[name] = {prefix: prefix, constStrings: constStrings};
-            this.gbStringService.initConstStrings(constStrings);
+            this._gbsService.initConstStrings(constStrings);
         }
     }
 
@@ -43,9 +43,9 @@ export class GlobalizationService {
     public changeLanguage(lang: string = ""): Observable<GlobalizationInfo>{
         return this._httpGbService.getInfo(lang).pipe(tap(x => {
             if (x.baseUpdateId != this._gbiService.info.baseUpdateId)
-                this.gbStringService.clearAllData();
+                this._gbsService.clearAllData();
             this._gbiService.info = x;
-            this.gbStringService.loadAllNoLoadedString();
+            this._gbsService.loadAllNoLoadedString();
         }));
     }
 }    

@@ -1,9 +1,11 @@
-import { Directive, ElementRef, Input, ViewContainerRef, OnInit, Renderer2, HostListener, OnDestroy, Optional } from '@angular/core'
+import { Directive, ElementRef, Input, ViewContainerRef, OnInit, Renderer2, HostListener, OnDestroy, Optional, Inject } from '@angular/core'
 import { Subscription, Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { OnUnsubscribe } from 'src/app/Services/super.controller';
 import { GlobalizationService } from '../Services/globalization.service';
 import { GlobalizationEditService } from '../Services/globalization-edit.service';
+import { GlobalizationStringService } from '../Services/globalization-string.service';
+import { ParentComponent } from 'src/app/Services/parent.component';
 
 class DbString{
     private _obs: Observable<string>;  
@@ -58,9 +60,13 @@ export class DbStringDirective extends OnUnsubscribe implements OnInit {
                 private _renderer: Renderer2,
                 private _viewContainerRef: ViewContainerRef,
                 private _gbService: GlobalizationService,
+                private _gbsService: GlobalizationStringService,
                 private _gbeService: GlobalizationEditService) {
     super();
+    console.log(_viewContainerRef);
     this._componentInfo = this._gbService.getComponent((<any>this._viewContainerRef)._hostView[8].__proto__.constructor.__proto__.name)
+    if (!this._componentInfo)
+      this._componentInfo = this._gbService.getComponent((<string>(<any>this._viewContainerRef)._hostView[1].template.name).split('_')[0])              
     if (!this._componentInfo) 
       this._componentInfo = {prefix: 'cm', constStrings: []};
   }
@@ -96,7 +102,7 @@ export class DbStringDirective extends OnUnsubscribe implements OnInit {
     
     
 
-    const som = this._gbService.gbStringService.getStringsObs(Object.keys(this._strings))
+    const som = this._gbsService.getStringsObs(Object.keys(this._strings))
     //console.log(som);
     Object.keys(som).forEach(x => {
       this._strings[x].obs = som[x];
@@ -104,7 +110,7 @@ export class DbStringDirective extends OnUnsubscribe implements OnInit {
   }
 
   public getString(name: string): string {
-    return this._gbService.gbStringService.getLoadedStringSave(name, "");
+    return this._gbsService.getLoadedStringSave(name, "");
   }
 
   public constStrings(): string[]{

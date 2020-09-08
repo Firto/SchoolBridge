@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 
 
 import { APIResult } from 'src/app/Models/api.result.model';
-import { tap, map } from 'rxjs/operators';
+import { tap, map, take } from 'rxjs/operators';
 import { UserService } from '../Services/user.service';
 import { ToastrService } from 'ngx-toastr';
 import { GlobalizationStringService } from '../Modules/globalization/Services/globalization-string.service';
@@ -46,7 +46,10 @@ export class ErrorInterceptor implements HttpInterceptor {
                         case "inc-token":
                             throw event.body.result;
                     }
-                    this._toastrService.error(event.body.result.message, null, {timeOut: 10000});
+                    event.body.result.message.pipe(take(1)).subscribe(x =>{
+                        this._toastrService.error(x, null, {timeOut: 10000});
+                    })
+                    
                     throw event.body.result;
                 }
                 return event;

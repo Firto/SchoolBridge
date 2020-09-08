@@ -20,17 +20,15 @@ export class GlobalizationEditService {
     }
 
     public set state(val: boolean){
-        this._guardService.setState(!val);
-        this._localStorage.write("gbediting", val);
         this._state.next(val);
     }
 
     public get stateObs(): Observable<boolean>{
         return this._state;
     }
-    private _editing: BehaviorSubject<DbStringDirective> = new BehaviorSubject<DbStringDirective>(null);
+    private _editing: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-    public get editingObs(): Observable<DbStringDirective>{
+    public get editingObs(): Observable<any>{
         return this._editing;
     }
 
@@ -45,16 +43,17 @@ export class GlobalizationEditService {
         }
 
         this._state.subscribe(x => {
+            this._guardService.setState(!x);
             this._localStorage.write("gbediting", x);
         })
 
         this._userService.userObs.subscribe(x => {
             if (!x)
-                this._localStorage.remove('gbediting');
+                this.state = false;
         });
     }
 
-    public changeEditing(directive: DbStringDirective){
+    public changeEditing(directive: any){
         this._editing.next(directive);
     }
 

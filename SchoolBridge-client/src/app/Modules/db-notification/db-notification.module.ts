@@ -8,6 +8,7 @@ import { DbNotificationsMapper } from './Mappers/db-notification.mapper';
 import { DbNtfOnLoginComponent } from './Components/db-notifications/db-ntf-on-login/db-ntf-on-login.component';
 import { DbNtfNewChatMessageComponent } from './Components/db-notifications/db-ntf-new-chat-message/db-ntf-new-chat-message.component';
 import { TimeAgoPipeModule } from '../TimeAgoPipe/time-ago-pipe.module';
+import { GlobalizationModule } from '../globalization/globalization.module';
 
 @NgModule({
     declarations: [
@@ -19,7 +20,8 @@ import { TimeAgoPipeModule } from '../TimeAgoPipe/time-ago-pipe.module';
     ],
     imports: [
         CommonModule,
-        TimeAgoPipeModule
+        TimeAgoPipeModule,
+        GlobalizationModule
     ],
     exports: [
         SetDbNotificationsComponent
