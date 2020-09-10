@@ -12,8 +12,8 @@ export class Message{
     get id(): string{
         return this._model.id;
     }
-    get date(): string{
-        return this._model.id;
+    get date(): Date{
+        return this._model.date;
     }
     get type(): string{
         return this._model.type;

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { TimeAgoPipe } from './time-ago.pipe';
+import { TimeAgoPipeService } from './time-ago.service';
 
 @NgModule({
   imports: [
@@ -12,4 +13,13 @@ import { TimeAgoPipe } from './time-ago.pipe';
     TimeAgoPipe
   ]
 })
-export class TimeAgoPipeModule {}
+export class TimeAgoPipeModule {
+  static forRoot() {
+    return {
+        ngModule: TimeAgoPipeModule,
+        providers: [
+          TimeAgoPipeService
+        ],
+    };
+}
+}

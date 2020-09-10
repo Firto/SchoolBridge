@@ -10,7 +10,7 @@ import { DBNMessageSource } from '../db-ntf-message/db-ntf-message.component';
     template: `<li [ngClass]="{'unread' : !baseSource.read}" class="top-text-block" >
                     <div class="top-text-heading">{{source.message}}</div>
                     <a class="top-text-light">if this not you, change your password!</a>
-                    <div class="top-text-light">{{baseSource.date | timeAgo}}</div>
+                    <div class="top-text-light">{{(baseSource.date | timeAgo) | async}}</div>
                 </li>`
     
 })

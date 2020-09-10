@@ -37,7 +37,7 @@ export interface DBNNewChatMessageSource extends IDBNSource{
                             </div>
                         </div>
                         <p class="top-text-light" ><span dbstring >new-msg</span>: {{messageSource.text}}</p>
-                        <p class="top-text-light">{{baseSource.date | timeAgo}}</p>
+                        <p class="top-text-light">{{(baseSource.date | timeAgo) | async}}</p>
                     </div>
                     <div *ngSwitchDefault>
 

@@ -70,4 +70,7 @@ export class ChatService {
         return this._baseService.send<ChatModel[]>(this._ser, "getChats");
     }
 
+    public readChat(): Observable<any>{
+        return this._baseService.send<any>(this._ser, "getChats");
+    }
 }

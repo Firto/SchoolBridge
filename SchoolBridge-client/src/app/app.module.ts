@@ -44,11 +44,11 @@ import { CommonModule } from '@angular/common';
     BrowserAnimationsModule,
     FormsModule,
     ToastContainerModule,
-    TimeAgoPipeModule,
+    TimeAgoPipeModule.forRoot(),
     ToastrModule.forRoot({ preventDuplicates: true, countDuplicates: true, resetTimeoutOnDuplicate: true }),
     GlobalizationModule.forRoot(),
     NotificationModule.forRoot(),
-    DbNotificationModule.forRoot()
+    DbNotificationModule.forRoot(),
   ],
   providers: [
     MyLocalStorageService,

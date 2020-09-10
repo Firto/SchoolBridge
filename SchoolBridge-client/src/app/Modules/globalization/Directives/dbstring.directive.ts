@@ -63,7 +63,7 @@ export class DbStringDirective extends OnUnsubscribe implements OnInit {
                 private _gbsService: GlobalizationStringService,
                 private _gbeService: GlobalizationEditService) {
     super();
-    console.log(_viewContainerRef);
+    //console.log(_viewContainerRef);
     this._componentInfo = this._gbService.getComponent((<any>this._viewContainerRef)._hostView[8].__proto__.constructor.__proto__.name)
     if (!this._componentInfo)
       this._componentInfo = this._gbService.getComponent((<string>(<any>this._viewContainerRef)._hostView[1].template.name).split('_')[0])              

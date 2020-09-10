@@ -12,7 +12,7 @@ export interface DBNMessageSource extends IDBNSource{
     styleUrls: ['../db-ntf.component.css'],
     template: `<li [ngClass]="{'unread' : !baseSource.read}" class="top-text-block" >
                     <div class="top-text-heading">{{source.message}}</div>
-                    <div class="top-text-light">{{baseSource.date | timeAgo}}</div>
+                    <div class="top-text-light">{{(baseSource.date | timeAgo) | async}}</div>
                 </li>`
     
 })

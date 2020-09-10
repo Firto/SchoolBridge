@@ -21,6 +21,9 @@ export class Chat {
     get read(): Observable<boolean>{
         return this._read;
     }
+    get messages(): Observable<Message[]>{
+        return this._messages;
+    }
 
     protected readonly _messages: BehaviorSubject<Message[]> = new BehaviorSubject<Message[]>([]);
     protected readonly _lastMessage: Observable<Message> = this._messages.pipe(filter(x => x.length > 0), map(x => x[x.length-1]));
