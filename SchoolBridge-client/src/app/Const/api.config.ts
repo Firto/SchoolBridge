@@ -14,7 +14,8 @@ export const apiConfig: Record<string, Service> = {
             },
             "refreshtoken": {
                 url: "refreshtoken/",
-                type: "POST"
+                type: "POST",
+                loader: false
             }
         }
     },
@@ -120,7 +121,18 @@ export const apiConfig: Record<string, Service> = {
         methods: {
             "getChats": {
                 url: "getchats",
-                type: "GET"
+                type: "GET",
+                loader: false
+            },
+            "getMessages": {
+                url: "getMessages",
+                type: "GET",
+                loader: false
+            },
+            "sendMessage": {
+                url: "sendMessage",
+                type: "GET",
+                loader: false
             }
         }
     }

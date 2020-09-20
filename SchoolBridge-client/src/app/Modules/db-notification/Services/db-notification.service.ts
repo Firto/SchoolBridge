@@ -2,58 +2,88 @@ import { Injectable, ComponentFactoryResolver, ComponentFactory } from '@angular
 import { Service } from 'src/app/Interfaces/Service/service.interface';
 import { BaseService } from 'src/app/Services/base.service';
 import { apiConfig } from 'src/app/Const/api.config';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject, of } from 'rxjs';
 import { NotificationService } from 'src/app/Modules/notification/Services/notification.service';
 import { DataBaseSource } from '../../notification/Models/NotificationSources/database-source';
 import { UserService } from 'src/app/Services/user.service';
 import { KeyedCollection } from 'src/app/Collections/keyed-collection';
 import { Guid } from 'guid-typescript';
 import { OnReadNtfSource } from '../../notification/Models/NotificationSources/on-read-ntf.source';
-import { take } from 'rxjs/operators';
+import { map, take, tap } from 'rxjs/operators';
+import { fromBinary } from '../../binary/from-binary.func';
+import { IDBNSource } from '../Models/IDBN-source.interface';
 
-@Injectable()
+export class DbNotification<T>{
+    public readonly source: T;
+    public readonly date: Date;
+    get id(): string{
+        return this.model.id;
+    }
+    get read(): boolean{
+        return this.model.read;
+    }
+    set read(val: boolean){
+        this.model.read = val;
+    }
+    get type(): string{
+        return this.model.type;
+    } 
+    constructor(public readonly model: DataBaseSource){
+        this.source = JSON.parse(fromBinary(this.model.base64Sourse));
+        this.date = new Date(this.model.date);
+    }
+}
+
+@Injectable({providedIn: 'root'})
 export class DbNotificationService { 
     private ser: Service;
-    
-    private _onReciveDbNotification: Subject<{key: string, value: DataBaseSource, reverse: boolean}> = new Subject<{key: string, value: DataBaseSource, reverse: boolean}>();
-    private _onReciveOnReadDbNotification: Subject<OnReadNtfSource> = new Subject<OnReadNtfSource>();
-    private _countUnreadNtfs: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+    private _notifications: Record<string, DbNotification<IDBNSource>> = {};
+    private __notifications: DbNotification<IDBNSource>[] = [];
+    private readonly _dbNotificatinsRecive$: Subject<DbNotification<IDBNSource>[]> = new Subject<DbNotification<IDBNSource>[]>();
+    private readonly _countUnread$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
-    public onReciveDbNotification: Observable<{key: string, value: DataBaseSource, reverse: boolean}> = this._onReciveDbNotification.asObservable();
-    public onReciveOnReadDbNotification: Observable<OnReadNtfSource> = this._onReciveOnReadDbNotification.asObservable();
-    public onUpdateCountUnreadNtfs: Observable<number> = this._countUnreadNtfs.asObservable();
+    public get notifications(): DbNotification<IDBNSource>[] {
+        return this.__notifications;
+    }
 
-    public notificationList: KeyedCollection<string, DataBaseSource> = new KeyedCollection<string, DataBaseSource>();
+    public readonly dbNotificatinsRecive$: Observable<DbNotification<IDBNSource>[]> = 
+        this._dbNotificatinsRecive$.pipe(tap(() => this.updateOutputMassOfNtfs()));
 
-    constructor(private baseService: BaseService,
-                private userService: UserService,
-                private ntfService: NotificationService) {
-       
+    public readonly countUnread$: Observable<number> = this._countUnread$.asObservable();
+
+    public get countUnread(): number {
+        return this._countUnread$.value;
+    } 
+
+    constructor(private _baseService: BaseService,
+                private _userService: UserService,
+                private _ntfService: NotificationService) {
         this.ser = apiConfig["notification"];
 
-        this.ntfService.reciveNotification.subscribe((data) => {
+        this._ntfService.reciveNotification.subscribe((data) => {
             switch (data.type){
                 case "dataBase":
-                    this._countUnreadNtfs.next(this._countUnreadNtfs.value + 1);
-                    this.localAddNotifications(<DataBaseSource>data.source);
+                    this._countUnread$.next(this.countUnread + 1);
+                    this._dbNotificatinsRecive$.next([this.localAddNotifications(<DataBaseSource>data.source)]);
                   break;
                 case "onReadNtf":
-                    const som = <OnReadNtfSource>data.source;
-                    for (let ind = this.notificationList.getIndex(som.last); ind >= 0; ind--) 
-                    if (this.notificationList.items[ind].value.id != null) 
-                        this.notificationList.items[ind].value.read = true;
-                    this._countUnreadNtfs.next(this._countUnreadNtfs.value - som.count);
-                    this._onReciveOnReadDbNotification.next(som);
+                    this.readNtfs(<OnReadNtfSource>data.source)
                   break;
               }
         });
 
-        this.userService.userObs.subscribe(x => {
+        this._userService.userObs.subscribe(x => {
             if (x){
-                this.notificationList.clear();
+                this._notifications = {};
+                this.__notifications = [];
+                if (x.login.countUnreadNotifications){
+                    this._countUnread$.next(x.login.countUnreadNotifications);
+                    x.login.countUnreadNotifications = 0;
+                    this._userService.writeInStorage(x);
+                }else 
                 this.getCountUnread().subscribe(s => {
-                    this._countUnreadNtfs.next(s);
-                });
+                    this._countUnread$.next(s);
+                }); 
             }
         });
 
@@ -73,63 +103,85 @@ export class DbNotificationService {
         });*/
     }
 
-    public readedNtfs(){
-        if (this.notificationList.items.some((x) => x.value.read == false && x.value.id != null))
-            this.read(this.getLastNtfId()).subscribe();
-        this.notificationList.items.forEach((x) => {
-            if (x.value.read == false && x.value.id == null){
-                x.value.read = true;
-                this._countUnreadNtfs.next(this._countUnreadNtfs.value - 1);
-            }
+    private sortDbNtifications(arr: DbNotification<IDBNSource>[]): DbNotification<IDBNSource>[]{
+        return arr.sort((a: DbNotification<IDBNSource>, b: DbNotification<IDBNSource>) => {
+            if (a.date > b.date) 
+                return -1;
+            if (a.date < b.date) 
+                return 1;
+            return 0;
         });
+    }
+
+    private updateOutputMassOfNtfs(){
+        this.__notifications = this.sortDbNtifications(Object.values(this._notifications));
+    }
+
+    private readNtfs(read: OnReadNtfSource){
+        const last : DbNotification<IDBNSource> = this._notifications[read.last];
+        let count: number = read.count;
+        Object.values(this._notifications).forEach((x, i) => {
+            if (x.date < last.date || !x.id) return;
+            x.read = true;
+            --count;
+        });
+        this._countUnread$.next(this.countUnread - read.count);
+    }
+
+    private localAddNotifications(source: DataBaseSource): DbNotification<IDBNSource>{
+        const id: string = source.id == null ? Guid.create().toString() : source.id;
+        this._notifications[id] = new DbNotification<IDBNSource>(source);
+        return this._notifications[id];
+    }
+
+    public readedNtfs(): Observable<any>{
+        const ntfs: DbNotification<IDBNSource>[] = Object.values(this._notifications);
+        const fullNtfs = this.sortDbNtifications(ntfs.filter((x) => !x.read && x.id));
+        const noneNtfs = ntfs.filter((x) => !x.read && !x.id);
+
+        const readed = noneNtfs.length + fullNtfs.length;
+
+        if (noneNtfs.length > 0)
+            noneNtfs.forEach((x) => x.read = true);
+        
+        let obs: Observable<any>;
+        if (fullNtfs.length > 0)
+            obs = this.read(fullNtfs[fullNtfs.length-1].id);
+        else obs = of();
+        
+        return obs.pipe(
+            tap(() => {
+                if (readed > 0)
+                    this._countUnread$.next(this.countUnread - readed); 
+            })
+        );
     }
 
     public getNtfs(): Observable<boolean> {
-        const sub: Subject<boolean> = new Subject<boolean>();
-        this.getn(this.getLastNtfId()).subscribe((data) => {
-            let end: boolean = false;
-            if (data.length > 0) {
-                data.forEach(baseSource => this.localAddNotifications(baseSource, false));
-                if (data.length < 20)
-                end = true;
-            }
-            else end = true;
-            sub.next(end);
-        });
-        return sub.pipe(take(1));
-    }
-
-    public localAddNotifications(source: DataBaseSource, reverse: boolean = true){
-        const id: string = source.id == null ? Guid.create().toString() : source.id;
-        if (reverse)
-            this.notificationList.addOrUpdateShift(id, source);
-        else this.notificationList.addOrUpdate(id, source);
-        this._onReciveDbNotification.next({key: id, value: source, reverse: reverse});
-    }
-
-    public localUpdateCountUnreadNtfs(){
-        this._countUnreadNtfs.next(this._countUnreadNtfs.value);
+        return this.getn(this.getLastNtfId()).pipe(map(x => {
+            this._dbNotificatinsRecive$.next(x.map(r => this.localAddNotifications(r)));
+            return x.length < 20; 
+        }));
     }
 
     public getLastNtfId(): string {
-        const ntfs: Array<DataBaseSource> = this.notificationList.items.filter(x => x.value.id != null).map(x => x.value);
+        const ntfs = this.notifications.filter(x => x.id);
         return ntfs.length > 0 ? ntfs[ntfs.length-1].id : null;
     }    
 
     public read(last: string = null): Observable<any> {
-        
-        return this.baseService.send<any>(this.ser, "read", null, { params: last == null ? null : {last: last} });
+        return this._baseService.send<any>(this.ser, "read", null, { params: last == null ? null : {last: last} });
     }
 
     public getn(last: string = null): Observable<DataBaseSource[]> {
-        return this.baseService.send<DataBaseSource[]>(this.ser, "get", null, { params: last == null ? null : {last: last} })
+        return this._baseService.send<DataBaseSource[]>(this.ser, "get", null, { params: last == null ? null : {last: last} })
     }
 
     public getAndRead(last: string = null): Observable<DataBaseSource[]> {
-        return this.baseService.send<DataBaseSource[]>(this.ser, "getandread", null, { params: last == null ? null : {last: last} });
+        return this._baseService.send<DataBaseSource[]>(this.ser, "getandread", null, { params: last == null ? null : {last: last} });
     }
 
     public getCountUnread(): Observable<number> {
-        return this.baseService.send<number>(this.ser, "getcountunread");
+        return this._baseService.send<number>(this.ser, "getcountunread");
     }
 }

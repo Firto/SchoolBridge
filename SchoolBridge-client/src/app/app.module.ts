@@ -1,4 +1,3 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import {  HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
@@ -11,7 +10,6 @@ import { LoaderComponent } from './Components/loader/loader.component';
 import { LoaderInterceptor } from './Intercepors/loader.interceptor';
 import { SyncRequestService } from 'ts-sync-request/dist'
 import { ErrorInterceptor } from './Intercepors/user-error.interceptor';
-import { NotificationService } from './Modules/notification/Services/notification.service';
 import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { UserService } from './Services/user.service';
 import { LoginService } from './Services/login.service';
@@ -22,13 +20,19 @@ import { BaseService } from './Services/base.service';
 import { GlobalizationModule } from './Modules/globalization/globalization.module';
 import { NotificationModule } from './Modules/notification/notification.module';
 import { GuardService } from './Services/guard.service';
-import { DefaultComponent } from './Components/default/default.component';
-import { DbNotificationModule } from './Modules/db-notification/db-notification.module';
 import { ServerHub } from './Services/server.hub';
-import { TimeAgoPipeModule } from './Modules/TimeAgoPipe/time-ago-pipe.module';
 import { ClientConnectionService } from './Services/client-connection.service';
 import { MyLocalStorageService } from './Services/my-local-storage.service';
 import { CommonModule } from '@angular/common';
+import { TimeAgoDirectiveModule } from './Modules/TimeAgoPipe/time-ago-directive.module';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
+import { MdGlobalization, MdGlobalizationService } from './Modules/globalization/Services/md-globalization.service';
+import { DbNotificationModule } from './Modules/db-notification/db-notification.module';
+import { StartModule } from './Modules/start/start.module';
+import { PanelModule } from './Modules/panel/panel.module';
+import { DefaultComponent } from './Components/default/default.component';
+import { BrowserModule } from '@angular/platform-browser';
 
 @NgModule({
   declarations: [
@@ -37,18 +41,17 @@ import { CommonModule } from '@angular/common';
     DefaultComponent
   ],
   imports: [
+    BrowserAnimationsModule,
     CommonModule,
     HttpClientModule,
     AppRoutingModule,
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    FormsModule,
-    ToastContainerModule,
-    TimeAgoPipeModule.forRoot(),
-    ToastrModule.forRoot({ preventDuplicates: true, countDuplicates: true, resetTimeoutOnDuplicate: true }),
+    //ToastContainerModule,
+    //ToastrModule.forRoot({ preventDuplicates: true, countDuplicates: true, resetTimeoutOnDuplicate: true }),
+    //custom 
+    TimeAgoDirectiveModule.forRoot(),
     GlobalizationModule.forRoot(),
     NotificationModule.forRoot(),
-    DbNotificationModule.forRoot(),
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     MyLocalStorageService,
@@ -64,7 +67,7 @@ import { CommonModule } from '@angular/common';
     GuardService, 
     { provide: HTTP_INTERCEPTORS, useClass: BasicAuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true }  
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true } 
   ],
   bootstrap: [AppComponent] 
 })

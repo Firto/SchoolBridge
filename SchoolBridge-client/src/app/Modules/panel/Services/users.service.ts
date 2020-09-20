@@ -8,17 +8,21 @@ import { Subject, Observable, of, BehaviorSubject } from 'rxjs';
 import { debounceTime, tap, bufferWhen, mergeMap, map, filter } from 'rxjs/operators';
 import { OnlineService } from './online.service';
 import { User } from '../Clases/user.class';
+import { UserService } from 'src/app/Services/user.service';
+import { GlobalizationInfoService } from '../../globalization/Services/globalization-info.service';
+import { PanelModule } from '../panel.module';
 
-@Injectable({providedIn:'root'})
+@Injectable({providedIn: 'root'})
 export class UsersService {
     private _ser: Service;
     
     private _toggleMainGetBuffer: Subject<any> = <Subject<any>>(new Subject<any>()).pipe(debounceTime(100));
     private _mainGetThread: Subject<ShortUserModel> = null;
 
-    private _loadedUsers: BehaviorSubject<Record<string, User>> = new BehaviorSubject<Record<string, User>>({});
+    private _loadedUsers: Record<string, BehaviorSubject<User>> = {};
 
     constructor(private _baseService: BaseService,
+                private _userService: UserService,
                 private _onlineService: OnlineService) { 
         this._ser = apiConfig["users"];
 
@@ -27,7 +31,7 @@ export class UsersService {
             bufferWhen(() => this._toggleMainGetBuffer),
             mergeMap(x => {
                 x = x.filter((r, y) => x.findIndex(m => m.id == r.id) == y);
-                const mustLoad = x.filter(r => !Object.keys(this._loadedUsers.value).includes(r.id));
+                const mustLoad = x.filter(r => !Object.keys(this._loadedUsers).includes(r.id) || !this._loadedUsers[r.id].value);
                 if (mustLoad.length > 0) 
                     return this.getMany(mustLoad).pipe(
                         map(x => {
@@ -42,9 +46,14 @@ export class UsersService {
             map((x) => {
                 return new ShortUserModel();
             })
-        )
+        );
 
         this._mainGetThread.subscribe();
+
+        this._userService.userObs.subscribe(x => {
+            if (!x)
+                this._loadedUsers = {};
+        });
     }
 
     public getMany(model: ShortUserModel[]): Observable<UserModel[]>{
@@ -52,18 +61,16 @@ export class UsersService {
     }
 
     public localLoadUsers(users: UserModel[]){
-        users.forEach(x => 
-            this._loadedUsers.value[x.id] = new User(x, this._onlineService)
-        );
-        this._loadedUsers.next(this._loadedUsers.value);
+        users.forEach(x => {
+            this._loadedUsers[x.id].next(new User(x, this._onlineService))
+        });
     }
 
     public get(model: ShortUserModel): Observable<User>{
         this._mainGetThread.next(model);
-        return this._loadedUsers.pipe(
-            filter(x => Object.keys(x).includes(model.id)),
-            map(x => x[model.id])
-        );
+        if (!Object.keys(this._loadedUsers).includes(model.id))
+            this._loadedUsers[model.id] = new BehaviorSubject<User>(null);
+        return this._loadedUsers[model.id];
     }
     
 }

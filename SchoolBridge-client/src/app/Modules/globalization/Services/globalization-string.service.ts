@@ -1,10 +1,7 @@
 import { Subject, BehaviorSubject, Observable } from 'rxjs';
 import { MyLocalStorageService } from 'src/app/Services/my-local-storage.service';
-import { tap, bufferWhen, mergeMap, debounceTime, map, filter } from 'rxjs/operators';
-import { Injectable } from '@angular/core';
-import { UserModel } from '../../panel/Models/user.model';
-import { User } from 'src/app/Models/user.model';
-import { ShortUserModel } from '../../panel/Models/short-user.model';
+import { tap, bufferWhen, mergeMap, debounceTime, map, filter, finalize } from 'rxjs/operators';
+import { ApplicationRef, ChangeDetectorRef, Injectable } from '@angular/core';
 import { HttpGlobalizationService } from './http-globalization.service';
 import { GlobalizationInfoService } from './globalization-info.service';
 
@@ -14,11 +11,12 @@ export class GlobalizationStringService {
     private get _stringD(){
         return this._gbInfoService.info ? this._stringDATA[this._gbInfoService.info.currentLanguage] : {};
     } 
-    private _toggleMainGetBuffer: Subject<any> = <Subject<any>>(new Subject<any>()).pipe(debounceTime(50));
+    private _toggleMainGetBuffer: Subject<any> = <Subject<any>>(new Subject<any>()).pipe(debounceTime(10));
     private _mainGetThread: Subject<string> = null;
 
     private _initializedStrings: Record<string, BehaviorSubject<string>> = {};
-
+   
+    public changeDetector: ChangeDetectorRef;
     constructor(private _localStorage: MyLocalStorageService,
                 private _httpGbService: HttpGlobalizationService,
                 private _gbInfoService: GlobalizationInfoService) { 
@@ -36,6 +34,10 @@ export class GlobalizationStringService {
             tap(x => this._toggleMainGetBuffer.next(null)),
             bufferWhen(() => this._toggleMainGetBuffer),
             mergeMap(x => {
+                x.forEach(x => {
+                    if (this._initializedStrings[x])
+                        this._initializedStrings[x].next("-loading-");
+                });
                 return this._httpGbService.getStrings(x).pipe(map(r => {
                     Object.assign(this._stringD, r);
                     this._localStorage.write("gbdata", this._stringDATA);
@@ -53,6 +55,7 @@ export class GlobalizationStringService {
         )
 
         this._mainGetThread.subscribe();
+       
     }
 
     public loadAllNoLoadedString(){
@@ -100,8 +103,9 @@ export class GlobalizationStringService {
     }
 
     public getStringObs(str: string): Observable<string>{
-        if (!this.isInitializedString(str) || this._initializedStrings[str] == null)
+        if (!this.isInitializedString(str) || this._initializedStrings[str] == null){
             this._initializedStrings[str] = new BehaviorSubject<string>(this.getLoadedStringHttp(str, "-loading-"));
+        }
         return this._initializedStrings[str];
     }
 
@@ -127,6 +131,14 @@ export class GlobalizationStringService {
             }
             return x.charAt(0).toUpperCase() + x.slice(1);
         }));
+    }
+
+    public getConstStringName(str: string){
+        const regex = /\[([a-z-0-9]+)(\s?\,\s?.+)?\]/;
+        const match = str.match(regex);
+        if (!match || match.length === 0) 
+            throw "Error string "+ str;
+        return match[1];
     }
 
     public setString(name: string, str: string){

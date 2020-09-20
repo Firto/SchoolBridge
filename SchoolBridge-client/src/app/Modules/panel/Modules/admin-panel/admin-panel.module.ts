@@ -16,8 +16,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     imports: [
         CommonModule,
         AdminPanelRoutingModule,
-        UserPermissionModule,
-        ReactiveFormsModule
+        UserPermissionModule
     ],
     providers: [
         

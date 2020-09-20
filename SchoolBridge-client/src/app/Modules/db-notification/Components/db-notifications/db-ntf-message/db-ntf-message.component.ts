@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { DbNtfComponent } from '../db-ntf-component.iterface';
 import { DataBaseSource } from 'src/app/Modules/notification/Models/NotificationSources/database-source';
 import { IDBNSource } from '../../../Models/IDBN-source.interface';
+import { DbNotification } from '../../../Services/db-notification.service';
 
 export interface DBNMessageSource extends IDBNSource{
     message: string;
@@ -9,15 +10,10 @@ export interface DBNMessageSource extends IDBNSource{
 
 @Component({
     selector: "db-ntf-message",
-    styleUrls: ['../db-ntf.component.css'],
-    template: `<li [ngClass]="{'unread' : !baseSource.read}" class="top-text-block" >
-                    <div class="top-text-heading">{{source.message}}</div>
-                    <div class="top-text-light">{{(baseSource.date | timeAgo) | async}}</div>
-                </li>`
+    styleUrls: ['../../base-db-ntf-component/base-db-ntf.component.css'],
+    template: `<div class="top-text-heading">{{model.source.message}}</div>`
     
 })
-
 export class DbNtfMessageComponent implements DbNtfComponent {
-    public baseSource: DataBaseSource;
-    public source: DBNMessageSource;
+    public model: DbNotification<DBNMessageSource>;
 }

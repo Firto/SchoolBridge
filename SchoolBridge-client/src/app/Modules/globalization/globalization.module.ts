@@ -10,13 +10,15 @@ import { HttpGlobalizationService } from './Services/http-globalization.service'
 import { GlobalizationStringService } from './Services/globalization-string.service';
 import { GlobalizationEditService } from './Services/globalization-edit.service';
 import { GlobalizationService } from './Services/globalization.service';
+import { ConstDbStringPipe } from './Pipes/constdbstring.pipe';
 
 
 @NgModule({
     declarations: [
         LanguageSelectorComponent,
         GlobalizationEdit,
-        DbStringDirective
+        DbStringDirective,
+        ConstDbStringPipe
     ],
     imports: [
         CommonModule
@@ -24,7 +26,8 @@ import { GlobalizationService } from './Services/globalization.service';
     exports: [ 
         LanguageSelectorComponent,
         GlobalizationEdit,
-        DbStringDirective
+        DbStringDirective,
+        ConstDbStringPipe
     ]
 })
 export class GlobalizationModule  {
@@ -37,7 +40,6 @@ export class GlobalizationModule  {
                 GlobalizationInfoService,
                 GlobalizationStringService,
                 HttpGlobalizationService,
-                //{ provide: HTTP_INTERCEPTORS, useClass: GlobalizationInterceptor, multi: true }
             ]
         };
     }

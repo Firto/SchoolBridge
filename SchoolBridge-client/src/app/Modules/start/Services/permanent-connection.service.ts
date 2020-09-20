@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';  
 import { Observable } from 'rxjs';
 import { ServerHub } from 'src/app/Services/server.hub';
+import { StartModule } from '../start.module';
 
 @Injectable()
 export class PermanentConnectionService {    

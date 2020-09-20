@@ -10,6 +10,8 @@ import { StartNavbarComponent } from './Components/navbar/start-navbar.component
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GlobalizationModule } from '../globalization/globalization.module';
 import { PermanentConnectionService } from './Services/permanent-connection.service';
+import { MdGlobalization } from '../globalization/Services/md-globalization.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
     declarations: [
@@ -19,16 +21,14 @@ import { PermanentConnectionService } from './Services/permanent-connection.serv
         EmailRegisterComponent,
         RegisterComponent
     ],
+    providers: [
+        RegisterService,
+        PermanentConnectionService
+    ],
     imports: [
         CommonModule,
         StartRoutingModule,
-        ReactiveFormsModule,
-        FormsModule,
         GlobalizationModule
-    ],
-    providers: [
-        PermanentConnectionService,
-        RegisterService
     ],
     exports: [
         StartComponent

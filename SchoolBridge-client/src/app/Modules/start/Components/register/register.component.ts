@@ -4,7 +4,7 @@ import { RegisterService } from 'src/app/Modules/start/Services/register.service
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { UserError } from 'src/app/Models/user-error.model';
-import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
+//import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
 import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
 
 @Component({
@@ -12,8 +12,7 @@ import { GlobalizationService } from 'src/app/Modules/globalization/Services/glo
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-
-@Globalization('cm-reg-end', {
+/*@Globalization('cm-reg-end', {
   args: [
     "login",
     "name",
@@ -36,7 +35,7 @@ import { GlobalizationService } from 'src/app/Modules/globalization/Services/glo
     "r-date-birthday-incorrect",
     "str-inc-rep"
   ]
-})
+})*/
 export class RegisterComponent  {
   [x: string]: any;
   regToken: string = "";

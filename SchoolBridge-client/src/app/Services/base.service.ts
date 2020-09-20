@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { ChangeDetectorRef, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Service } from 'src/app/Interfaces/Service/service.interface';
 import { HttpClient, HttpHeaders, HttpParams, HttpRequest } from '@angular/common/http';
@@ -6,6 +6,7 @@ import { APIResult } from 'src/app/Models/api.result.model';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 import { ConnectionService } from 'ng-connection-service';
 import { take } from 'rxjs/operators';
+import { NavigationEnd, Router } from '@angular/router';
 
 export interface HttpOptions{
     headers?: HttpHeaders;
@@ -28,7 +29,7 @@ export interface HttpOptionsWide{
     };
 }
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class BaseService {
 
     /*private most: Array<{obs: Subject<APIResult>, 
@@ -41,7 +42,7 @@ export class BaseService {
 
     private _state: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
     public state: Observable<boolean> = this._state.asObservable();
-
+    public cd: ChangeDetectorRef = null;
     constructor(private http: HttpClient) {
         /*this.connectionService.monitor().subscribe((x) => {
             this.cnn = x;

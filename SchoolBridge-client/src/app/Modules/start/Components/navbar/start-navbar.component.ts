@@ -1,5 +1,4 @@
 import { Component, AfterViewInit } from '@angular/core';
-import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
 import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
 
 @Component({
@@ -7,7 +6,7 @@ import { GlobalizationService } from 'src/app/Modules/globalization/Services/glo
   templateUrl: './start-navbar.component.html',
   styleUrls: ['./start-navbar.component.css']
 })
-@Globalization('cm-st-nav', [])
+//@Globalization('cm-st-nav', [])
 export class StartNavbarComponent implements AfterViewInit{
   private checkbox: HTMLInputElement;
 

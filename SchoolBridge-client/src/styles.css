@@ -2,7 +2,27 @@
 @import url("https://use.fontawesome.com/releases/v5.6.1/css/all.css");
 
 body {
-  background: #151515;
+  background-color: #151515;
+}
+
+.loader-topbar {
+  margin: 5px auto;
+  border: 3px solid #ddd;
+  border-radius: 50%;
+  border-top: 3px solid #666;
+  width: 22px;
+  height: 22px;
+  -webkit-animation: spin-topbar 1s linear infinite;
+  animation: spin-topbar 1s linear infinite;
+}
+
+@keyframes spin-topbar {
+  0% {
+      -webkit-transform: rotate(0deg);
+  }
+  100% {
+      -webkit-transform: rotate(360deg);
+  }
 }
 
 .editing {

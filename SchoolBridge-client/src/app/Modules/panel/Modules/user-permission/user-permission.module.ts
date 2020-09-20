@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { UserPermissionGuard } from './user-permission.guard';
 import { UserPermissionPipe } from './user-permission.pipe';
 import { UserPermissionService } from './user-permission.service';
 
@@ -10,7 +11,7 @@ import { UserPermissionService } from './user-permission.service';
         
     ],
     providers: [
-        
+       
     ],
     exports: [
         UserPermissionPipe
@@ -21,7 +22,8 @@ export class UserPermissionModule  {
         return {
             ngModule: UserPermissionModule,
             providers: [
-                UserPermissionService
+                UserPermissionService,
+                UserPermissionGuard
             ]
         };
     }

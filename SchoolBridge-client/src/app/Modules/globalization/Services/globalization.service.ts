@@ -9,7 +9,7 @@ import { GlobalizationInfo } from '../Models/globalization-info.model';
   
 @Injectable()
 export class GlobalizationService {
-    private _initedComponents: Record<string, {prefix: string, constStrings: string[]}> = {};
+    //private _initedComponents: Record<string, {constStrings: string[]}> = {};
 
     constructor(private _localStorage: MyLocalStorageService,
                 private _httpGbService: HttpGlobalizationService,
@@ -29,16 +29,16 @@ export class GlobalizationService {
         this._gbiService.info = info;
     }
 
-    public initComponent(name: string, prefix: string, constStrings: string[]){
+    /*public initComponent(name: string, constStrings: string[]){
         if (!Object.keys(this._initedComponents).includes(name)){
-            this._initedComponents[name] = {prefix: prefix, constStrings: constStrings};
+            this._initedComponents[name] = {constStrings: constStrings};
             this._gbsService.initConstStrings(constStrings);
         }
-    }
+    }*/
 
-    public getComponent(name: string): {prefix: string, constStrings: string[]}{
+    /*public getComponent(name: string): {constStrings: string[]}{
         return Object.keys(this._initedComponents).includes(name) ? this._initedComponents[name] : null;
-    }
+    }*/
 
     public changeLanguage(lang: string = ""): Observable<GlobalizationInfo>{
         return this._httpGbService.getInfo(lang).pipe(tap(x => {

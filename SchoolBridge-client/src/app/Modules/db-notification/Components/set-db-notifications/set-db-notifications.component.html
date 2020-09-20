@@ -4,16 +4,14 @@
       <div class="btn-group pull-right top-head-dropdown dropdown">
           <label (onMutation)="onNtfMenuChange($event)" [mutationConfig]="{attributes: true}" class="ntf-toggle-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fas fa-bell"></i>
-              <sup *ngIf="(ntfService.onUpdateCountUnreadNtfs | async) > 0" ><small><small class="badge badge-pill badge-danger" >{{ntfService.onUpdateCountUnreadNtfs | async}}</small></small></sup>
+              <sup *ngIf="ntfService.countUnread > 0" ><small><small class="badge badge-pill badge-danger" >{{ntfService.countUnread}}</small></small></sup>
           </label>
 
           <ul class="dropdown-menu dropdown-menu-right" (scroll)="onNtfScroll($event)">
               <label class="hide-menu-btn position-fixed">
                   <i class="fas fa-times"></i>
               </label>
-              <div>
-                  <template #notificationContainer></template>
-              </div>
+              <base-db-ntf *ngFor="let item of ntfService.notifications" [ntf]="item" (onChange)="onChange()" ></base-db-ntf>
               <ng-container *ngIf="loader">
                   <li>
                       <div class="loader-topbar"></div>

@@ -1,11 +1,11 @@
 <div class="d-flex justify-content-center align-items-center login-container">
-    <form class="def-form text-center" [formGroup]="form">
+    <form class="def-form text-center">
         <h1 class="mb-5 font-weight-light text-uppercase" dbstring >header</h1>
-        <div class="form-group" *ngIf="{name: 'email', ctrl: form.controls.email} as em">
-            <input formControlName="{{em.name}}" type="text" class="form-control rounded-pill form-control-lg" 
-                dbstring [attrString]="{str:'pn-'+ em.name, arg: 'placeholder'}" [dbPrefix]="false">
+        <div class="form-group">
+            <input #email type="text" class="form-control rounded-pill form-control-lg" dbstring
+                [attrString]="{str:'pn-email', arg: 'placeholder'}" [dbPrefix]="false" (change)="onChange('email')"> 
             <p class="text-danger font-weight-bold text-center"
-                *ngFor="let item of em.ctrl.getError('err')">
+                *ngFor="let item of form.args.email.errors">
                 {{item | async}}
             </p>
         </div>
@@ -14,7 +14,7 @@
             <span dbstring >has-account</span>
             <a class="forgot-link" routerLink="../login">
                 <strong dbstring >login-now</strong>
-            </a>
+            </a> 
         </p>
     </form>
 </div>

@@ -1,5 +1,8 @@
 .messaging{
-    height: calc(100vh - 50px);
+	height: calc(100vh - 50px);
+	max-width: 1200px;
+	margin: 0 auto;
+	background: gray;
 }
 
 .inbox_people {
@@ -66,7 +69,6 @@
 .chat_ib h5 {
 	font-size: 15px;
 	color: #464646;
-	margin: 0 0 8px 0;
 }
 
 .chat_ib h5 span {
@@ -187,6 +189,17 @@
 	display: flex;
 	flex-direction: column;
 	margin-top: -8px;
+	position: relative;
+}
+
+.nomesgs{
+	float: left;
+    width: 70%;
+    height: inherit;
+    margin-top: -8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .sent_msg p {
@@ -243,10 +256,6 @@
 	flex-grow: 12;
 }
 
-.msg_bar{
-	
-}
-
 .msg_bar img {
 	height: 50px;
     display: block;
@@ -263,7 +272,6 @@
 
 .chat {
 	width: 100%;
-	max-width: 800px;
 	height: calc(100vh - 50px);
 	padding: 15px 30px;
 	margin: 0 auto;
@@ -283,6 +291,9 @@
 	-ms-flex-pack: end;
 	justify-content: flex-end;
   }
+  .chat::-webkit-scrollbar {
+	  width:0px;
+}
   .chat__message {
 	font-size: 18px;
 	padding: 10px 20px;
@@ -324,13 +335,18 @@
 	right: -5px;
 	background-image: url("https://stageviewcincyshakes.firebaseapp.com/icon-blue-message.2be55af0d98ee2864e29.png");
   }
+
+  .chat__message .date {
+	  font-size: smaller;
+  }
   
   .chat__form {
 	background-color: #e0e0e0;
+	position: relative;
+	z-index: 30;
   }
-  .chat__form div {
-	max-width: 800px;
-	margin: 0 auto;
+
+  .chat__form div#chat__form {
 	height: 50px;
 	display: -webkit-box;
 	display: -ms-flexbox;
@@ -338,28 +354,46 @@
 	-webkit-box-align: center;
 	-ms-flex-align: center;
 	align-items: center;
+	width: 100%;
   }
+
   .chat__form input {
 	height: 40px;
 	font-size: 16px;
-	min-width: 90%;
 	padding-left: 15px;
 	background-color: #fff;
 	border-radius: 15px;
 	border: none;
+	flex-grow: 12;
   }
-  .chat__form button {
-	width: 10%;
-	height: 100%;
+  .chat__form button, .backBtn {
 	font-size: 16px;
 	background-color: transparent;
 	border: none;
 	text-align: center;
-	text-transform: uppercase;
 	cursor: pointer;
+	flex-grow: 0;
+	border-radius: 50%;
+	height: 35px;
+	width: 35px;
+	margin-right: 5px;
+	margin-left: 5px;
+	transition: 0.3s;
   }
-  .chat__form button:hover {
-	font-weight: bold;
+  .chat__form button:hover, .backBtn:hover {
+	color: white;
+	background-color: rgb(0, 0, 0);
+	
+  }
+  .backBtn{
+	height: 50px;
+	width: 50px;
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	z-index: 10;
+	color: #007bff;
+	background-color: rgb(38, 39, 41);
   }
 
 @media screen and (max-width:800px) {

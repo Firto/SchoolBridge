@@ -2,7 +2,7 @@ import { ComponentFactoryResolver, ComponentFactory, Injectable } from '@angular
 import { DbNtfComponent } from '../Components/db-notifications/db-ntf-component.iterface';
 import { dbNotificatonsConfig } from '../Configs/db-notifications.config';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class DbNotificationsMapper{
     constructor(private cmpFactoryResolver: ComponentFactoryResolver){}
 

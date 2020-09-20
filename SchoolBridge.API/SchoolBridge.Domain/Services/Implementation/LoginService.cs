@@ -121,6 +121,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Tokens = await _tokenService.Login(user.Id, uuid),
                 Permissions = user.Permissions.Select(x => x.Permission.Name),
                 Role = user.Role.Name,
+                UserId = user.Id,
                 CountUnreadNotifications = await _dataBaseNotificationService.GetCountUnreadAsync(user.Id)
             };
             return dto;

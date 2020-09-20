@@ -1,0 +1,16 @@
+{
+  "name": "SchoolBridge",
+  "short_name": "SchoolBridge",
+  "theme_color": "#151515",
+  "background_color": "#fff",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "assets/icons/main-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -5,8 +5,8 @@ export class OnUnsubscribe implements OnDestroy {
     protected _destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
     
     ngOnDestroy(): void {
+        console.log("UNSUB");
         this._destroy.next(null);
         this._destroy.complete();
-        console.log("UNSUB");
     }
 }

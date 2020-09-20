@@ -14,8 +14,7 @@ import { SetSchoolComponent } from './Components/set-school/set-school.component
     imports: [
         CommonModule,
         DirectorPanelRoutingModule,
-        UserPermissionModule,
-        ReactiveFormsModule
+        UserPermissionModule
     ],
     providers: [
         
