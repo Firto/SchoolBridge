@@ -10,5 +10,5 @@ if (environment.production) {
 
 export let appInjector: Injector;
 
-platformBrowserDynamic().bootstrapModule(AppModule).then(m => appInjector = m.injector)
+platformBrowserDynamic().bootstrapModule(AppModule, {ngZone: "noop"}).then(m => appInjector = m.injector)
   .catch(err => console.error(err));

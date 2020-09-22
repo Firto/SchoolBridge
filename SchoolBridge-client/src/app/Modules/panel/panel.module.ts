@@ -20,19 +20,17 @@ import { OnlineService } from './Services/online.service';
         SelectPanelComponent,
         SettingsComponent
     ],
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        FormsModule,
-        DbNotificationModule,
-        UserPermissionModule.forRoot(),
-        PanelRoutingModule,
-        GlobalizationModule
-    ],
     providers: [
         ProfileService,
         OnlineService,
-        UsersService,
+        UsersService
+    ],
+    imports: [
+        CommonModule,
+        PanelRoutingModule,
+        GlobalizationModule,
+        DbNotificationModule,
+        UserPermissionModule.forRoot(),
     ],
     exports: [
         PanelComponent

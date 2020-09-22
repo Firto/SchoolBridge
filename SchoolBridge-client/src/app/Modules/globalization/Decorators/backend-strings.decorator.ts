@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 
 
 
-export function Globalization(prefix: string, constStrings: {errors: string[], validating: string[], args: string[]} | string[]) {
+/*export function Globalization(constStrings: {errors: string[], validating: string[], args: string[]} | string[]) {
   return function _Globalization<T extends {new(...argss: any[]): {}}>(constr: T){
     return class extends constr {
       public form: FormGroup;
@@ -26,7 +26,7 @@ export function Globalization(prefix: string, constStrings: {errors: string[], v
           if ('errors' in constStrings){
             constStringss = [].concat(...constStrings.errors.map(x => 'cl-'+x),...constStrings.validating, ...constStrings.args.map(x => 'pn-' + x));
           }else constStringss = constStrings;
-          _gb.initComponent(constr.name, prefix, constStringss);
+          _gb.initComponent(constr.name, constStringss);
         }
       }
 
@@ -37,4 +37,4 @@ export function Globalization(prefix: string, constStrings: {errors: string[], v
       }
     } 
   }
-}
+}*/

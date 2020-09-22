@@ -7,7 +7,7 @@ import { GuardService } from '../Services/guard.service';
 @Injectable({ providedIn: 'root' })
 export class LoginnedGuard implements CanActivate, CanActivateChild {
     constructor(private userService: UserService,
-                private toastrService: ToastrService,
+                /*private toastrService: ToastrService,*/
                 private router: Router,
                 private _guardService: GuardService) { }
 
@@ -20,7 +20,7 @@ export class LoginnedGuard implements CanActivate, CanActivateChild {
             return true;
         if (this.userService.user)  
             return true;
-        this.toastrService.error("No permission to page!");
+        //this.toastrService.error("No permission to page!");
         this.router.navigateByUrl('/start?returnUrl=' + encodeURI(window.location.pathname));
         return false;
     }

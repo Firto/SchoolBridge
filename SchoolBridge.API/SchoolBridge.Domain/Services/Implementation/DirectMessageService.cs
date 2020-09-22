@@ -118,7 +118,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             await _directChatGR.UpdateAsync(chat);
         }
 
-        public IEnumerable<DirectChatDto> GetDirectMessages(string userId, string chatId, string last, int count = 20)
+        public IEnumerable<MessageDto> GetDirectMessages(string userId, string chatId, string last, int count = 20)
         {
             var chat = _directChatGR.GetDbSet().Where(x => x.Id == chatId && (x.User1Id == userId || x.User2Id == userId)).FirstOrDefault();
             if (chat == null)
@@ -132,16 +132,19 @@ namespace SchoolBridge.Domain.Services.Implementation
                     throw new ClientException("inc-message-id", last);
             }
 
-            return _mapper.Map<IEnumerable<DirectMessage>, IEnumerable<DirectChatDto>>(
+            return _mapper.Map<IEnumerable<DirectMessage>, IEnumerable<MessageDto>>(
                 _directMessageGR.GetDbSet()
                 .Where((x) => x.ChatId == chatId && (message == null || x.Date < message.Date))
-                .OrderBy((x) => x.Date)
+                .OrderByDescending((x) => x.Date)
                 .Take(count)
                 .ToArray()
-           );
+           ).Select(x => {
+               x.Sender = _userService.GetShortDto(x.Sender.Id);
+               return x;
+           });
         }
 
-        public async Task<IEnumerable<DirectChatDto>> GetDirectMessagesAsync(string userId, string chatId, string last, int count = 20)
+        public async Task<IEnumerable<MessageDto>> GetDirectMessagesAsync(string userId, string chatId, string last, int count = 20)
         {
             var chat = _directChatGR.GetDbSet().Where(x => x.Id == chatId && (x.User1Id == userId || x.User2Id == userId)).FirstOrDefault();
             if (chat == null)
@@ -155,13 +158,16 @@ namespace SchoolBridge.Domain.Services.Implementation
                     throw new ClientException("inc-message-id", last);
             }
             
-            return _mapper.Map<IEnumerable<DirectMessage>, IEnumerable<DirectChatDto>>(
+            return _mapper.Map<IEnumerable<DirectMessage>, IEnumerable<MessageDto>>(
                 await _directMessageGR.GetDbSet()
                 .Where((x) => x.ChatId == chatId && (message == null || x.Date < message.Date))
-                .OrderBy((x) => x.Date)
+                .OrderByDescending((x) => x.Date)
                 .Take(count)
                 .ToArrayAsync()
-           );
+           ).Select(x => {
+               x.Sender = _userService.GetShortDto(x.Sender.Id);
+               return x;
+           });
         }
 
         public MessageDto SendMessage(JwtSecurityToken token, string chatId, string type, IMessageSource message)

@@ -8,6 +8,7 @@
     white-space: inherit !important;
     border-bottom: 1px solid #f4f4f4;
     position: relative;
+    overflow: hidden;
 }
 
 .top-text-block.unread:before {

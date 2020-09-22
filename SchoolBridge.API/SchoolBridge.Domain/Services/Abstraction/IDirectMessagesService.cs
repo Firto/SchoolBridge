@@ -17,8 +17,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
         void Read(string chatId, string userId);
         Task ReadAsync(string chatId, string userId);
 
-        IEnumerable<DirectChatDto> GetDirectMessages(string userId, string chatId, string last, int count = 20);
-        Task<IEnumerable<DirectChatDto>> GetDirectMessagesAsync(string userId, string chatId, string last, int count = 20);
+        IEnumerable<MessageDto> GetDirectMessages(string userId, string chatId, string last, int count = 20);
+        Task<IEnumerable<MessageDto>> GetDirectMessagesAsync(string userId, string chatId, string last, int count = 20);
 
         MessageDto SendMessage(JwtSecurityToken token, string chatId, string type, IMessageSource message);
         Task<MessageDto> SendMessageAsync(JwtSecurityToken token, string chatId, string type, IMessageSource message);

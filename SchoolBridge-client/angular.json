@@ -5,7 +5,13 @@
   "projects": {
     "SchoolBridge-client": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular": {
+          "component": {
+            "changeDetection": "OnPush"
+          }
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -20,7 +26,8 @@
             "tsConfig": "tsconfig.app.json",
             "aot": true,
             "assets": [
-            	"src/assets"
+            	"src/assets",
+              "src/manifest.webmanifest"
             ],
             "styles": [
             	"node_modules/bootstrap/dist/css/bootstrap.min.css",
@@ -28,9 +35,10 @@
             	"src/styles.css"
             ],
             "scripts": [
+              "node_modules/immutable/dist/immutable.min.js",
             	"node_modules/jquery/dist/jquery.min.js",
-                "src/scripts/popper.min.js",
-                "node_modules/bootstrap/dist/js/bootstrap.min.js"
+              "src/scripts/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
             ]
           },
           "configurations": {
@@ -60,7 +68,9 @@
                   "maximumWarning": "6kb",
                   "maximumError": "10kb"
                 }
-              ]
+              ],
+              "serviceWorker": true,
+              "ngswConfigPath": "ngsw-config.json"
             }
           }
         },
@@ -89,7 +99,8 @@
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "assets": [
-              "src/assets"
+              "src/assets",
+              "src/manifest.webmanifest"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",

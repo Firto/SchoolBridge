@@ -13,8 +13,7 @@ import { GlobalizationStringService } from '../Modules/globalization/Services/gl
 export class ErrorInterceptor implements HttpInterceptor {
 
     constructor(private _gbsService: GlobalizationStringService,
-                private _userService: UserService,
-                private _toastrService: ToastrService) {
+                private _userService: UserService) {
     }
 
     intercept(request: HttpRequest<APIResult>, next: HttpHandler): Observable<HttpEvent<APIResult>> {
@@ -46,9 +45,9 @@ export class ErrorInterceptor implements HttpInterceptor {
                         case "inc-token":
                             throw event.body.result;
                     }
-                    event.body.result.message.pipe(take(1)).subscribe(x =>{
+                    /*event.body.result.message.pipe(take(1)).subscribe(x =>{
                         this._toastrService.error(x, null, {timeOut: 10000});
-                    })
+                    })*/
                     
                     throw event.body.result;
                 }

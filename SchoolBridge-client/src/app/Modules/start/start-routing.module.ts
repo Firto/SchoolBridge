@@ -6,10 +6,10 @@ import { EmailRegisterComponent } from './Components/email-register/email-regist
 import { LoginRegisterGuard } from 'src/app/Guard/login-register.guard';
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: EmailRegisterComponent },
-  { path: 'endregister', component: RegisterComponent },
-  { path: '', redirectTo:'login' }
+  { path: 'login', component: LoginComponent, data: {animation: 'LoginPage'} },
+  { path: 'register', component: EmailRegisterComponent, data: {animation: 'RegisterPage'} },
+  { path: 'endregister', component: RegisterComponent, data: {animation: 'EndRegisterPage'} },
+  { path: '', redirectTo: 'login', pathMatch: "prefix" }
 ];
 
 @NgModule({

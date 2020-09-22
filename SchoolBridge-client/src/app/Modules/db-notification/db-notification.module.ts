@@ -7,12 +7,14 @@ import { DbNotificationService } from './Services/db-notification.service';
 import { DbNotificationsMapper } from './Mappers/db-notification.mapper';
 import { DbNtfOnLoginComponent } from './Components/db-notifications/db-ntf-on-login/db-ntf-on-login.component';
 import { DbNtfNewChatMessageComponent } from './Components/db-notifications/db-ntf-new-chat-message/db-ntf-new-chat-message.component';
-import { TimeAgoPipeModule } from '../TimeAgoPipe/time-ago-pipe.module';
 import { GlobalizationModule } from '../globalization/globalization.module';
+import { TimeAgoDirectiveModule } from '../TimeAgoPipe/time-ago-directive.module';
+import { BaseDbNtfComponent } from './Components/base-db-ntf-component/base-db-ntf.component';
 
 @NgModule({
     declarations: [
         NgxMutationObserverDirective,
+        BaseDbNtfComponent,
         SetDbNotificationsComponent,
         DbNtfMessageComponent,
         DbNtfOnLoginComponent,
@@ -20,21 +22,11 @@ import { GlobalizationModule } from '../globalization/globalization.module';
     ],
     imports: [
         CommonModule,
-        TimeAgoPipeModule,
+        TimeAgoDirectiveModule,
         GlobalizationModule
     ],
     exports: [
         SetDbNotificationsComponent
     ]
 })
-export class DbNotificationModule  {
-    static forRoot() {
-        return {
-            ngModule: DbNotificationModule,
-            providers: [
-                DbNotificationService,
-                DbNotificationsMapper
-            ],
-        };
-    }
-} 
+export class DbNotificationModule {} 

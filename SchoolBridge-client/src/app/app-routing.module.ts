@@ -13,8 +13,9 @@ export const routes: Routes = [
     component: StartComponent, 
     canActivate: [LoginRegisterGuard],
     runGuardsAndResolvers: 'always',
-    loadChildren: () => import('./Modules/start/start.module').then(m => m.StartModule),
-    
+    loadChildren: () => {
+      return import('./Modules/start/start.module').then(m => m.StartModule)
+    },
   },
   { path: 'panel',
     component: PanelComponent, 

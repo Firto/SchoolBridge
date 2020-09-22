@@ -25,17 +25,6 @@
     text-align: center;
 }
 
-.loader-topbar {
-    margin: 5px auto;
-    border: 3px solid #ddd;
-    border-radius: 50%;
-    border-top: 3px solid #666;
-    width: 22px;
-    height: 22px;
-    -webkit-animation: spin-topbar 1s linear infinite;
-    animation: spin-topbar 1s linear infinite;
-}
-
 .hide-menu-btn,
 .ntf-toggle-btn {
     transition: 0.4s;
@@ -53,14 +42,7 @@
     display: none;
 }
 
-@keyframes spin-topbar {
-    0% {
-        -webkit-transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
-}
+
 
 @media screen and (max-width:800px) {
     .hide-menu-btn {

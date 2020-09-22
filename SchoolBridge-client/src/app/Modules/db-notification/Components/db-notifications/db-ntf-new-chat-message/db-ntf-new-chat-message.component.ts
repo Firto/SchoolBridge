@@ -1,16 +1,23 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { DbNtfComponent } from '../db-ntf-component.iterface';
 import { DataBaseSource } from 'src/app/Modules/notification/Models/NotificationSources/database-source';
 import { IDBNSource } from '../../../Models/IDBN-source.interface';
 import { ShortUserModel } from 'src/app/Modules/panel/Models/short-user.model';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { UserModel } from 'src/app/Modules/panel/Models/user.model';
 import { UsersService } from 'src/app/Modules/panel/Services/users.service';
 import { apiConfig } from 'src/app/Const/api.config';
 import { environment } from 'src/environments/environment';
 import { User } from 'src/app/Modules/panel/Clases/user.class';
-import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
+//import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
 import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
+import { fromBinary } from 'src/app/Modules/binary/from-binary.func';
+import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globalization.service';
+import { OnUnsubscribe } from 'src/app/Services/super.controller';
+import { debounceTime, mergeMap, takeUntil } from 'rxjs/operators';
+import { merge } from 'jquery';
+import { DbNotification } from '../../../Services/db-notification.service';
+import { observed } from 'src/app/Decorators/observed.decorator';
 
 export interface DBNNewChatMessageSource extends IDBNSource{
     sender: ShortUserModel;
@@ -21,46 +28,56 @@ export interface DBNNewChatMessageSource extends IDBNSource{
 
 @Component({
     selector: "db-ntf-on-new-chat-message",
-    styleUrls: ['../db-ntf.component.css', 'db-ntf-new-chat-message.component.css'],
-    template: `<li [ngClass]="{'unread' : !baseSource.read}" class="top-text-block" [ngSwitch]="source.type" >
+    styleUrls: ['../../base-db-ntf-component/base-db-ntf.component.css', 'db-ntf-new-chat-message.component.css'],
+    template: `<div [ngSwitch]="model.source.type" >
                    <div *ngSwitchCase="'text'" class="text-message">
-                        <img src="{{(sender | async)?.photo}}" alt="avatar" />
-                        <div class="about">
-                            <div class="name">
-                                {{(sender | async)?.login}}
-                                <span *ngIf="((sender | async)?.onlineStatus | async) !== 2" class="status">
-                                    <i class="fa fa-circle" 
-                                    [ngClass]="{'online' : ((sender | async)?.onlineStatus | async) === 1,
-                                                'offline' : ((sender | async)?.onlineStatus | async) === 0 }" ></i>
-                                    online
-                                </span>
+                        <div *ngIf="sender; else elseBlock">
+                            <img src="{{sender.photo}}" alt="avatar" />
+                            <div class="about">
+                                <div class="name">
+                                    {{sender.login}}
+                                    <span *ngIf="(sender?.onlineStatus | async) !== 2" class="status">
+                                        <i class="fa fa-circle" 
+                                        [ngClass]="{'online' : (sender?.onlineStatus | async) === 1,
+                                                    'offline' : (sender?.onlineStatus | async) === 0 }" ></i>
+                                        online
+                                    </span>
+                                </div>
                             </div>
                         </div>
+                        <ng-template #elseBlock>
+                            <div class="loader-topbar"></div>
+                        </ng-template>
                         <p class="top-text-light" ><span dbstring >new-msg</span>: {{messageSource.text}}</p>
-                        <p class="top-text-light">{{baseSource.date | timeAgo}}</p>
                     </div>
                     <div *ngSwitchDefault>
 
                     </div>
-                </li>`
+                </div>`,
+    providers: MdGlobalization("ch-msg")
 })
-@Globalization('cm-db-ntf-on-new-chat-msg', [])
-export class DbNtfNewChatMessageComponent implements DbNtfComponent {
-    private _sender: Observable<User>;
+//@Globalization('cm-db-ntf-on-new-chat-msg', [])
+export class DbNtfNewChatMessageComponent extends OnUnsubscribe implements DbNtfComponent  {
+    private _model: DbNotification<DBNNewChatMessageSource>;
+    private _sender: User = null;
 
-    public baseSource: DataBaseSource;
-    private _source: DBNNewChatMessageSource = null;
+    set model(value: DbNotification<DBNNewChatMessageSource>) {
+        this._model = value;
+        this.messageSource = JSON.parse(fromBinary(this._model.source.base64Source));
 
-
-    get source(): DBNNewChatMessageSource {
-        
-        return this._source;
-        
+        this._usersService.get(this._model.source.sender).pipe(takeUntil(this._destroy)).subscribe(x => {
+            this._sender = x;
+            if (x){
+                x.onlineStatus.pipe(takeUntil(this._destroy)).subscribe(x => {
+                    this._sb.next();
+                });
+                this._sb.next();
+            }
+            
+        });
     }
-    set source(value: DBNNewChatMessageSource) {
-        this._source = value;
-        this.messageSource = JSON.parse(atob(this._source.base64Source));
-        this._sender = this._usersService.get(this._source.sender);
+    get model(): DbNotification<DBNNewChatMessageSource> {
+        return this._model;
     }
 
     get sender() {
@@ -69,7 +86,10 @@ export class DbNtfNewChatMessageComponent implements DbNtfComponent {
 
     public messageSource: any;
 
-    constructor (_gb: GlobalizationService,
-                private _usersService: UsersService){
+    protected _sb: Subject<unknown> = new Subject();
+    @observed() public onChanged: Observable<unknown> = this._sb.pipe(debounceTime(1000));
+
+    constructor (private _usersService: UsersService){
+        super();
     }
 }

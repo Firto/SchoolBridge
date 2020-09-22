@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ProfileService } from '../../Services/profile.service';
 import { environment } from 'src/environments/environment';
+import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globalization.service';
 
 @Component({
   selector: 'settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.css']
+  styleUrls: ['./settings.component.css'],
+  providers: MdGlobalization('st')
 })
 
 export class SettingsComponent implements OnInit {

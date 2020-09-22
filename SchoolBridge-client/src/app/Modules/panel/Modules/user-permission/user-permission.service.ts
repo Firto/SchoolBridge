@@ -3,9 +3,9 @@ import { UserService } from '../../../../Services/user.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class UserPermissionService {
-    public static guards = [ ]; 
+    public guards = [ ]; 
     public onUpdatePermissions: Subject<string[]> = new Subject<string[]>();
 
     constructor(private userService: UserService) {

@@ -27,7 +27,7 @@ export class RegisterService {
                 private _permanentConnectionService: PermanentConnectionService,
                 private _notificationService: NotificationService,
                 private _loaderService: LoaderService,
-                private _toastrService: ToastrService,
+                //private _toastrService: ToastrService,
                 private _uuidService: DeviceUUIDService) {
         this.ser = apiConfig["register"];
 
@@ -37,13 +37,13 @@ export class RegisterService {
                 this._loaderService.hide();
                 if ((<OnSendEmailSource>x.source).ok)
                 {
-                    this._toastrService.success("Succesful sending email to "+ (<OnSendEmailSource>x.source).email +"!");
+                    //this._toastrService.success("Succesful sending email to "+ (<OnSendEmailSource>x.source).email +"!");
                     //this._router.navigateByUrl("/start");
                 }
-                else this._toastrService.error("Error while sending email to "+ (<OnSendEmailSource>x.source).email +", try again!");
+                //else this._toastrService.error("Error while sending email to "+ (<OnSendEmailSource>x.source).email +", try again!");
             }
         })
-    }
+    } 
 
     start(email: string): Observable<PermanentSubscribe> {
         return this._baseService.send<PermanentSubscribe>(this.ser, "start", null, { headers: {'UUID':this._uuidService.uuid}, params: { email: email}}).pipe(
