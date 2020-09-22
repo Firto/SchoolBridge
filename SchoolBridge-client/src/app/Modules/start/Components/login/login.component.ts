@@ -41,7 +41,7 @@ import { markDirty } from 'src/app/Helpers/mark-dirty.func';
     'l-too-many-devices',
     'v-dto-invalid'
   ],
-  validating:[ 
+  validating:[
     'v-d-not-null'
   ],
   args: [
@@ -55,22 +55,22 @@ export class LoginComponent extends OnUnsubscribe implements OnInit {
   @ViewChild('login', {static: true}) public el_lg: ElementRef;
   @ViewChild('password', {static: true}) public el_ps:  ElementRef;
 
-  constructor(private authService: LoginService, 
+  constructor(private authService: LoginService,
               private router:Router,
               private route: ActivatedRoute) {
     super();
-    this.form.onChanged.pipe(takeUntil(this._destroy)).subscribe(() => {
-      markDirty(this);
-      console.log("RRR");
-    });
   }
 
   ngOnInit(): void {
     if (this.route.snapshot.queryParams['returnUrl'])
       this.returnUrl = this.route.snapshot.queryParams['returnUrl'];
     else this.returnUrl = "/panel";
+
+    this.form.onChanged.pipe(takeUntil(this._destroy)).subscribe(() => {
+      markDirty(this);
+    });
   }
-  
+
   onChange(arg: string){
     if (this.form.valid) return;
     this.form.args[arg].clearErrorsD();
@@ -85,7 +85,7 @@ export class LoginComponent extends OnUnsubscribe implements OnInit {
         err => {
           if (err.id == "v-dto-invalid")
             this.form.setErrors(err.additionalInfo);
-        } 
+        }
       );
   }
 

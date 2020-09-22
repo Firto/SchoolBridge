@@ -43,7 +43,7 @@ nav a img {
     height: 50px;
     width: 50px;
     margin-right: 20px;
-    margin-bottom: 7px;
+    margin-top: -8px;
 }
 
 .menu {
@@ -73,6 +73,7 @@ nav a img {
     cursor: pointer;
     color: gray;
     display: none;
+    margin-bottom: 0px;
 }
 
 .show-menu-btn {

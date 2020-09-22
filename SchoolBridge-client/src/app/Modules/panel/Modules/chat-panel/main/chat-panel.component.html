@@ -1,6 +1,6 @@
 <div class="messaging">
     <div class="inbox_msg">
-      <div class="inbox_people" [ngClass]="{'mclose' : curChat | async}" >
+      <div class="inbox_people">
         <div class="headind_srch">
           <div class="recent_heading">
             <h4>Recent</h4>
@@ -12,65 +12,10 @@
           </div>
         </div>
         <div class="inbox_chat scroll"  >
-          <div *ngIf="isLoadingChatObs | async" class="loader-topbar"></div>
-          <div *ngFor="let item of (chatService.chats | async) | keyvalue;" class="chat_list active_chat">
-            <div class="chat_people" *ngIf="item.value.direct; else elseBlock" (click)="onSelectChat(item.value)">
-              <div class="chat_img">
-                <img src="{{(item.value.user | async)?.photo}}" alt="{{(item.value.user | async)?.login}}">
-                <i *ngIf="((item.value.user | async)?.onlineStatus | async) !== 2" class="fa fa-circle onl-status" 
-                [ngClass]="{'online' : ((item.value.user | async)?.onlineStatus | async) === 1,
-                            'offline' : ((item.value.user | async)?.onlineStatus | async) === 0 }" ></i>
-              </div>
-              <div class="chat_ib">
-                <h5>{{(item.value.user | async)?.login}} <span *ngIf="item.value.lastMessageObs | async" class="chat_date" [timeAgo]="(item.value.lastMessageObs | async)?.date" ></span></h5>
-                <p><span *ngIf="(item.value.read | async) === false" class="font-weight-bold" >new</span> {{(item.value.lastMessageObs | async)?.toString()}}</p>
-              </div>
-            </div>
-            <ng-template #elseBlock>
-              Content to render when condition is false.
-            </ng-template>
-          </div>
+          <direct-chat *ngFor="let item of chats" [source]="item" ></direct-chat>
         </div>
       </div>
-      <div class="mesgs" *ngIf="curChat | async; else elseBlock;" >
-        <div class="msg_bar row no-gutters bg-white" >
-          <button (click)="delectChat()" type="button" class="btn bg-dark rounded-0 text-white col-1">
-            <i class="fa fa-angle-left"></i>
-          </button>
-          <div *ngIf="(curChat | async)?.direct; else elseBlock" class="col-2 offset-4 row no-gutters" >
-            <img class="rounded-circle" src="{{((curChat | async)?.user | async)?.photo}}"/>
-            <p class="text-dark" >{{((curChat | async)?.user | async)?.login}}</p>
-          </div>
-          <ng-template #elseBlock>
-            Content to render when condition is false.
-          </ng-template>
-        </div>
-        <div class="chat" libScrollEvent (onScroll)="onChatScroll($event)" [bottomOffset]="50" [topOffset]="50" >
-          <div class="chat__wrapper" >
-            <div *ngFor="let item of (curChat | async)?.messagesObs | async;" 
-            class="chat__message" [ngClass]="{'chat__message-own' : (curChat | async)?.model.user.id != item.model.sender.id}" >
-              <div class="date" [timeAgo]="item.date" ></div>
-              <div>{{item.toString()}}</div>
-            </div>
-          </div>
-          <div *ngIf="isLoadingMsgObs | async" class="loader-topbar"></div>
-        </div>
-        <div class="chat__form">
-          <div id="chat__form">
-            <!--<input [(ngModel)]="currentMessage" 
-            name="currentMessage" 
-            (keyup.enter)="sendMessage()" 
-            type="text"
-            dbstring 
-            [attrString]="{str:'ps-send-msg', arg: 'placeholder'}" >Type your message here ...-->
-            <button (click)="sendMessage()" ><i class="fas fa-paper-plane"></i></button>
-          </div>
-        </div>
-        <div id="result"></div>
-        <button #toBottomBtn class="backBtn" (click)="toBottom()" ><i class="fa fa-angle-down"></i></button>
-      </div>
-      <ng-template #elseBlock>
+      <div class="mesgs mclose" >
         <div class="text-white font-weight-bold text-center nomesgs" ><span>Select chat</span></div>
-      </ng-template>
     </div>
   </div>

@@ -40,7 +40,7 @@ namespace SchoolBridge.API
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _env;
 
-        private readonly IEnumerable<string> _allowedOrgins = new string[] { "http://192.168.0.6:4200", "http://192.168.0.6:4300" };
+        //private readonly IEnumerable<string> _allowedOrgins = new string[] { "http://192.168.0.4:4200", "http://192.168.0.4:4300" };
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
@@ -132,7 +132,7 @@ namespace SchoolBridge.API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors(x => x.SetIsOriginAllowed((x) => { Console.WriteLine(x); return _allowedOrgins.Contains(x); })
+            app.UseCors(x => x.SetIsOriginAllowed(_ => true/*(x) => { Console.WriteLine(x); return _allowedOrgins.Contains(x); }*/)
                             .AllowAnyHeader()
                             .WithMethods("GET", "POST")
                             .AllowCredentials());
