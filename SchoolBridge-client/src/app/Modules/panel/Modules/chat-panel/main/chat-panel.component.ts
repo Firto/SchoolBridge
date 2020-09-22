@@ -70,8 +70,4 @@ export class ChatPanelComponent implements OnInit {
 
         this.CMService.sendMessage(this.curChat.value, this.currentMessage).subscribe(x => this.currentMessage = "");
     }
-
-    public delectChat(){
-        this.curChat.next(null); 
-    }
 }

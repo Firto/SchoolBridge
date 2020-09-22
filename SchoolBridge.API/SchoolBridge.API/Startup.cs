@@ -132,7 +132,7 @@ namespace SchoolBridge.API
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors(x => x.SetIsOriginAllowed((x) => { Console.WriteLine(x); return _allowedOrgins.Contains(x); })
+            app.UseCors(x => x.SetIsOriginAllowed((x) => { Console.WriteLine(x); return true; })
                             .AllowAnyHeader()
                             .WithMethods("GET", "POST")
                             .AllowCredentials());

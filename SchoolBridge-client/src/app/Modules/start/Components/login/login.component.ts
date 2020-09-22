@@ -13,19 +13,6 @@ import { markDirty } from 'src/app/Helpers/mark-dirty.func';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  /*animations: [
-    trigger('openClose', [
-      transition('open <=> closed', [
-        animate('0.5s')
-      ])
-    ]),
-    state('open', style({
-      opacity: 1,
-    })),
-    state('closed', style({
-      opacity: 0,
-    })),
-  ],*/
   providers: MdGlobalization('lg', [
     'l-user-banned',
     'l-pass-log-inc',
@@ -34,21 +21,6 @@ import { markDirty } from 'src/app/Helpers/mark-dirty.func';
     'pn-password'
   ])
 })
-/*@Globalization('cm-lg', {
-  errors: [
-    'l-user-banned',
-    'l-pass-log-inc',
-    'l-too-many-devices',
-    'v-dto-invalid'
-  ],
-  validating:[ 
-    'v-d-not-null'
-  ],
-  args: [
-    'login',
-    'password'
-  ]
-})*/
 export class LoginComponent extends OnUnsubscribe implements OnInit {
   public returnUrl: string = null;
   public form: NgxFormModel = new NgxFormModel("form", ["login", "password"]);
