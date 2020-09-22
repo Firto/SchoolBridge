@@ -21,4 +21,8 @@ export class ChatPanelComponent {
     public onSelectChat(chat: Chat){
         this.curChat.next(chat); 
     }
+
+    public delectChat(){
+        this.curChat.next(null); 
+    }
 }

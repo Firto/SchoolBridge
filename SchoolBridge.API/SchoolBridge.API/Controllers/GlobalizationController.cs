@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SchoolBridge.API.Controllers.Attributes;
 using SchoolBridge.API.Controllers.Attributes.Globalization;
@@ -46,7 +43,13 @@ namespace SchoolBridge.API.Controllers
         [HttpPost, BaseUpatedId]
         public async Task<ResultDto> Strings([FromBody, MyValidation]GetLanguageStringsDto entity)
         {
-            return ResultDto.Create(_languageStringService.GetByTypeCurrent(entity.Types));
+            return ResultDto.Create(_languageStringService.GetByStringNameCurrent(entity.Strings));
+        }
+
+        [HttpPost, BaseUpatedId]
+        public async Task<ResultDto> StringsByType([FromBody, MyValidation]GetLanguageStringsDto entity)
+        {
+            return ResultDto.Create(_languageStringService.GetByTypeCurrent(entity.Strings));
         }
 
         [HttpGet]
@@ -58,7 +61,7 @@ namespace SchoolBridge.API.Controllers
         [HttpPost, ActionName("string/addorupdate"), HasPermission("EditGbStrings")]
         public async Task<ResultDto> StringAddOrUpdate([FromBody, MyValidation]AddOrUpdateStringDto entity)
         {
-            _languageStringService.AddOrUpdateString(entity.Name, entity.Types, entity.LangAbbName, entity.String);
+            _languageStringService.AddOrUpdateString(entity.Name, _languageStringService.GetCurrentLanguage(), entity.String);
             return ResultDto.Create(null);
         }
 

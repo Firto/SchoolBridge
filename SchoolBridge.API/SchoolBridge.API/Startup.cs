@@ -40,7 +40,7 @@ namespace SchoolBridge.API
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _env;
 
-        private readonly IEnumerable<string> _allowedOrgins = new string[] { "http://192.168.0.6:4200" };
+        private readonly IEnumerable<string> _allowedOrgins = new string[] { "http://localhost:4200" };
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {

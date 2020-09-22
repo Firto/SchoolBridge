@@ -1,88 +1,38 @@
 <div class="messaging">
-    <div class="inbox_msg">
-      <div class="inbox_people" [ngClass]="{'mclose' : curChat | async}" >
-        <div class="headind_srch">
-          <div class="recent_heading">
-            <h4>Recent</h4>
-          </div>
-          <div class="srch_bar">
-            <div class="stylish-input-group">
-              <input type="text" class="search-bar"  placeholder="Search" >
-              </div>
-          </div>
+  <div class="inbox_msg">
+    <div class="inbox_people" [ngClass]="{'mclose' : curChat | async}">
+      <div class="headind_srch">
+        <div class="recent_heading">
+          <h4>Recent</h4>
         </div>
-        <div class="inbox_chat scroll"  >
-          <div *ngFor="let item of (chatService.chats | async) | keyvalue;" class="chat_list active_chat">
-            <div class="chat_people" *ngIf="item.value.direct; else elseBlock" (click)="onSelectChat(item.value)">
-              <div class="chat_img">
-                <img src="{{(item.value.user | async)?.photo}}" alt="{{(item.value.user | async)?.login}}">
-                <i *ngIf="((item.value.user | async)?.onlineStatus | async) !== 2" class="fa fa-circle onl-status" 
-                [ngClass]="{'online' : ((item.value.user | async)?.onlineStatus | async) === 1,
-                            'offline' : ((item.value.user | async)?.onlineStatus | async) === 0 }" ></i>
-              </div>
-              <div class="chat_ib">
-                <h5>{{(item.value.user | async)?.login}} <span *ngIf="item.value.lastMessage | async" class="chat_date">{{(item.value.lastMessage | async)?.date | timeAgo}}</span></h5>
-                <p><span *ngIf="(item.value.read | async) === false" class="font-weight-bold" >new</span> {{(item.value.lastMessage | async)?.toString()}}</p>
-              </div>
-            </div>
-            <ng-template #elseBlock>
-              Content to render when condition is false.
-            </ng-template>
+        <div class="srch_bar">
+          <div class="stylish-input-group">
+            <input type="text" class="search-bar" placeholder="Search">
           </div>
         </div>
       </div>
-      <div class="mesgs" [ngClass]="{'mclose' : curChat | async}" >
-        <div class="msg_bar p-2" *ngIf="curChat | async" >
-          <button type="button" class="btn rounded-circle text-white">
-            <i class="fa fa-angle-left"></i>
-          </button>
-        </div>
-        <div class="msg_history">
-          <div class="incoming_msg">
-            <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-            <div class="received_msg">
-              <div class="received_withd_msg"> 
-                <p>Test which is a new approach to have all
-                  solutions</p>
-                <span class="time_date"> 11:01 AM    |    June 9</span></div>
+
+      <div class="inbox_chat scroll">
+        <div *ngFor="let item of (chatService.chats | async) | keyvalue;" class="chat_list active_chat">
+          <div class="chat_people" *ngIf="item.value.direct; else elseBlock" (click)="onSelectChat(item.value)">
+            <div class="chat_img">
+              <img src="{{(item.value.user | async)?.photo}}" alt="{{(item.value.user | async)?.login}}">
+              <i *ngIf="((item.value.user | async)?.onlineStatus | async) !== 2" class="fa fa-circle onl-status"
+                [ngClass]="{'online' : ((item.value.user | async)?.onlineStatus | async) === 1,
+                          'offline' : ((item.value.user | async)?.onlineStatus | async) === 0 }"></i>
+            </div>
+            <div class="chat_ib">
+              <h5>{{(item.value.user | async)?.login}} <span *ngIf="item.value.lastMessage | async"
+                  class="chat_date">{{(item.value.lastMessage | async)?.date | timeAgo}}</span></h5>
+              <p><span *ngIf="(item.value.read | async) === false" class="font-weight-bold">new</span>
+                {{(item.value.lastMessage | async)?.toString()}}</p>
             </div>
           </div>
-          <div class="outgoing_msg">
-            <div class="sent_msg">
-              <p>Test which is a new approach to have all
-                solutions</p>
-              <span class="time_date"> 11:01 AM    |    June 9</span> </div>
-          </div>
-          <div class="incoming_msg">
-            <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-            <div class="received_msg">
-              <div class="received_withd_msg">
-                <p>Test, which is a new approach to have</p>
-                <span class="time_date"> 11:01 AM    |    Yesterday</span></div>
-            </div>
-          </div>
-          <div class="outgoing_msg">
-            <div class="sent_msg">
-              <p>Apollo University, Delhi, India Test</p>
-              <span class="time_date"> 11:01 AM    |    Today</span> </div>
-          </div>
-          <div class="incoming_msg">
-            <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-            <div class="received_msg">
-              <div class="received_withd_msg">
-                <p>We work directly with our designers and suppliers,
-                  and sell direct to you, which means quality, exclusive
-                  products, at a price anyone can afford.</p>
-                <span class="time_date"> 11:01 AM    |    Today</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="type_msg">
-          <div class="input_msg_write">
-            <input type="text" class="write_msg" placeholder="Type a message" />
-            <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane" aria-hidden="true"></i></button>
-          </div>
+          <ng-template #elseBlock>
+            Content to render when condition is false.
+          </ng-template>
         </div>
       </div>
     </div>
   </div>
+</div>

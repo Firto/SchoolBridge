@@ -8,6 +8,7 @@ import { Subject, Observable, of, BehaviorSubject } from 'rxjs';
 import { debounceTime, tap, bufferWhen, mergeMap, map, filter } from 'rxjs/operators';
 import { OnlineService } from './online.service';
 import { User } from '../Clases/user.class';
+import { UserService } from 'src/app/Services/user.service';
 
 @Injectable({providedIn:'root'})
 export class UsersService {
@@ -19,7 +20,8 @@ export class UsersService {
     private _loadedUsers: BehaviorSubject<Record<string, User>> = new BehaviorSubject<Record<string, User>>({});
 
     constructor(private _baseService: BaseService,
-                private _onlineService: OnlineService) { 
+                private _onlineService: OnlineService,
+                private _userService: UserService) { 
         this._ser = apiConfig["users"];
 
         this._mainGetThread = <Subject<ShortUserModel>>(new Subject<ShortUserModel>()).pipe(
@@ -45,6 +47,7 @@ export class UsersService {
         )
 
         this._mainGetThread.subscribe();
+        _userService.userObs.subscribe(x => { if(!x) this._loadedUsers.next({}); });
     }
 
     public getMany(model: ShortUserModel[]): Observable<UserModel[]>{

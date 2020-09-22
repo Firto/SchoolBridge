@@ -23,12 +23,18 @@ import { GlobalizationModule } from '../globalization/globalization.module';
         TimeAgoPipeModule,
         GlobalizationModule
     ],
-    providers: [
-        DbNotificationService,
-        DbNotificationsMapper
-    ],
     exports: [
         SetDbNotificationsComponent
     ]
 })
-export class DbNotificationModule  {} 
+export class DbNotificationModule  {
+    static forRoot() {
+        return {
+            ngModule: DbNotificationModule,
+            providers: [
+                DbNotificationService,
+                DbNotificationsMapper
+            ],
+        };
+    }
+} 

@@ -10,10 +10,18 @@ import { NotificationService } from './Services/notification.service';
         
     ],
     providers: [
-        NotificationService
     ],
     exports: [
         
     ]
 })
-export class NotificationModule  {} 
+export class NotificationModule  {
+    static forRoot() {
+        return {
+            ngModule: NotificationModule,
+            providers: [
+                NotificationService
+            ]
+        };
+    }
+}

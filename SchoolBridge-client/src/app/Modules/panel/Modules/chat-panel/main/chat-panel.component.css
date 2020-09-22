@@ -186,6 +186,7 @@
 	height: inherit;
 	display: flex;
 	flex-direction: column;
+	margin-top: -8px;
 }
 
 .sent_msg p {
@@ -243,7 +244,21 @@
 }
 
 .msg_bar{
+	
+}
 
+.msg_bar img {
+	height: 50px;
+    display: block;
+    margin: 0 auto;
+}
+
+.msg_bar p {
+	display: block;
+    width: 100%;
+    text-align: center;
+    color: white;
+    margin-bottom: 0;
 }
 
 @media screen and (max-width:800px) {
@@ -270,5 +285,9 @@
 
 	.mesgs.mclose{
 		left: 100%; 
+	}
+
+	.mesgs{
+		margin-top: 0;
 	}
 }

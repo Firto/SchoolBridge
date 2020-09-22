@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace SchoolBridge.DataAccess.Migrations
 {
@@ -23,7 +24,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     AbbName = table.Column<string>(nullable: false),
                     FullName = table.Column<string>(nullable: false)
                 },
@@ -37,7 +38,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -50,7 +51,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -63,7 +64,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -76,7 +77,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -189,11 +190,18 @@ namespace SchoolBridge.DataAccess.Migrations
                     PasswordHash = table.Column<string>(maxLength: 210, nullable: false),
                     RoleId = table.Column<int>(nullable: false),
                     Banned = table.Column<string>(maxLength: 210, nullable: true),
-                    Birthday = table.Column<DateTime>(nullable: false)
+                    Birthday = table.Column<DateTime>(nullable: false),
+                    PhotoId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Images_PhotoId",
+                        column: x => x.PhotoId,
+                        principalTable: "Images",
+                        principalColumn: "FileId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Users_Roles_RoleId",
                         column: x => x.RoleId,
@@ -223,6 +231,33 @@ namespace SchoolBridge.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DirectChats",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    User1Id = table.Column<string>(nullable: true),
+                    User2Id = table.Column<string>(nullable: true),
+                    Read = table.Column<int>(nullable: false),
+                    LastModify = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DirectChats", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DirectChats_Users_User1Id",
+                        column: x => x.User1Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DirectChats_Users_User2Id",
+                        column: x => x.User2Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Notifications",
                 columns: table => new
                 {
@@ -239,6 +274,29 @@ namespace SchoolBridge.DataAccess.Migrations
                     table.ForeignKey(
                         name: "FK_Notifications_Users_UserId",
                         column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PupilSubjects",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SubjectName = table.Column<string>(nullable: false),
+                    Comment = table.Column<string>(nullable: false),
+                    DayNumber = table.Column<byte>(nullable: false),
+                    LessonNumber = table.Column<byte>(nullable: false),
+                    PupilId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PupilSubjects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PupilSubjects_Users_PupilId",
+                        column: x => x.PupilId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -268,143 +326,32 @@ namespace SchoolBridge.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Files",
-                column: "Id",
-                value: "default-user-photo");
-
-            migrationBuilder.InsertData(
-                table: "LanguageStringTypes",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
+            migrationBuilder.CreateTable(
+                name: "DirectMessages",
+                columns: table => new
                 {
-                    { 1, "client-error" },
-                    { 2, "component" },
-                    { 3, "valid-error" },
-                    { 4, "default" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Languages",
-                columns: new[] { "Id", "AbbName", "FullName" },
-                values: new object[,]
+                    Id = table.Column<string>(nullable: false),
+                    Date = table.Column<DateTime>(nullable: false),
+                    Type = table.Column<string>(nullable: false),
+                    Base64Source = table.Column<string>(nullable: false),
+                    SenderId = table.Column<string>(nullable: true),
+                    ChatId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
                 {
-                    { 1, "en", "English" },
-                    { 2, "ua", "Українська" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Permissions",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
-                {
-                    { 21, "CreateLanguageString" },
-                    { 22, "GetLanguageString" },
-                    { 23, "EditLanguageString" },
-                    { 24, "RemoveLanguageString" },
-                    { 25, "AddLanguageStringType" },
-                    { 26, "GetLanguageStringType" },
-                    { 27, "EditLanguageStringType" },
-                    { 31, "GetPupilsList" },
-                    { 29, "GetAdminsList" },
-                    { 30, "GetAdminInfo" },
-                    { 20, "RemoveLanguageStringIdType" },
-                    { 32, "GetPupilsInfo" },
-                    { 33, "UpdateBaseUpdateId" },
-                    { 34, "GetAdminPanel" },
-                    { 35, "GetGlobalizationTab" },
-                    { 28, "RemoveLanguageStringType" },
-                    { 19, "EditLanguageStringIdType" },
-                    { 15, "EditLanguageStringId" },
-                    { 17, "CreateLanguageStringIdType" },
-                    { 1, "CreateAdmin" },
-                    { 2, "EditAdmin" },
-                    { 3, "EditAdminPermissions" },
-                    { 4, "RemoveAdmin" },
-                    { 5, "CreatePupil" },
-                    { 6, "EditPupilPermissions" },
-                    { 7, "EditPupil" },
-                    { 18, "GetLanguageStringIdType" },
-                    { 8, "RemovePupil" },
-                    { 10, "GetLanguage" },
-                    { 11, "EditLanguage" },
-                    { 12, "RemoveLanguage" },
-                    { 13, "CreateLanguageStringId" },
-                    { 14, "GetLanguageStringId" },
-                    { 16, "RemoveLanguageStringId" },
-                    { 9, "CreateLanguage" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Roles",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
-                {
-                    { 1, "Admin" },
-                    { 9, "Pupil" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "DefaultRolePermissions",
-                columns: new[] { "RoleId", "PermissionId" },
-                values: new object[,]
-                {
-                    { 1, 5 },
-                    { 1, 6 },
-                    { 1, 7 },
-                    { 1, 10 },
-                    { 1, 11 },
-                    { 1, 12 }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Images",
-                columns: new[] { "FileId", "Static", "Type" },
-                values: new object[] { "default-user-photo", true, "image/jpeg" });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "Banned", "Birthday", "Email", "Lastname", "Login", "Name", "PasswordHash", "RoleId", "Surname" },
-                values: new object[] { "admin", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "admin@admin.admin", "Admin", "admin", "Admin", "26ECBVYXG5LTG6S4F7DE7CE0EAAB506AF411CABC26BE20437F9E83957412E1E501A5AEF5A1A62F1CC6528EC4F013CF617FDBDAE076", 1, "Admin" });
-
-            migrationBuilder.InsertData(
-                table: "UserPermissions",
-                columns: new[] { "UserId", "PermissionId" },
-                values: new object[,]
-                {
-                    { "admin", 1 },
-                    { "admin", 33 },
-                    { "admin", 32 },
-                    { "admin", 31 },
-                    { "admin", 30 },
-                    { "admin", 29 },
-                    { "admin", 28 },
-                    { "admin", 27 },
-                    { "admin", 26 },
-                    { "admin", 25 },
-                    { "admin", 24 },
-                    { "admin", 23 },
-                    { "admin", 22 },
-                    { "admin", 21 },
-                    { "admin", 20 },
-                    { "admin", 34 },
-                    { "admin", 19 },
-                    { "admin", 17 },
-                    { "admin", 16 },
-                    { "admin", 15 },
-                    { "admin", 14 },
-                    { "admin", 13 },
-                    { "admin", 12 },
-                    { "admin", 11 },
-                    { "admin", 10 },
-                    { "admin", 7 },
-                    { "admin", 6 },
-                    { "admin", 5 },
-                    { "admin", 4 },
-                    { "admin", 3 },
-                    { "admin", 2 },
-                    { "admin", 18 },
-                    { "admin", 35 }
+                    table.PrimaryKey("PK_DirectMessages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DirectMessages_DirectChats_ChatId",
+                        column: x => x.ChatId,
+                        principalTable: "DirectChats",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DirectMessages_Users_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -416,6 +363,26 @@ namespace SchoolBridge.DataAccess.Migrations
                 name: "IX_DefaultRolePermissions_PermissionId",
                 table: "DefaultRolePermissions",
                 column: "PermissionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DirectChats_User1Id",
+                table: "DirectChats",
+                column: "User1Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DirectChats_User2Id",
+                table: "DirectChats",
+                column: "User2Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DirectMessages_ChatId",
+                table: "DirectMessages",
+                column: "ChatId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DirectMessages_SenderId",
+                table: "DirectMessages",
+                column: "SenderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_LanguageStringIdTypes_StringIdId",
@@ -433,9 +400,19 @@ namespace SchoolBridge.DataAccess.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PupilSubjects_PupilId",
+                table: "PupilSubjects",
+                column: "PupilId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserPermissions_PermissionId",
                 table: "UserPermissions",
                 column: "PermissionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_PhotoId",
+                table: "Users",
+                column: "PhotoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
@@ -452,7 +429,7 @@ namespace SchoolBridge.DataAccess.Migrations
                 name: "DefaultRolePermissions");
 
             migrationBuilder.DropTable(
-                name: "Images");
+                name: "DirectMessages");
 
             migrationBuilder.DropTable(
                 name: "LanguageStringIdTypes");
@@ -464,10 +441,13 @@ namespace SchoolBridge.DataAccess.Migrations
                 name: "Notifications");
 
             migrationBuilder.DropTable(
+                name: "PupilSubjects");
+
+            migrationBuilder.DropTable(
                 name: "UserPermissions");
 
             migrationBuilder.DropTable(
-                name: "Files");
+                name: "DirectChats");
 
             migrationBuilder.DropTable(
                 name: "LanguageStringTypes");
@@ -485,7 +465,13 @@ namespace SchoolBridge.DataAccess.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
+                name: "Images");
+
+            migrationBuilder.DropTable(
                 name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Files");
         }
     }
 }

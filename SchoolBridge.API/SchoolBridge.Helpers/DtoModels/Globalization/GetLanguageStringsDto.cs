@@ -8,6 +8,6 @@ namespace SchoolBridge.Helpers.DtoModels.Globalization
     public class GetLanguageStringsDto
     {
         [PropValid("str-input", "lss-lng-type")]
-        public string[] Types { get; set; }
+        public string[] Strings { get; set; }
     }
 }

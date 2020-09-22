@@ -10,8 +10,8 @@ using SchoolBridge.DataAccess;
 namespace SchoolBridge.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20200831163853_lll")]
-    partial class lll
+    [Migration("20200908160550_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -51,8 +51,8 @@ namespace SchoolBridge.DataAccess.Migrations
                     b.Property<DateTime>("LastModify")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<bool>("Read")
-                        .HasColumnType("boolean");
+                    b.Property<int>("Read")
+                        .HasColumnType("integer");
 
                     b.Property<string>("User1Id")
                         .HasColumnType("text");
