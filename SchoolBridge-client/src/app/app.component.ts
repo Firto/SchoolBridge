@@ -16,7 +16,7 @@ import { LoaderService } from './Services/loader.service';
   providers: RootMdGlobalization('cm', [
     'v-dto-invalid',
     'v-d-not-null'
-  ])
+  ] )
 })
 
 export class AppComponent {

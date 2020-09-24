@@ -20,7 +20,6 @@ import { observed } from 'src/app/Decorators/observed.decorator';
 })
 export class EmailRegisterComponent extends OnUnsubscribe implements OnInit {
   public form: NgxFormModel = new NgxFormModel("form", ["email"]);
-  @ViewChild('email', {static: true}) public el_lg: ElementRef;
 
   constructor(private registerService: RegisterService) {
     super();
@@ -33,14 +32,14 @@ export class EmailRegisterComponent extends OnUnsubscribe implements OnInit {
   }
 
   public onChange(arg: string): void {
-    if (this.form.valid) return;
-    this.form.args[arg].clearErrorsD();
+    if (!this.form.valid)
+      this.form.args[arg].clearErrorsD();
   }
 
   public register(): void {
     if (!this.form.valid) return;
 
-    this.registerService.start(this.el_lg.nativeElement.value).subscribe(
+    this.registerService.start(this.form.args.email.value).subscribe(
       res => {},
       (err: UserError) =>{
         if (err.id == "v-dto-invalid")

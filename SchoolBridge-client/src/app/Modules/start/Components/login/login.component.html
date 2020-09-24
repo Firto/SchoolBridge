@@ -1,19 +1,11 @@
 <div class="d-flex justify-content-center align-items-center login-container">
-    <div class="def-form text-center">
+    <div class="def-form text-center" (keyup.enter)="logon()">
         <h1 class="mb-5 font-weight-light text-uppercase" dbstring>header</h1>
-        <div class="form-group">
-            <input #login type="text" class="form-control rounded-pill form-control-lg" dbstring
-                [attrString]="{str:'pn-login', arg: 'placeholder'}" [dbPrefix]="false" (change)="onChange('login')">
+        <div class="form-group" *ngFor="let som of form.argsV">
+            <input id="{{som.name}}" type="{{som.type}}" class="form-control rounded-pill form-control-lg" dbstring
+                [attrString]="{str:'pn-' + som.name, arg: 'placeholder'}" [dbPrefix]="false" (change)="onChange(som.name)">
             <p class="text-danger font-weight-bold text-center"
-                *ngFor="let item of form.args.login.errors">
-                {{item | async}}
-            </p>
-        </div>
-        <div class="form-group">
-            <input #password type="password" class="form-control rounded-pill form-control-lg" dbstring
-                [attrString]="{str:'pn-password', arg: 'placeholder'}" [dbPrefix]="false" (change)="onChange('password')"> 
-            <p class="text-danger font-weight-bold text-center"
-                *ngFor="let item of form.args.password.errors">
+                *ngFor="let item of som.errors">
                 {{item | async}}
             </p>
         </div>

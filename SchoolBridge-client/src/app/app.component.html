@@ -1,4 +1,6 @@
-<app-loader></app-loader>
-<gb-edit *ngIf="this.isEditing$ | async" ></gb-edit>
-<!--<div class="overlay-container" toastContainer></div>-->
-<router-outlet></router-outlet>
+<div>
+  <app-loader></app-loader>
+  <gb-edit *ngIf="this.isEditing$ | async"></gb-edit>
+  <!--<div class="overlay-container" toastContainer></div>-->
+  <router-outlet></router-outlet>
+</div>

@@ -3,7 +3,7 @@
 
 body {
   background-color: #151515;
-  overflow: hidden;
+  height: 100%;
 }
 
 .loader-topbar {

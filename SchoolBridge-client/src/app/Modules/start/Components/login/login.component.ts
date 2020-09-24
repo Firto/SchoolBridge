@@ -13,19 +13,6 @@ import { markDirty } from 'src/app/Helpers/mark-dirty.func';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  /*animations: [
-    trigger('openClose', [
-      transition('open <=> closed', [
-        animate('0.5s')
-      ])
-    ]),
-    state('open', style({
-      opacity: 1,
-    })),
-    state('closed', style({
-      opacity: 0,
-    })),
-  ],*/
   providers: MdGlobalization('lg', [
     'l-user-banned',
     'l-pass-log-inc',
@@ -34,26 +21,9 @@ import { markDirty } from 'src/app/Helpers/mark-dirty.func';
     'pn-password'
   ])
 })
-/*@Globalization('cm-lg', {
-  errors: [
-    'l-user-banned',
-    'l-pass-log-inc',
-    'l-too-many-devices',
-    'v-dto-invalid'
-  ],
-  validating:[
-    'v-d-not-null'
-  ],
-  args: [
-    'login',
-    'password'
-  ]
-})*/
 export class LoginComponent extends OnUnsubscribe implements OnInit {
   public returnUrl: string = null;
-  public form: NgxFormModel = new NgxFormModel("form", ["login", "password"]);
-  @ViewChild('login', {static: true}) public el_lg: ElementRef;
-  @ViewChild('password', {static: true}) public el_ps:  ElementRef;
+  public form: NgxFormModel = new NgxFormModel("form", ["login", {name: "password", type: "password"}]);
 
   constructor(private authService: LoginService,
               private router:Router,
@@ -78,7 +48,7 @@ export class LoginComponent extends OnUnsubscribe implements OnInit {
 
   logon(){
     if (this.form.valid)
-      this.authService.login(this.el_lg.nativeElement.value, this.el_ps.nativeElement.value).subscribe(
+      this.authService.login(this.form.args.login.value, this.form.args.password.value).subscribe(
         val => {
           this.router.navigateByUrl(this.returnUrl);
         },

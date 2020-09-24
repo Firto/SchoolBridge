@@ -7,6 +7,10 @@ import { UserError } from 'src/app/Models/user-error.model';
 //import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
 import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
 import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globalization.service';
+import { NgxFormModel } from 'src/app/Modules/ngx-form/ngx-form.model';
+import { takeUntil } from 'rxjs/operators';
+import { markDirty } from 'src/app/Helpers/mark-dirty.func';
+import { OnUnsubscribe } from 'src/app/Services/super.controller';
 
 @Component({
   selector: 'app-register',
@@ -32,33 +36,56 @@ import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globa
     "str-inc-rep"
   ])
 })
-export class RegisterComponent  {
+export class RegisterComponent extends OnUnsubscribe implements OnInit {
   regToken: string = "";
-  public model: EndRegister = new EndRegister();
+  public form: NgxFormModel = new NgxFormModel("form",
+    [
+      "login",
+      "name",
+      "surname",
+      "lastname",
+      {name: "birthday", type: "date"},
+      {name: "password", type: "password"},
+      {name: "confirmPassword", type: "password"}
+    ]
+  );
 
   constructor(private registerService: RegisterService,
               private route: ActivatedRoute,
               private router: Router) {
+    super();
     this.regToken = this.route.snapshot.queryParams['token'];
   }
 
-  public register(): void {
-    /*if (!this.form.valid) return;
+  ngOnInit(): void {
+    this.form.onChanged.pipe(takeUntil(this._destroy)).subscribe(() => {
+      markDirty(this);
+    });
+  }
 
-    this.model = <EndRegister>this.form.getRawValue();
-    this.model.registrationToken = this.regToken;
-    if (!this.model.birthday) {
-      this.model.birthday = new Date();
-      this.model.birthday.setMilliseconds(this.model.birthday.getMilliseconds() + 100000);
+  onChange(arg: string){
+    if (this.form.valid) return;
+    this.form.args[arg].clearErrorsD();
+  }
+
+  public register(): void {
+    if (!this.form.valid) return;
+
+    const ss: any = this.form.createObj();
+    ss.registrationToken = this.regToken;
+    console.log(ss);
+    if (!ss.birthday) {
+      ss.birthday = new Date();
+      ss.birthday.setMilliseconds(ss.birthday.getMilliseconds() + 100000);
     }
-    this.registerService.end(this.model).subscribe(
+    this.registerService.end(ss).subscribe(
       res => {
         this.router.navigateByUrl('/');
       },
       (err: UserError) => {
         if (err.id == "v-dto-invalid")
-            this.validate(err);
-      });*/
+          this.form.setErrors(err.additionalInfo);
+      });
   }
 
 }
