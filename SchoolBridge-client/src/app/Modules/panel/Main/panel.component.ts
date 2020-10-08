@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ClientConnectionService } from 'src/app/Services/client-connection.service';
 import { MdGlobalization } from '../../globalization/Services/md-globalization.service';
 
 @Component({
@@ -8,5 +9,5 @@ import { MdGlobalization } from '../../globalization/Services/md-globalization.s
   providers: MdGlobalization('pn')
 })
 export class PanelComponent  {
-
+  constructor (clConnection: ClientConnectionService){}
 }

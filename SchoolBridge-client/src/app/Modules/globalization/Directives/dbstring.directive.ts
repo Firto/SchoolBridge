@@ -9,26 +9,18 @@ import { ParentComponent } from 'src/app/Services/parent.component';
 import { MdGlobalizationService } from '../Services/md-globalization.service';
 
 class DbString {
-  public get type(): string {
-    return this._type;
-  }
-  public get obs(): Observable<string> {
-    return this._obs;
-  }
-  public get attr(): string {
-    return this._attr;
-  }
+  constructor(
+    public readonly name: string,
+    public readonly elementRef: ElementRef,
+    public readonly renderer: Renderer2,
+    public readonly type: "html" | "attr",
+    public readonly obs: Observable<string>,
+    public readonly attr: string = "") {
 
-  constructor(private _elementRef: ElementRef,
-    private _renderer: Renderer2,
-    private _type: "html" | "attr",
-    private _obs: Observable<string>,
-    private _changeDetectorRef: ChangeDetectorRef,
-    private _attr: string = "") {
-    this._obs.subscribe(x => {
-      if (this._type !== 'html')
-        this._renderer.setAttribute(this._elementRef.nativeElement, this._attr, x);
-      else this._elementRef.nativeElement.innerHTML = x;
+    this.obs.subscribe(x => {
+      if (this.type !== 'html')
+        this.renderer.setAttribute(this.elementRef.nativeElement, this.attr, x);
+      else this.elementRef.nativeElement.innerHTML = x;
     });
   }
 }
@@ -41,23 +33,17 @@ export class DbStringDirective extends OnUnsubscribe implements AfterViewInit {
   @Input('dbPrefix') prefix: boolean = true;
 
   private _strings: DbString[] = [];
-  private _componentInfo: { prefix: string, constStrings: string[] };
-
-  get componentInfo(): { prefix: string, constStrings: string[] } {
-    return this._componentInfo;
-  }
 
   constructor(private _elementRef: ElementRef,
     private _renderer: Renderer2,
     private _mdGbService: MdGlobalizationService,
     private _gbsService: GlobalizationStringService,
-    private _gbeService: GlobalizationEditService,
-    private _changeDetectorRef: ChangeDetectorRef) {
+    private _gbeService: GlobalizationEditService) {
     super();
   }
 
   getUsedStrings(): string[] {
-    return Object.keys(this._strings);
+    return this._strings.map(x => x.name);
   }
 
   changeState(s: Boolean) {
@@ -74,33 +60,35 @@ export class DbStringDirective extends OnUnsubscribe implements AfterViewInit {
     if (this.arg)
       this._strings.push(
         new DbString(
+          this._mdGbService.getFullStringName(this.arg.str, this.prefix),
           this._elementRef,
           this._renderer,
           "attr",
           this._mdGbService.useString(this.arg.str, this.prefix),
-          this._changeDetectorRef,
           this.arg.arg)
       );
 
     if (this._elementRef.nativeElement.innerHTML) {
-      let key = this._elementRef.nativeElement.innerHTML;
+      let key = (<string>this._elementRef.nativeElement.innerHTML).replace(' ', "");
       this._strings.push(
         new DbString(
+          this._mdGbService.getFullStringName(key, this.prefix),
           this._elementRef,
           this._renderer,
           "html",
-          this._mdGbService.useString(key, this.prefix),
-          this._changeDetectorRef)
+          this._mdGbService.useString(key, this.prefix))
       );
     }
   }
 
   public getString(name: string): string {
+
     return this._gbsService.getLoadedStringSave(name, "");
   }
 
   public constStrings(): string[] {
-    return [];
+    const mp = this._strings.map(x => x.name);
+    return this._mdGbService.constStrings.filter(x => !mp.includes(x));
   }
 
   @HostListener('contextmenu', ['$event']) onClick(ev: MouseEvent) {

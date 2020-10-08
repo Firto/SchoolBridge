@@ -1,0 +1,13 @@
+<div class="chat_people">
+  <d-chat-user [source]="user"></d-chat-user>
+  <div>
+    <span *ngIf="!source.read" class="font-weight-bold">
+      new
+    </span>
+    {{ source.lastMessage?.toString() }}
+    <span
+      class="chat_date"
+      [timeAgo]="source.lastMessage?.toString()" >
+    </span>
+  </div>
+</div>

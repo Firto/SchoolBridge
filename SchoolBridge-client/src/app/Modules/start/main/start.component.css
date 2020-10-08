@@ -1,5 +1,13 @@
 .wrapper {
-    background: #00000000;
-    max-width: 81.25rem;
-    margin: 0 auto;
+  background: #00000000;
+  max-width: 81.25rem;
+  margin: 0 auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.wrapper::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
 }

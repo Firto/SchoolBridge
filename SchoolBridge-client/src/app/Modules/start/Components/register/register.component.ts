@@ -6,27 +6,23 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { UserError } from 'src/app/Models/user-error.model';
 //import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
 import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
+import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globalization.service';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
-})
-/*@Globalization('cm-reg-end', {
-  args: [
-    "login",
-    "name",
-    "surname",
-    "lastname",
-    "password",
-    "confirmPassword",
-    "birthday"
-  ],
-  errors: [
-    "v-d-not-null",
-    "r-email-alrd-reg"
-  ],
-  validating: [
+  styleUrls: ['./register.component.css'],
+  providers: MdGlobalization("e-reg",[
+    "pn-login",
+    "pn-name",
+    "pn-surname",
+    "pn-lastname",
+    "pn-password",
+    "pn-confirmPassword",
+    "pn-birthday",
+
+    "r-email-alrd-reg",
+
     "str-no-spc-ch-2",
     "str-no-spc-ch",
     "str-too-sh",
@@ -34,24 +30,20 @@ import { GlobalizationService } from 'src/app/Modules/globalization/Services/glo
     "str-too-long",
     "r-date-birthday-incorrect",
     "str-inc-rep"
-  ]
-})*/
+  ])
+})
 export class RegisterComponent  {
-  [x: string]: any;
   regToken: string = "";
-  public form: any;
-  public model: EndRegister = new EndRegister(); 
+  public model: EndRegister = new EndRegister();
 
-  constructor(private _gb: GlobalizationService,
-              private _fb: FormBuilder,
-              private registerService: RegisterService,
+  constructor(private registerService: RegisterService,
               private route: ActivatedRoute,
-              private router: Router) { 
+              private router: Router) {
     this.regToken = this.route.snapshot.queryParams['token'];
   }
 
   public register(): void {
-    if (!this.form.valid) return; 
+    /*if (!this.form.valid) return;
 
     this.model = <EndRegister>this.form.getRawValue();
     this.model.registrationToken = this.regToken;
@@ -66,7 +58,7 @@ export class RegisterComponent  {
       (err: UserError) => {
         if (err.id == "v-dto-invalid")
             this.validate(err);
-      });
+      });*/
   }
 
 }

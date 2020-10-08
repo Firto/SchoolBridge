@@ -24,9 +24,12 @@ export class Chat {
             return null;
         return this._messages.value[this._messages.value.length-1];
     }
-    get read(): Observable<boolean>{
-        return this._read;
+    get read(): boolean{
+        return this._read.value;
     }
+    get readObs(): Observable<boolean>{
+      return this._read;
+  }
     get messagesObs(): Observable<Message[]>{
         return this._messages;
     }
@@ -39,7 +42,7 @@ export class Chat {
     protected readonly _read: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(this._model.read);
     protected _isEnd: boolean = false;
     protected _isStart: boolean = false;
-    
+
 
     constructor(protected _model: ChatModel,
                 protected _usersService: UsersService,

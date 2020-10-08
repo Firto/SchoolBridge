@@ -3,6 +3,7 @@
 
 body {
   background-color: #151515;
+  overflow: hidden;
 }
 
 .loader-topbar {
@@ -48,7 +49,7 @@ body {
   a.forgot-link:hover{
 	  color:#0984e3;
   }
-  
+
   .form-control:focus{
 	  border-color:#0984e3;
 	  box-shadow: 0 0 0 0.2rem #0984e3;

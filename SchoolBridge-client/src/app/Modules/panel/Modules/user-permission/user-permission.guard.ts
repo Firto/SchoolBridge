@@ -7,8 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 export class UserPermissionGuard {
 
     constructor(private _userPermService: UserPermissionService,
-                private _router: Router,
-                private _toastrService: ToastrService) { } // uses the parent class instance actually, but could in theory take any other deps
+                private _router: Router) { } // uses the parent class instance actually, but could in theory take any other deps
 
     canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         return this.canActivate(childRoute, state);
@@ -16,7 +15,7 @@ export class UserPermissionGuard {
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         if (route.data.perms && !this._userPermService.HasPermission(route.data.perms)){
-            this._toastrService.error("No permission to page!");
+            //this._toastrService.error("No permission to page!");
             this._router.navigateByUrl('/panel');
             return false;
         }
