@@ -12,9 +12,11 @@ import { GlobalizationModule } from '../globalization/globalization.module';
 import { PermanentConnectionService } from './Services/permanent-connection.service';
 import { MdGlobalization } from '../globalization/Services/md-globalization.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HomeComponent } from './Components/home/home.component';
 
 @NgModule({
     declarations: [
+        HomeComponent,
         StartComponent,
         StartNavbarComponent,
         LoginComponent,

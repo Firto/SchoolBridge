@@ -43,22 +43,6 @@ export class RegisterComponent  {
   }
 
   public register(): void {
-    /*if (!this.form.valid) return;
-
-    this.model = <EndRegister>this.form.getRawValue();
-    this.model.registrationToken = this.regToken;
-    if (!this.model.birthday) {
-      this.model.birthday = new Date();
-      this.model.birthday.setMilliseconds(this.model.birthday.getMilliseconds() + 100000);
-    }
-    this.registerService.end(this.model).subscribe(
-      res => {
-        this.router.navigateByUrl('/');
-      },
-      (err: UserError) => {
-        if (err.id == "v-dto-invalid")
-            this.validate(err);
-      });*/
   }
 
 }

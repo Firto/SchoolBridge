@@ -1,4 +1,4 @@
-<nav class="navBar">
+<!-- <nav class="navBar">
     <svg class="h-100 float-left" viewBox="0 0 20 18">
         <text x="0" y="15" class="fill-white text-uppercase font-weight-slight" >sb</text>
     </svg>
@@ -8,10 +8,10 @@
     </label>
     <ul class="menu align-middle">
         <li (click)="onClickMenuItem()" >
-            <a routerLink="./login" routerLinkActive="active" >sign In</a>
+            <a routerLink="./login" routerLinkActive="active" dbstring>sign In</a>
         </li>
         <li (click)="onClickMenuItem()" >
-            <a routerLink="./register" routerLinkActive="active" >register</a>
+            <a routerLink="./register" routerLinkActive="active" dbstring>register</a>
         </li>
         <li>
             <label for="chk" class="hide-menu-btn">
@@ -20,4 +20,48 @@
         </li>
     </ul>
     <app-language-selector class="lang-selector" ></app-language-selector>
-</nav>
+</nav> -->
+
+<header class="header_area">
+    <div class="main_menu">
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand logo_h" href="index.html"><img src="img/logo.png" alt="" /></a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                    data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="icon-bar"></span> <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                    <ul class="nav navbar-nav menu_nav ml-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" routerLink="./home" routerLinkActive="active">Home</a>
+                        </li>
+                        <li class="nav-item submenu dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                                aria-haspopup="true" aria-expanded="false">Start</a>
+                            <ul class="dropdown-menu">
+                                <li class="nav-item" (click)="onClickMenuItem()">
+                                    <a class="nav-link" routerLink="./register" routerLinkActive="active" dbstring>Register</a>
+                                </li>
+                                <li class="nav-item" (click)="onClickMenuItem()">
+                                    <a class="nav-link" routerLink="./login" routerLinkActive="active" dbstring>Login</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item submenu dropdown">
+                            <ul class="dropdown-menu">
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link search" id="search">
+                                <i class="ti-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>

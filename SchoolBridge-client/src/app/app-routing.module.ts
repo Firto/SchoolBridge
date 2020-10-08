@@ -23,14 +23,14 @@ export const routes: Routes = [
     runGuardsAndResolvers: 'always',
     loadChildren: () => import('./Modules/panel/panel.module').then(m => m.PanelModule),
   },
-  /*{ path: 'ed-gb',
-    component: EditGlobalizationComponent,
-    loadChildren: () => import('./Modules/edit-globalization/edit-globalization.module').then(m => m.EditGlobalizationModule),
-  },*/
   { path: '',
     pathMatch: 'full',
     component: DefaultComponent,
   }
+  /*{ path: 'ed-gb',
+    component: EditGlobalizationComponent,
+    loadChildren: () => import('./Modules/edit-globalization/edit-globalization.module').then(m => m.EditGlobalizationModule),
+  },*/
   /*{ path: 'login', component: LoginComponent, canActivate: [LoginRegisterGuard] },
   { path: 'admin-panel', 
     component: AdminPanelComponent,

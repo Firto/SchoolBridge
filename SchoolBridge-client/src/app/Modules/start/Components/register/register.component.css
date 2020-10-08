@@ -1,11 +1,3 @@
-
-.login-form a:hover{
-	color:#9e09e3;
-  }
-  .form-control:focus{
-	border-color:#9e09e3;
-	box-shadow: 0 0 0 0.2rem #9e09e3;
-  }
   .btn-reg {
 	background: #e874ff;
 	border-color:#e874ff;
@@ -20,6 +12,10 @@
   .btn-reg:focus{
 	box-shadow: 0 0 0 0.2rem #9e09e3;
   }
-  .login-form a:hover{
-	color:#9e09e3;
-  }
+  .register_banner_area{
+    z-index: 1;
+  min-height: 900px;
+  position: relative;
+  background: url(./../home/img/register_banner.jpg) no-repeat center;
+  background-size: cover;
+}
