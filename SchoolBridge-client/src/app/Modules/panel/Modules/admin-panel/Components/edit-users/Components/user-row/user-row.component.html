@@ -1,0 +1,13 @@
+<th class="text-uppercase" scope="row">{{ user.id }}</th>
+<td>{{ user.role }}</td>
+<td>{{ user.onlineStatus }}</td>
+<td>
+  <button *ngIf="!user.banned; else elsBlck" class="btn btn-danger" (click)="this.editEvent.emit()" dbstring>
+    ban
+  </button>
+  <ng-template #elsBlck>
+    <button class="btn btn-success" (click)="this.editEvent.emit()" dbstring>
+      unban
+    </button>
+  </ng-template>
+</td>

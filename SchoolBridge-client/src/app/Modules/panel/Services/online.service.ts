@@ -5,7 +5,7 @@ import { apiConfig } from 'src/app/Const/api.config';
 import { ShortUserModel } from '../Models/short-user.model';
 import { UserModel } from '../Models/user.model';
 import { Subject, Observable, BehaviorSubject, of } from 'rxjs';
-import { debounceTime, tap, bufferWhen, mergeMap, map, filter } from 'rxjs/operators';
+import { debounceTime, tap, bufferWhen, mergeMap, map, filter, mapTo } from 'rxjs/operators';
 import { ServerHub } from 'src/app/Services/server.hub';
 import { ClientConnectionService } from 'src/app/Services/client-connection.service';
 import { UserService } from 'src/app/Services/user.service';
@@ -33,8 +33,9 @@ export class OnlineService {
     }
 
     public subscribe(model: UserModel): Observable<number>{
-        if (model.id == this._userService.user.login.userId) return of(1);
         this.changeOnline(model.id, model.onlineStatus);
+        if (model.id == this._userService.user.login.userId)
+          return this._onChangeOnline.pipe(mapTo(1));
         this._connService.send("onlineSubscribe", model.onlineStatusSubscriptionToken).subscribe();
 
         return this._onChangeOnline.pipe(
