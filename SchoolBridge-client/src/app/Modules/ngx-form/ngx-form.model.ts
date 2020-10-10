@@ -5,14 +5,23 @@ import { debounceTime, finalize, tap } from "rxjs/operators";
 
 export class NgxFormArgModel {
   private _errors: Observable<string>[] = [];
+
+  public get name(): string{
+    return this.info.name;
+  }
+
+  public get type(): string{
+    return this.info.type;
+  }
+
   constructor(
-    public readonly name: {name: string, type: string},
+    public readonly info: {name: string, type: string},
     private readonly _sb: Subject<unknown>
   ) {}
 
   public setErrors(errors: Observable<string>[]): void {
     this._errors = errors;
-  }
+  }a
 
   public clearErrors(): void {
     this._errors = [];
@@ -32,13 +41,15 @@ export class NgxFormArgModel {
   }
 
   public get value(): string {
-    return document.getElementById(this.name.name).nodeValue;
+    return (<any>document.getElementById(this.name)).value;
   }
 }
 
 export class NgxFormModel {
   public readonly args: Record<string, NgxFormArgModel> = {};
-
+  public get argsV(): NgxFormArgModel[] {
+    return Object.values(this.args);
+  }
   private _sb: Subject<unknown> = new Subject();
   public readonly onChanged: Observable<unknown> = this._sb.pipe(
     debounceTime(100)
