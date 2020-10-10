@@ -5,7 +5,7 @@ namespace SchoolBridge.Helpers.DtoModels.Authefication
 {
     public class EndRegisterDto
     {
-
+        [PropValid("str-input")]
         public string RegistrationToken { get; set; }
 
         [PropValid("str-input", "str-login")]

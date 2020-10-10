@@ -31,7 +31,8 @@ namespace SchoolBridge.Domain.Services.ServiceProviderExtentions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["RegistrationKey"])),
                     ClockSkew = TimeSpan.Zero
                 },
-                RegistrationTokenExpires = TimeSpan.FromDays(int.Parse(configuration["RegistrationExpireDays"]))
+                RegistrationTokenExpires = TimeSpan.FromDays(int.Parse(configuration["RegistrationExpireDays"])),
+                ChangePasswordTokenExpires = TimeSpan.FromDays(int.Parse(configuration["ChangePasswordExpireDays"]))
             });
         }
     }

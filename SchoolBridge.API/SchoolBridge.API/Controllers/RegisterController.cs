@@ -34,5 +34,20 @@ namespace SchoolBridge.API.Controllers
         {
             return ResultDto.Create(await _registrationService.EndRegister(entity, uuid));
         }
+
+        [HttpGet]
+        [MyNoAutorize]
+        public async Task<ResultDto> ChangePassword([FromQuery, ArgValid("str-input", "str-email")] string email)
+        {
+            return ResultDto.Create(_registrationService.ChangePasswordEmail(email));
+        }
+
+        [UUID]
+        [HttpPost]
+        [MyNoAutorize]
+        public async Task<ResultDto> EndChangePassword([FromBody, MyValidation] EndChangePasswordEmailDto entity, [BindNever] string uuid)
+        {
+            return ResultDto.Create(await _registrationService.EndChangePasswordEmail(entity, uuid));
+        }
     }
 }

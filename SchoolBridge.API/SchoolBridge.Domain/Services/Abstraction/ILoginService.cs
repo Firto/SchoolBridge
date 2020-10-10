@@ -15,8 +15,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Task Logout(IHeaderDictionary headers);
         Task LogoutAll(IHeaderDictionary headers);
 
-        Task ChangePasswordEmail(string email);
-        Task<LoggedDto> EndChangePasswordEmail(EndChangePasswordEmailDto entity);
+        //Task ChangePasswordEmail(string email);
+        //Task<LoggedDto> EndChangePasswordEmail(EndChangePasswordEmailDto entity);
 
         // basic
         //Task<ProfileDto> SetProfileInfo(User user, ProfileDto entity);
