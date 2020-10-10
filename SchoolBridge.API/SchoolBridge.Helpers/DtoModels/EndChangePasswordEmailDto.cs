@@ -10,6 +10,8 @@ namespace SchoolBridge.Helpers.DtoModels
         [PropValid("str-input")]
         public string changePasswordToken { get; set; }
         [PropValid("str-input", "str-password")]
-        public string newPassword { get; set; }
+        public string Password { get; set; }
+        [PropValid("str-input", "str-password-rep")]
+        public string ConfirmPassword { get; set; }
     }
 }

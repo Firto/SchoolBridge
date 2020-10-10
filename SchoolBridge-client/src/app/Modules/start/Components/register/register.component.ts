@@ -76,7 +76,6 @@ export class RegisterComponent extends OnUnsubscribe implements OnInit {
 
     const ss: any = this.form.createObj();
     ss.registrationToken = this.regToken;
-    console.log(ss);
     if (!ss.birthday) {
       ss.birthday = new Date();
       ss.birthday.setMilliseconds(ss.birthday.getMilliseconds() + 100000);
