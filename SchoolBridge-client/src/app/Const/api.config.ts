@@ -30,6 +30,14 @@ export const apiConfig: Record<string, Service> = {
         url: "end/",
         type: "POST",
       },
+      forgotpassword: {
+        url: "changepassword/",
+        type: "GET",
+      },
+      endforgotpassword: {
+        url: "endchangepassword/",
+        type: "POST",
+      },
     },
   },
   notification: {
@@ -117,18 +125,18 @@ export const apiConfig: Record<string, Service> = {
       getAll: {
         url: "getAll",
         type: "GET",
-        loader: false
+        loader: false,
       },
       ban: {
         url: "ban",
         type: "POST",
-        loader: false
+        loader: false,
       },
       unban: {
         url: "unban",
         type: "POST",
-        loader: false
-      }
+        loader: false,
+      },
     },
   },
   chat: {
