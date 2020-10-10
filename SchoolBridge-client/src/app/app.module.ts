@@ -10,7 +10,7 @@ import { LoaderComponent } from './Components/loader/loader.component';
 import { LoaderInterceptor } from './Intercepors/loader.interceptor';
 import { SyncRequestService } from 'ts-sync-request/dist'
 import { ErrorInterceptor } from './Intercepors/user-error.interceptor';
-import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
+//import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 import { UserService } from './Services/user.service';
 import { LoginService } from './Services/login.service';
 import { LoaderService } from './Services/loader.service';
@@ -33,10 +33,11 @@ import { StartModule } from './Modules/start/start.module';
 import { PanelModule } from './Modules/panel/panel.module';
 import { DefaultComponent } from './Components/default/default.component';
 import { BrowserModule } from '@angular/platform-browser';
+import { ToastNotificationsModule } from './Modules/ngx-toast-notifications';
 
 @NgModule({
   declarations: [
-    AppComponent, 
+    AppComponent,
     LoaderComponent,
     DefaultComponent
   ],
@@ -45,9 +46,10 @@ import { BrowserModule } from '@angular/platform-browser';
     CommonModule,
     HttpClientModule,
     AppRoutingModule,
+    ToastNotificationsModule,
     //ToastContainerModule,
     //ToastrModule.forRoot({ preventDuplicates: true, countDuplicates: true, resetTimeoutOnDuplicate: true }),
-    //custom 
+    //custom
     TimeAgoDirectiveModule.forRoot(),
     GlobalizationModule.forRoot(),
     NotificationModule.forRoot(),
@@ -62,13 +64,13 @@ import { BrowserModule } from '@angular/platform-browser';
     LoginService,
     LoaderService,
     DeviceUUIDService,
-    SyncRequestService, 
+    SyncRequestService,
     CryptService,
-    GuardService, 
+    GuardService,
     { provide: HTTP_INTERCEPTORS, useClass: BasicAuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true } 
+    { provide: HTTP_INTERCEPTORS, useClass: LoaderInterceptor, multi: true }
   ],
-  bootstrap: [AppComponent] 
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

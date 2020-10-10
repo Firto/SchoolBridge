@@ -1,26 +1,33 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router, CanActivateChild } from '@angular/router';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router, CanActivateChild, CanLoad, Route } from '@angular/router';
 import { UserService } from '../Services/user.service';
-import { ToastrService } from 'ngx-toastr';
+//import { ToastrService } from 'ngx-toastr';
 import { GuardService } from '../Services/guard.service';
+import { Toaster } from '../Modules/ngx-toast-notifications';
+import { GlobalizationStringService } from '../Modules/globalization/Services/globalization-string.service';
 
 @Injectable({ providedIn: 'root' })
-export class LoginnedGuard implements CanActivate, CanActivateChild {
+export class LoginnedGuard implements CanActivate, CanActivateChild, CanLoad {
     constructor(private userService: UserService,
-                /*private toastrService: ToastrService,*/
+                private toastrService: Toaster,
                 private router: Router,
-                private _guardService: GuardService) { }
+                private _guardService: GuardService,
+                private _gbsService: GlobalizationStringService) { }
 
     canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         return this.canActivate(childRoute, state);
     }
 
+    canLoad(route: Route): boolean {
+      return this.canActivate(null, null);
+    }
+
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         if (!this._guardService.getState())
             return true;
-        if (this.userService.user)  
+        if (this.userService.user)
             return true;
-        //this.toastrService.error("No permission to page!");
+        this.toastrService.open(this._gbsService.getStringObs('no-perm-page'), {type: 'danger'});
         this.router.navigateByUrl('/start?returnUrl=' + encodeURI(window.location.pathname));
         return false;
     }

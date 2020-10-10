@@ -1,106 +1,27 @@
-<!-- <div class="messaging">
-    <div class="inbox_msg">
-      <div class="inbox_people">
-        <div class="headind_srch">
-          <div class="recent_heading">
-            <h4>Recent</h4>
-          </div>
-          <div class="srch_bar">
-            <div class="stylish-input-group">
-              <input type="text" class="search-bar"  placeholder="Search" >
-              </div>
-          </div>
+<div class="messaging">
+  <div class="inbox_msg">
+    <div [ngClass]="{'mclose': curChat}" class="inbox_people mclose">
+      <div class="headind_srch">
+        <!--<div class="recent_heading">
+          <h4>Recent</h4>
         </div>
-        <div class="inbox_chat scroll"  >
-          <direct-chat *ngFor="let item of chats" [source]="item" ></direct-chat>
-        </div>
+        <div class="srch_bar">
+          <div class="stylish-input-group">
+            <input type="text" class="search-bar" placeholder="Search" />
+          </div>
+        </div>-->
       </div>
-      <div class="mesgs mclose" >
-        <div class="text-white font-weight-bold text-center nomesgs" ><span>Select chat</span></div>
-    </div>
-  </div> -->
-
-<div class="container">
-  <div class="row ">
-    <div class="col-md-4 border-right">
-      <div class="search-box">
-        <div class="input-wrapper">
-          <i class="fas fa-search"></i>
-          <input placeholder="Search here" type="text">
-        </div>
-      </div>
-
-      <!-- <div *ngFor="let item of (chatService.chats | async) | keyvalue;" class="chat_list active_chat">
-        <div class="chat_people" *ngIf="item.value.direct; else elseBlock" (click)="onSelectChat(item.value)">
-          <div class="chat_img">
-            <img src="{{(item.value.user | async)?.photo}}" alt="{{(item.value.user | async)?.login}}">
-            <i *ngIf="((item.value.user | async)?.onlineStatus | async) !== 2" class="fa fa-circle onl-status" 
-            [ngClass]="{'online' : ((item.value.user | async)?.onlineStatus | async) === 1,
-                        'offline' : ((item.value.user | async)?.onlineStatus | async) === 0 }" ></i>
-          </div>
-          <div class="chat_ib">
-            <h5>{{(item.value.user | async)?.login}} <span *ngIf="item.value.lastMessage | async" class="chat_date">{{(item.value.lastMessage | async)?.date | timeAgo}}</span></h5>
-            <p><span *ngIf="(item.value.read | async) === false" class="font-weight-bold" >new</span> {{(item.value.lastMessage | async)?.toString()}}</p>
-          </div>
-        </div>
-        <ng-template #elseBlock>
-          Content to render when condition is false.
-        </ng-template>
-      </div> -->
-<div *ngFor="let item of (chatService.chats | async) | keyvalue;" >
-  <div *ngIf="item.value.direct; else elseBlock" class="friend-drawer friend-drawer--onhover">
-    <img class="profile-image" src="{{(item.value.user | async)?.photo}}" alt="">
-    <div class="text">
-      <h6>Robo Cop</h6>
-      <p class="text-muted">Hey, you're arrested!</p>
-    </div>
-    <span class="time text-muted small">13:21</span>
-  </div>
-  <hr>
-  <ng-template #elseBlock>
-    Content to render when condition is false.
-  </ng-template>
-</div>
-
-
-    </div>
-    <div class="col-md-8 settings-container">
-      <div class="settings-tray">
-        <div class="friend-drawer friend-drawer--grey">
-          <img class="profile-image" src="https://www.clarity-enhanced.net/wp-content/uploads/2020/06/robocop.jpg"
-            alt="">
-          <div class="text">
-            <h6>Nickname</h6>
-          </div>
-          <span class="settings-tray--right">
-          </span>
-        </div>
-      
-      <div class="chat-panel">
-         <div class="row no-gutters">
-          <div class="col-md-3 chat-bubble-container">
-            <div class="chat-bubble chat-bubble--left">
-              Placeholder twoPlaceholder twoPlaceholder twoPlaceholder twoPlaceholder twoPlaceholder twoPlaceholder twoPlaceholder two
-            </div>
-          </div>
-        </div>
-        <div class="row no-gutters">
-          <div class="col-md-3 offset-md-9">
-            <div class="chat-bubble chat-bubble--right">
-             Placeholder onePlaceholder twoPlaceholder twoPlaceholder twoPlaceholder
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-12 chat-box-container">
-            <div class="chat-box-tray">
-              <input type="text" placeholder="Type your message here...">
-              <i class="fas fa-paper-plane"></i>
-            </div>
-          </div>
-        </div>
+      <div class="inbox_chat scroll card-group vgr-cards">
+        <div *ngIf="isLoading.value" class="loader-topbar"></div>
+        <direct-chat
+          class="card"
+          *ngFor="let item of chats"
+          [source]="item"
+          (click)="selectChat(item)"
+          [ngClass]="{'select': item.id === curChat?.id}"
+        ></direct-chat>
       </div>
     </div>
-    </div>
+    <app-messages class="mesgs" [ngClass]="{'mclose': !curChat}" [source]="curChat" (back)="selectChat(null)" ></app-messages>
   </div>
 </div>

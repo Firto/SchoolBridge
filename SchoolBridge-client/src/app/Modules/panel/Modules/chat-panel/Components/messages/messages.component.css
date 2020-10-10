@@ -1,0 +1,173 @@
+.chat_img {
+  float: left;
+  width: 50px;
+  position: relative;
+}
+.chat_img img {
+  width: 100%;
+  border-radius: 50%;
+}
+.nomesgs {
+  float: left;
+  width: 70%;
+  height: inherit;
+  margin-top: -8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.type_msg {
+  border-top: 1px solid #c4c4c4;
+  position: relative;
+}
+.msg_bar img {
+  height: 50px;
+  display: block;
+  margin: 0 auto;
+}
+.msg_bar p {
+  display: block;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 0;
+}
+.chat {
+  width: 100%;
+  height: calc(100vh - 50px);
+  padding: 15px 30px;
+  margin: 0 auto;
+  overflow-y: auto;
+  transform: rotate(180deg);
+  direction: rtl;
+}
+.chat__wrapper {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column-reverse;
+  flex-direction: column-reverse;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+.chat::-webkit-scrollbar {
+  width: 0;
+}
+.chat__message {
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 25px;
+  color: #000;
+  background-color: #e6e7ec;
+  max-width: 600px;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  position: relative;
+  margin: 15px 0;
+  word-break: break-all;
+  transform: rotate(180deg);
+  direction: ltr;
+}
+.chat__message:after {
+  content: "";
+  width: 20px;
+  height: 12px;
+  display: block;
+  background-image: url(https://stageviewcincyshakes.firebaseapp.com/icon-gray-message.e6296433d6a72d473ed4.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  position: absolute;
+  bottom: -2px;
+  left: -5px;
+}
+.chat__message-own {
+  color: #fff;
+  margin-left: auto;
+  background-color: #00a9de;
+}
+.chat__message-own:after {
+  width: 19px;
+  height: 13px;
+  left: inherit;
+  right: -5px;
+  background-image: url(https://stageviewcincyshakes.firebaseapp.com/icon-blue-message.2be55af0d98ee2864e29.png);
+}
+.chat__message .date {
+  font-size: smaller;
+}
+
+.chat__form {
+  background-color: #e0e0e0;
+  position: relative;
+  z-index: 30;
+}
+
+.chat__form > div {
+  height: 50px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  width: 100%;
+}
+
+.chat__form input {
+  height: 40px;
+  font-size: 16px;
+  padding-left: 15px;
+  background-color: #fff;
+  border-radius: 15px;
+  border: none;
+  flex-grow: 12;
+}
+.chat__form button,
+.backBtn {
+  font-size: 16px;
+  background-color: transparent;
+  border: none;
+  text-align: center;
+  cursor: pointer;
+  flex-grow: 0;
+  border-radius: 50%;
+  height: 35px;
+  width: 35px;
+  margin-right: 5px;
+  margin-left: 5px;
+  transition: 0.3s;
+}
+.chat__form button:hover,
+.backBtn:hover {
+  color: white;
+  background-color: rgb(0, 0, 0);
+}
+.online {
+  color: #86bb71;
+}
+.offline {
+  color: #e38968;
+}
+.onl-status {
+  z-index: 100;
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+.backBtn {
+  height: 50px;
+  width: 50px;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  z-index: 10;
+  color: #007bff;
+  background-color: rgb(38, 39, 41);
+  border: none;
+  background: none;
+}

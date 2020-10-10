@@ -6,14 +6,16 @@ import { Observable, throwError } from 'rxjs';
 import { APIResult } from 'src/app/Models/api.result.model';
 import { tap, map, take } from 'rxjs/operators';
 import { UserService } from '../Services/user.service';
-import { ToastrService } from 'ngx-toastr';
+//import { ToastrService } from 'ngx-toastr';
 import { GlobalizationStringService } from '../Modules/globalization/Services/globalization-string.service';
+import { Toaster } from '../Modules/ngx-toast-notifications';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
 
     constructor(private _gbsService: GlobalizationStringService,
-                private _userService: UserService) {
+                private _userService: UserService,
+                private _toastrService: Toaster) {
     }
 
     intercept(request: HttpRequest<APIResult>, next: HttpHandler): Observable<HttpEvent<APIResult>> {
@@ -21,7 +23,7 @@ export class ErrorInterceptor implements HttpInterceptor {
             map((event: HttpEvent<APIResult>) => {
                 if (event instanceof HttpResponse){
                     if (event.body.ok)
-                        return <any>event.clone({body: event.body.result}); 
+                        return <any>event.clone({body: event.body.result});
                     event.body.result.message = this._gbsService.convertString(event.body.result.message);
                     if ("additionalInfo" in event.body.result)
                         Object.keys(event.body.result.additionalInfo).forEach(x => {
@@ -45,10 +47,11 @@ export class ErrorInterceptor implements HttpInterceptor {
                         case "inc-token":
                             throw event.body.result;
                     }
-                    /*event.body.result.message.pipe(take(1)).subscribe(x =>{
+                    this._toastrService.open(event.body.result.message, {type: 'danger'});
+                    /*.pipe(take(1)).subscribe(x =>{
                         this._toastrService.error(x, null, {timeOut: 10000});
                     })*/
-                    
+
                     throw event.body.result;
                 }
                 return event;

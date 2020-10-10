@@ -8,7 +8,7 @@ import { UserModel } from 'src/app/Modules/panel/Models/user.model';
 import { UsersService } from 'src/app/Modules/panel/Services/users.service';
 import { apiConfig } from 'src/app/Const/api.config';
 import { environment } from 'src/environments/environment';
-import { User } from 'src/app/Modules/panel/Clases/user.class';
+import { ShortUser, User } from 'src/app/Modules/panel/Clases/user.class';
 //import { Globalization } from 'src/app/Modules/globalization/Decorators/backend-strings.decorator';
 import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
 import { fromBinary } from 'src/app/Modules/binary/from-binary.func';
@@ -22,7 +22,7 @@ import { observed } from 'src/app/Decorators/observed.decorator';
 export interface DBNNewChatMessageSource extends IDBNSource{
     sender: ShortUserModel;
     type: string;
-    date: Date 
+    date: Date
     base64Source: string;
 }
 
@@ -31,15 +31,15 @@ export interface DBNNewChatMessageSource extends IDBNSource{
     styleUrls: ['../../base-db-ntf-component/base-db-ntf.component.css', 'db-ntf-new-chat-message.component.css'],
     template: `<div [ngSwitch]="model.source.type" >
                    <div *ngSwitchCase="'text'" class="text-message">
-                        <div *ngIf="sender; else elseBlock">
-                            <img src="{{sender.photo}}" alt="avatar" />
+                        <div *ngIf="sender.user; else elseBlock">
+                            <img src="{{sender.user.photo}}" alt="avatar" />
                             <div class="about">
                                 <div class="name">
-                                    {{sender.login}}
-                                    <span *ngIf="(sender?.onlineStatus | async) !== 2" class="status">
-                                        <i class="fa fa-circle" 
-                                        [ngClass]="{'online' : (sender?.onlineStatus | async) === 1,
-                                                    'offline' : (sender?.onlineStatus | async) === 0 }" ></i>
+                                    {{sender.user.login}}
+                                    <span *ngIf="sender.user.onlineStatus !== 2" class="status">
+                                        <i class="fa fa-circle"
+                                        [ngClass]="{'online' : sender.user.onlineStatus === 1,
+                                                    'offline' : sender.user.onlineStatus === 0 }" ></i>
                                         online
                                     </span>
                                 </div>
@@ -59,21 +59,18 @@ export interface DBNNewChatMessageSource extends IDBNSource{
 //@Globalization('cm-db-ntf-on-new-chat-msg', [])
 export class DbNtfNewChatMessageComponent extends OnUnsubscribe implements DbNtfComponent  {
     private _model: DbNotification<DBNNewChatMessageSource>;
-    private _sender: User = null;
+    private _sender: ShortUser = null;
 
     set model(value: DbNotification<DBNNewChatMessageSource>) {
         this._model = value;
         this.messageSource = JSON.parse(fromBinary(this._model.source.base64Source));
+        this._sender = this._usersService.get(this._model.source.sender);
+        this._sender.userObs.pipe(takeUntil(this._destroy)).subscribe(x => {
+            if (!x) return;
 
-        this._usersService.get(this._model.source.sender).pipe(takeUntil(this._destroy)).subscribe(x => {
-            this._sender = x;
-            if (x){
-                x.onlineStatus.pipe(takeUntil(this._destroy)).subscribe(x => {
-                    this._sb.next();
-                });
-                this._sb.next();
-            }
-            
+            x.onlineStatusObs.pipe(takeUntil(this._destroy)).subscribe(x => {
+              this._sb.next();
+            });
         });
     }
     get model(): DbNotification<DBNNewChatMessageSource> {

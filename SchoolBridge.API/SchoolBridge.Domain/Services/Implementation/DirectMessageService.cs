@@ -74,7 +74,8 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Read = !((userId == x.User1Id && x.Read == 1) || (userId == x.User2Id && x.Read == 2)),
                 SubscribeToken = _chatEventService.CreateSubscriptionToken(tokenId, x.Id),
                 LastMessage = _mapper.Map<DirectMessage, MessageDto>(x.Messages.OrderBy(x => x.Date).Last()),
-                User = _userService.GetShortDto(x.User1Id == userId ? x.User2Id : x.User1Id)
+                User = _userService.GetShortDto(x.User1Id == userId ? x.User2Id : x.User1Id),
+                Typing = _chatEventService.IsTyping(x.Id, x.User1Id == userId ? x.User2Id : x.User1Id)
             }).ToArray().Select(x => {
                 if (x.LastMessage != null)
                     x.LastMessage.Sender = _userService.GetShortDto(x.LastMessage.Sender.Id);
@@ -90,7 +91,8 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Read = !((userId == x.User1Id && x.Read == 1) || (userId == x.User2Id && x.Read == 2)),
                 SubscribeToken = _chatEventService.CreateSubscriptionToken(tokenId, x.Id),
                 LastMessage = x.Messages.Count() > 0 ? _mapper.Map<DirectMessage, MessageDto>(x.Messages.OrderBy(x => x.Date).Last()) : null,
-                User = _userService.GetShortDto(x.User1Id == userId ? x.User2Id : x.User1Id)
+                User = _userService.GetShortDto(x.User1Id == userId ? x.User2Id : x.User1Id),
+                Typing = _chatEventService.IsTyping(x.Id, x.User1Id == userId ? x.User2Id : x.User1Id)
             }).Select(x => {
                 if (x.LastMessage != null) 
                     x.LastMessage.Sender = _userService.GetShortDto(x.LastMessage.Sender.Id);
@@ -207,7 +209,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Date = msg.Date,
                 Sender = ntf.Sender
             };
-            _chatEventService.SendEventAsync(chatId, "newMessage", msgDto);
+            _chatEventService.SendNewMessageEvent(token.Subject, chatId, msgDto);
 
             return msgDto;
         }
@@ -249,7 +251,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Sender = ntf.Sender
             };
 
-            await _chatEventService.SendEventAsync(chatId, "newMessage", msgDto);
+            await _chatEventService.SendNewMessageEvent(token.Subject, chatId, msgDto);
 
             return msgDto;
         }
@@ -299,7 +301,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Sender = ntf.Sender
             };
 
-            _chatEventService.SendEventAsync(chat.Id, "newMessage", msgDto);
+            _chatEventService.SendNewMessageEvent(token.Subject, chat.Id, msgDto);
 
             return msgDto;
         }
@@ -349,7 +351,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 Sender = ntf.Sender
             };
 
-            await _chatEventService.SendEventAsync(chat.Id, "newMessage", msgDto);
+            await _chatEventService.SendNewMessageEvent(token.Subject, chat.Id, msgDto);
 
             return msgDto;
         }

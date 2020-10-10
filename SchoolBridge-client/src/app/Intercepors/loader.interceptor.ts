@@ -31,9 +31,9 @@ export class LoaderInterceptor implements HttpInterceptor {
             }
         }
         if (show){
-            this.loaderService.show();
+            this.loaderService.showww("base-loading");
             return next.handle(req).pipe(
-                finalize(() => this.loaderService.hide())
+                finalize(() => this.loaderService.hide("base-loading"))
             );
         }else return next.handle(req);
     }

@@ -4,6 +4,7 @@ using System;
 using System.Threading.Tasks;
 using SchoolBridge.DataAccess.Entities.Authorization;
 using SchoolBridge.Helpers.AddtionalClases.UserConnectionService;
+using System.Linq;
 
 namespace SchoolBridge.Domain.SignalR.Hubs
 {
@@ -51,6 +52,12 @@ namespace SchoolBridge.Domain.SignalR.Hubs
             UserSession session;
             if (!_userConnectionService.GetUserSession(Context, out session)) return;
             _chatEventService.Subscribe(session, token);
+        }
+
+        public void ChatTyping(string chatId) {
+            UserSession session;
+            if (!_userConnectionService.GetUserSession(Context, out session)) return;
+            _chatEventService.SendTypingEvent(session, chatId);
         }
 
         public override async Task OnDisconnectedAsync(Exception ex)

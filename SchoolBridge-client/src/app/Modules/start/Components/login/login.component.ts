@@ -14,9 +14,9 @@ import { markDirty } from 'src/app/Helpers/mark-dirty.func';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   providers: MdGlobalization('lg', [
-    'l-user-banned',
-    'l-pass-log-inc',
-    'l-too-many-devices',
+    'cl-l-user-banned',
+    'cl-l-pass-log-inc',
+    'cl-l-too-many-devices',
     'pn-login',
     'pn-password'
   ])
