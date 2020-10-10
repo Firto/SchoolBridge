@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';  
+import { Injectable } from '@angular/core';
 import { MyLocalStorageService } from 'src/app/Services/my-local-storage.service';
 import { HttpGlobalizationService } from './http-globalization.service';
 import { GlobalizationInfoService } from './globalization-info.service';
@@ -6,7 +6,7 @@ import { GlobalizationStringService } from './globalization-string.service';
 import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { GlobalizationInfo } from '../Models/globalization-info.model';
-  
+
 @Injectable()
 export class GlobalizationService {
     //private _initedComponents: Record<string, {constStrings: string[]}> = {};
@@ -48,4 +48,4 @@ export class GlobalizationService {
             this._gbsService.loadAllNoLoadedString();
         }));
     }
-}    
+}

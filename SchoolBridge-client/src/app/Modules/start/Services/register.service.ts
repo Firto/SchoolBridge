@@ -1,6 +1,6 @@
 import { Injectable, Injector } from '@angular/core';
 import { Observable } from 'rxjs';
-import { map, takeUntil, tap } from 'rxjs/operators';
+import { map, takeUntil, takeWhile, tap } from 'rxjs/operators';
 
 import { apiConfig } from 'src/app/Const/api.config';
 import { APIResult } from 'src/app/Models/api.result.model';
@@ -11,12 +11,14 @@ import { Service } from 'src/app/Interfaces/Service/service.interface';
 import { PermanentSubscribe } from '../../notification/Models/permanent-subscribe.model';
 import { EndRegister } from '../Models/endregister.model';
 import { OnSendEmailSource } from '../../notification/Models/NotificationSources/on-send-email.source';
-import { ToastrService } from 'ngx-toastr';
+//import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
 import { UserService } from 'src/app/Services/user.service';
 import { LoaderService } from 'src/app/Services/loader.service';
 import { PermanentConnectionService } from 'src/app/Modules/start/Services/permanent-connection.service';
 import { DeviceUUIDService } from 'src/app/Services/device-uuid.service';
+import { GlobalizationStringService } from '../../globalization/Services/globalization-string.service';
+import { Toaster } from '../../ngx-toast-notifications';
 
 @Injectable()
 export class RegisterService {
@@ -27,30 +29,28 @@ export class RegisterService {
                 private _permanentConnectionService: PermanentConnectionService,
                 private _notificationService: NotificationService,
                 private _loaderService: LoaderService,
-                //private _toastrService: ToastrService,
-                private _uuidService: DeviceUUIDService) {
+                private _toastr: Toaster,
+                private _uuidService: DeviceUUIDService,
+                private _gbsService: GlobalizationStringService) {
         this.ser = apiConfig["register"];
 
         this._notificationService.reciveNotification.subscribe(x => {
-            
+
             if (x.type == "onSendEmail"){
-                this._loaderService.hide();
+                this._loaderService.hide('wait-snd-em');
                 if ((<OnSendEmailSource>x.source).ok)
-                {
-                    //this._toastrService.success("Succesful sending email to "+ (<OnSendEmailSource>x.source).email +"!");
-                    //this._router.navigateByUrl("/start");
-                }
-                //else this._toastrService.error("Error while sending email to "+ (<OnSendEmailSource>x.source).email +", try again!");
+                  this._toastr.open(this._gbsService.convertString(`[tst-suc-send-em, ${(<OnSendEmailSource>x.source).email}]`), {type: 'success'});
+                else this._toastr.open(this._gbsService.convertString(`[tst-unsuc-send-em, ${(<OnSendEmailSource>x.source).email}]`), {type: 'danger'});
             }
         })
-    } 
+    }
 
     start(email: string): Observable<PermanentSubscribe> {
         return this._baseService.send<PermanentSubscribe>(this.ser, "start", null, { headers: {'UUID':this._uuidService.uuid}, params: { email: email}}).pipe(
             tap(res => {
                 //this.router.navigateByUrl("/start");
                 this._permanentConnectionService.subscribe(res.token).subscribe();
-                this._loaderService.show("Wait sending email...");
+                this._loaderService.showww('wait-snd-em');
             })
         );
     }

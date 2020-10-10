@@ -10,16 +10,18 @@ import { DefaultComponent } from './Components/default/default.component';
 
 export const routes: Routes = [
   { path: 'start',
-    component: StartComponent, 
+    component: StartComponent,
     canActivate: [LoginRegisterGuard],
+    canLoad: [LoginRegisterGuard],
     runGuardsAndResolvers: 'always',
     loadChildren: () => {
       return import('./Modules/start/start.module').then(m => m.StartModule)
     },
   },
   { path: 'panel',
-    component: PanelComponent, 
+    component: PanelComponent,
     canActivate: [LoginnedGuard],
+    canLoad: [LoginnedGuard],
     runGuardsAndResolvers: 'always',
     loadChildren: () => import('./Modules/panel/panel.module').then(m => m.PanelModule),
   },
@@ -32,9 +34,9 @@ export const routes: Routes = [
     component: DefaultComponent,
   }
   /*{ path: 'login', component: LoginComponent, canActivate: [LoginRegisterGuard] },
-  { path: 'admin-panel', 
+  { path: 'admin-panel',
     component: AdminPanelComponent,
-    loadChildren: () => import('./Modules/admin-panel/admin-panel.module').then(m => m.AdminPanelModule) 
+    loadChildren: () => import('./Modules/admin-panel/admin-panel.module').then(m => m.AdminPanelModule)
   },
   { path: 'register', component: EmailRegisterComponent, canActivate: [LoginRegisterGuard] },
   { path: 'endregister', component: RegisterComponent, canActivate: [LoginRegisterGuard] },*/

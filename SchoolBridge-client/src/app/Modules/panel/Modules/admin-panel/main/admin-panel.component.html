@@ -1,15 +1,15 @@
 <div class="wrapper">
     <!-- Sidebar  -->
-    <nav id="sidebar" class="active">
+    <nav #navBar id="sidebar" class="active">
         <div class="sidebar-header">
-            <h3>Admin Panel</h3>
-            <strong>AP</strong>
-            <a href="#" ><i class="fas fa-arrow-right"></i></a>
+            <h3 (click)="hide()" >Admin Panel</h3>
+            <strong (click)="show()" >AP</strong>
+            <!--<a  ><i class="fas fa-arrow-right"></i></a>-->
         </div>
         <ul class="list-unstyled components">
             <li *ngIf="'GetGlobalizationTab' | userPerm" >
                 <a routerLink="./globalization" routerLinkActive="router-link-active" style="white-space: nowrap;">
-                    <i class="fas fa-globe"></i><span>&nbsp;Globalization</span>
+                    <i class="fas fa-globe"></i>&nbsp;<span dbstring >globalization</span>
                 </a>
             </li>
         </ul>

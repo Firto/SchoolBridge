@@ -31,6 +31,7 @@
     font-size: 30px;
     cursor: pointer;
     color: gray;
+    margin-bottom: 0;
 }
 
 .hide-menu-btn:hover,

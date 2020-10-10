@@ -1,9 +1,17 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/material-design-icons/3.0.1/iconfont/material-icons.min.css');
 @import url("https://use.fontawesome.com/releases/v5.6.1/css/all.css");
 
 body {
   background-color: #151515;
   height: 100%;
+  overflow-x: hidden;
+}
+
+app-root{
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 
 .loader-topbar {

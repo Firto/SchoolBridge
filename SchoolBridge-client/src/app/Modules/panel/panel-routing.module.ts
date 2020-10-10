@@ -9,15 +9,16 @@ import { UserPermissionGuard } from './Modules/user-permission/user-permission.g
 
 const routes: Routes = [
   { path: 'admin',
-    component: AdminPanelComponent, 
+    component: AdminPanelComponent,
     canActivate: [UserPermissionGuard],
+    canLoad: [UserPermissionGuard],
     data: {
         perms: ['GetAdminPanel']
     },
     loadChildren: () => import('./Modules/admin-panel/admin-panel.module').then(m => m.AdminPanelModule),
   },
   { path: 'chat',
-    component: ChatPanelComponent, 
+    component: ChatPanelComponent,
     loadChildren: () => import('./Modules/chat-panel/chat-panel.module').then(m => m.ChatPanelModule),
   },
   { path: 'settings',

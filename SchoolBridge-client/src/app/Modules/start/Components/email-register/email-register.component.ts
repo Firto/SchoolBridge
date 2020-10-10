@@ -16,6 +16,11 @@ import { observed } from 'src/app/Decorators/observed.decorator';
   providers: MdGlobalization('rg', [
     'v-str-email',
     'pn-email',
+    // Succesful sending email to
+    'tst-suc-send-em',
+    'tst-unsuc-send-em',
+    // Wait sending email,
+    'wait-snd-em'
   ])
 })
 export class EmailRegisterComponent extends OnUnsubscribe implements OnInit {

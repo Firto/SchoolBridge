@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { ServerHub } from 'src/app/Services/server.hub';
 import { UserService } from './user.service';
-import { mergeMap, tap } from 'rxjs/operators';
+import { filter, mergeMap, tap } from 'rxjs/operators';
 
 @Injectable()
 export class ClientConnectionService {
@@ -31,6 +31,7 @@ export class ClientConnectionService {
   public send(methodName: string, ...args: any[]): Observable<void>{
     if (this._onSubscribed.value)
       return this._onSubscribed.pipe(
+        filter(x => !x),
         mergeMap(x => this.serverHub.send(methodName, ...args))
       );
     else if (!this._subscribed.value)

@@ -6,6 +6,7 @@ import { UserPermissionModule } from '../user-permission/user-permission.module'
 import { HomeComponent } from './Components/home/home.component';
 import { GlobalizationComponent } from './Components/globalization/globalization.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { GlobalizationModule } from 'src/app/Modules/globalization/globalization.module';
 
 @NgModule({
     declarations: [
@@ -16,13 +17,14 @@ import { ReactiveFormsModule } from '@angular/forms';
     imports: [
         CommonModule,
         AdminPanelRoutingModule,
-        UserPermissionModule
+        UserPermissionModule,
+        GlobalizationModule
     ],
     providers: [
-        
+
     ],
     exports: [
         AdminPanelComponent
     ]
 })
-export class AdminPanelModule  {} 
+export class AdminPanelModule  {}

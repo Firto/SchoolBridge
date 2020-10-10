@@ -20,16 +20,17 @@ namespace SchoolBridge.Domain.Services.Implementation
 {
     public class ChatEventService : IChatEventService
     {
-        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, ChatEventSubscription>> _allChatsUnderSupervision = new ConcurrentDictionary<string, ConcurrentDictionary<string, ChatEventSubscription>>();
-        private readonly ConcurrentDictionary<string, ChatEventSubscriptionSession> _allSubscribedUsers = new ConcurrentDictionary<string, ChatEventSubscriptionSession>();
+        private static readonly long _typingTime = 2; // 5 seconds 
+
+        private readonly ChatsUnderSupervision _chats = new ChatsUnderSupervision();
 
         private readonly IHubContext<ServerHub> _hubContext;
         private readonly IUserConnectionService _userConnectionService;
         private readonly ChatEventServiceConfiguration _configuration;
 
         public ChatEventService(IHubContext<ServerHub> hubContext,
-                            IUserConnectionService userConnectionService,
-                            ChatEventServiceConfiguration configuration)
+                                IUserConnectionService userConnectionService,
+                                ChatEventServiceConfiguration configuration)
         {
             _hubContext = hubContext;
             _configuration = configuration;
@@ -38,13 +39,8 @@ namespace SchoolBridge.Domain.Services.Implementation
             _userConnectionService.OnDisconnected += OnDisconnected;
         }
 
-        public string[] GetSubscribedClients(string chatId)
-        {
-            ConcurrentDictionary<string, ChatEventSubscription> conns;
-            if (_allChatsUnderSupervision.TryGetValue(chatId, out conns))
-                return conns.Select(x => x.Key).ToArray();
-            else return new string[] { };
-        }
+        public bool IsTyping(string chatId, string userId)
+            => _chats.Chats.ContainsKey(chatId) && _chats.Chats[chatId].Users.ContainsKey(userId) && _chats.Chats[chatId].Users[userId].LastType + _typingTime > DateTime.Now.ToUnixTimestamp();
 
         public string CreateSubscriptionToken(string creatorTokenId, string chatId)
         {
@@ -87,46 +83,74 @@ namespace SchoolBridge.Domain.Services.Implementation
             if (!ValidateToken(subscribeToken, out token))
                 return;
 
-            ChatEventSubscription subscription = new ChatEventSubscription(token);
-
-            if (session.TokenId != subscription.Token.Id)
+            if (session.TokenId != token.Id)
                 return;
 
-            if (!_allSubscribedUsers.ContainsKey(session.ConnectionId))
-                _allSubscribedUsers.TryAdd(session.ConnectionId, new ChatEventSubscriptionSession(session, _allChatsUnderSupervision));
-
-            _allSubscribedUsers[session.ConnectionId].AddChatToSupervision(subscription);
+            _chats.Subscribe(token.Subject, session);
         }
 
         public void Unsubscribe(UserSession session, string subscribeToken)
         {
-            if (_allSubscribedUsers.ContainsKey(session.ConnectionId))
-                return;
-
             JwtSecurityToken token;
             if (!ValidateToken(subscribeToken, out token))
                 return;
 
-            ChatEventSubscriptionSession session1;
-            if (_allSubscribedUsers.TryGetValue(session.ConnectionId, out session1))
-                session1.RemoveChatFromSupervision(token.Subject);
+            if (session.TokenId != token.Id)
+                return;
+
+            _chats.Unsubscribe(token.Subject, session);
         }
 
         public async Task OnDisconnected(UserSession session)
         {
-            ChatEventSubscriptionSession session1;
-            if (_allSubscribedUsers.TryRemove(session.ConnectionId, out session1))
-                session1.ClearAllSubscriptions();
-
-            if (!_allChatsUnderSupervision.ContainsKey(session.UserId))
-                return;
+            if (_chats.Users.ContainsKey(session.ConnectionId))
+                _chats.FullDisconnectUser(session);
         }
 
-        public async Task SendEventAsync(string chatId, string type, IChatEventSource source) {
-            if (!_allChatsUnderSupervision.ContainsKey(chatId))
+        public async Task SendEventAsync(string chatId, string type, IChatEventSource source, string[] exlude = null)
+        {
+            if (!_chats.Chats.ContainsKey(chatId))
                 return;
 
-            await _hubContext.Clients.Clients(GetSubscribedClients(chatId)).SendAsync("ChatEvent", new ChatEventDto { Type = type, ChatId = chatId, Source = source });
+            await _hubContext.Clients.Clients(_chats.Chats[chatId].GetSessions().Where(x => exlude == null || !exlude.Contains(x.ConnectionId)).Select(x => x.ConnectionId).ToArray()).SendAsync("ChatEvent", new ChatEventDto { Type = type, ChatId = chatId, Source = source });
+
+        }
+
+        public async Task SendNewMessageEvent(string userId, string chatId, NewMessageSource source)
+        {
+            if (_chats.Chats.ContainsKey(chatId) && _chats.Chats[chatId].Users.ContainsKey(userId)) {
+                _chats.Chats[chatId].Users[userId].SetNotTyping();
+
+                var now = DateTime.Now.ToUnixTimestamp();
+                await SendEventAsync(chatId, "Typing",
+                new ChatTypingEventSource()
+                {
+                    Typing = _chats.Chats[chatId].Users.Values
+                        .Where(x => x.LastType + _typingTime > now)
+                        .Select(x => x.UserId).ToArray()
+                });
+            }
+            await SendEventAsync(chatId, "newMessage", source);
+        }
+
+        public async Task SendTypingEvent(UserSession session, string chatId)
+        {
+            if (!_chats.Users.ContainsKey(session.ConnectionId))
+                return;
+            var som = _chats.GetUser(session);
+
+            if (!som.Chats.ContainsKey(chatId))
+                return;
+
+            som.Chats[chatId].Users[som.UserId].UpdateLastType();
+
+            await SendEventAsync(chatId, "Typing",
+                new ChatTypingEventSource()
+                {
+                    Typing = som.Chats[chatId].Users.Values
+                        .Where(x => x.LastType + _typingTime > som.Chats[chatId].Users[som.UserId].LastType)
+                        .Select(x => x.UserId).ToArray()
+                });
         }
 
         public void Dispose()

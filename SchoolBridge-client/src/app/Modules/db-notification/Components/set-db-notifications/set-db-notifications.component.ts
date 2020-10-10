@@ -1,16 +1,8 @@
-import { Component, ViewContainerRef, ViewChild, AfterViewInit, ChangeDetectorRef, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { KeyedCollection } from 'src/app/Collections/keyed-collection';
-import { DbNtfComponent } from '../db-notifications/db-ntf-component.iterface';
-import { DbNotification, DbNotificationService } from '../../Services/db-notification.service';
-import { DataBaseSource } from '../../../notification/Models/NotificationSources/database-source';
-import { DbNotificationsMapper } from '../../Mappers/db-notification.mapper';
-import { Guid } from "guid-typescript";
-import { UserService } from 'src/app/Services/user.service';
-import { fromBinary } from 'src/app/Modules/binary/from-binary.func';
+import { Component, OnInit } from '@angular/core';
+import { Observable, Subject } from 'rxjs';
+import { DbNotificationService } from '../../Services/db-notification.service';
 import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globalization.service';
 import { observed } from 'src/app/Decorators/observed.decorator';
-import { IDBNSource } from '../../Models/IDBN-source.interface';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { OnUnsubscribe } from 'src/app/Services/super.controller';
 import { markDirty } from 'src/app/Helpers/mark-dirty.func';
@@ -25,8 +17,8 @@ export class SetDbNotificationsComponent extends OnUnsubscribe implements OnInit
     public loader: boolean = false;
     private _onCh: Subject<any> = new Subject<any>();
     @observed() public onCh: Observable<any> = this._onCh.pipe(debounceTime(100));
-     
-    private end: boolean = false; 
+
+    private end: boolean = false;
 
     constructor(public ntfService: DbNotificationService) {
         super();

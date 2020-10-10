@@ -13,10 +13,10 @@ import { UserService } from 'src/app/Services/user.service';
 @Injectable({providedIn: 'root'})
 export class OnlineService {
     private _onChangeOnline: BehaviorSubject<Record<string, number>> = new BehaviorSubject<Record<string, number>>({});
-    
+
     constructor(private _serverHub: ServerHub,
                 private _connService: ClientConnectionService,
-                private _userService: UserService) { 
+                private _userService: UserService) {
         this._serverHub.registerOnServerEvent("onlineStatusCheck", (userId: string, onlineStatus:number) => {
             this.changeOnline(userId, onlineStatus);
         });
@@ -41,5 +41,9 @@ export class OnlineService {
             filter(x => Object.keys(x).includes(model.id)),
             map(x => x[model.id])
         );
-    } 
+    }
+
+    public get stats(): Record<string, number>{
+      return this._onChangeOnline.value;
+    }
 }

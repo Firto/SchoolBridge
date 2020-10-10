@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';  
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { MyLocalStorageService } from 'src/app/Services/my-local-storage.service';
 import { UserService } from 'src/app/Services/user.service';
@@ -10,7 +10,7 @@ import { GlobalizationInfoService } from './globalization-info.service';
 import { tap } from 'rxjs/operators';
 import { GlobalizationService } from './globalization.service';
 import { GuardService } from 'src/app/Services/guard.service';
-  
+
 @Injectable()
 export class GlobalizationEditService {
     private _state: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -57,7 +57,7 @@ export class GlobalizationEditService {
         this._editing.next(directive);
     }
 
-    public setString(name: string, str: string): Observable<any> 
+    public setString(name: string, str: string): Observable<any>
     {
         return this._httpgbService.setString(name, str).pipe(
                 tap((x) => this._gbsService.setString(name, str))
@@ -75,7 +75,7 @@ export class GlobalizationEditService {
 
     public addLanguage(abbName: string, fullName: string): Observable<any>{
         return this._httpgbService.addLanguage(abbName, fullName).pipe(tap(res=> {
-            this._gbiService.info.awaibleLanguages[res.result.abbName] = res.result.fullName;
+            this._gbiService.info.awaibleLanguages[abbName] = fullName;
             this._gbiService.info = this._gbiService.info;
         }));
     }
@@ -86,4 +86,4 @@ export class GlobalizationEditService {
             this._gbiService.info = this._gbiService.info;
        }));
     }
-}    
+}
