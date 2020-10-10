@@ -28,14 +28,14 @@
 .hide-menu-btn,
 .ntf-toggle-btn {
     transition: 0.4s;
-    font-size: 30px;
+    font-size: 23px;
     cursor: pointer;
     color: gray;
 }
 
 .hide-menu-btn:hover,
 .ntf-toggle-btn:hover {
-    color: #3498db;
+    color: #ffc107;
 }
 
 .hide-menu-btn {

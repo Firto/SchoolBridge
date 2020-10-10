@@ -33,7 +33,10 @@ import { OnUnsubscribe } from 'src/app/Services/super.controller';
     "str-no-dig",
     "str-too-long",
     "r-date-birthday-incorrect",
-    "str-inc-rep"
+    "str-inc-rep",
+
+    "cl-r-token-already-used",
+    "cl-r-token-inc"
   ])
 })
 export class RegisterComponent extends OnUnsubscribe implements OnInit {
@@ -87,5 +90,4 @@ export class RegisterComponent extends OnUnsubscribe implements OnInit {
           this.form.setErrors(err.additionalInfo);
       });
   }
-
 }

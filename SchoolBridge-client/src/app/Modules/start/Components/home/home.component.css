@@ -1,13 +1,6 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,500|Rubik:500, 600");
 @import url("./css/bootstrap.css");
 
-.test {
-  line-height: 25px;
-  font-size: 16px;
-  font-family: "Roboto", sans-serif;
-  font-weight: 400;
-  color: #7b838a; 
-  overflow-y:scroll;}
 
 h1,
 h2,

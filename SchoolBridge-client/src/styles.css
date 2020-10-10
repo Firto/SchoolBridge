@@ -1,11 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
 @import url("https://use.fontawesome.com/releases/v5.6.1/css/all.css");
 
-body {
-  background-color: #151515;
-  overflow-x: hidden;
-}
-
 .loader-topbar {
   margin: 5px auto;
   border: 3px solid #ddd;
@@ -27,7 +22,7 @@ body {
 }
 
 .login-container{
-	height: 65vh;
+	height: 75vh;
 	width: 100%;
 	color: #fff;
   }

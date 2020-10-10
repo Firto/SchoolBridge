@@ -14,7 +14,7 @@
     margin-right: 45px;
 }
 .header_area .navbar .nav .nav-item .nav-link {
-    font: 500 14px/80px "Rubik", sans-serif;
+    font: 500 17px/80px "Rubik", sans-serif;
     text-transform: capitalize;
     color: #002347;
     padding: 0px;
@@ -29,7 +29,7 @@
     display: none; 
 }
 .header_area .navbar .nav .nav-item:hover .nav-link, .header_area .navbar .nav .nav-item.active .nav-link {
-    color: #fdc632; 
+    color: #b18100; 
 }
 .header_area .navbar .nav .nav-item.submenu {
     position: relative;
@@ -118,7 +118,7 @@
     font-weight: 600; 
 }
 .header_area.white-header .navbar .nav .nav-item.active .nav-link, .header_area.white-header .navbar .nav .nav-item:hover .nav-link {
-      color: #fdc632; 
+      color: #b18100; 
 }
 .header_area.white-header .navbar .nav .nav-item .nav-link {
       color: #ffffff; 
@@ -151,6 +151,6 @@
     background: #002347; 
 }
 .header_area.white-header.navbar_fixed .main_menu .navbar .nav .nav-item.active .nav-link, .header_area.white-header.navbar_fixed .main_menu .navbar .nav .nav-item:hover .nav-link {
-    color: #fdc632; 
+    color:#b18100; 
 }
   

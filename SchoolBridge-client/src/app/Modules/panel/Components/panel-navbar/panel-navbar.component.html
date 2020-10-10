@@ -1,32 +1,45 @@
-<nav class="navBar">
-    <svg class="h-100" viewBox="0 0 20 18">
-        <text x="0" y="15" class="fill-white text-uppercase font-weight-slight" >sb</text>
-    </svg>
-    <input type="checkbox" id="chkk" name="chkk">
-    <label for="chkk" class="show-menu-btn">
-        <img src="./../../../assets/img/menu.png" class="nav-img" alt="menu" />
-    </label>
-    <ul class="menu align-middle">
-        <li (click)="onClickMenuItem()" >
-            <a routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" dbstring >panels</a>
-        </li>
-        <li (click)="onClickMenuItem()" >
-            <a routerLink="./settings" routerLinkActive="active" dbstring >settings</a>
-        </li>
-        <li (click)="onClickMenuItem()" >
-            <a routerLink="./chat" routerLinkActive="active" dbstring >chat</a>
-        </li>
-        <li (click)="onClickMenuItem()" >
-            <a class="cancel" (click)="logout()" dbstring >logout</a>
-        </li>
-        <li>
-            <app-language-selector ></app-language-selector>
-        </li>
-        <li >
-            <label for="chkk" class="hide-menu-btn">
-                <i class="fas fa-times"></i>
-            </label>
-        </li>
-    </ul>
-    <set-db-notifications dbNotifications></set-db-notifications>
-</nav>
+<div class="navBar">
+    <header class="header_area">
+        <div class="main_menu">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <app-language-selector class="lang-selector"></app-language-selector>
+                   
+                    <button class="navbar-toggler" type="button" data-toggle="collapse"
+                        data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav menu_nav ml-auto">
+                            <li class="nav-item submenu dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
+                                    aria-haspopup="true" aria-expanded="false">Menu</a>
+                                <ul class="dropdown-menu">
+                                    <li (click)="onClickMenuItem()" class="nav-item">
+                                        <a class="nav-link" routerLink="./" routerLinkActive="active"
+                                            [routerLinkActiveOptions]="{exact: true}" dbstring>panels</a>
+                                    </li>
+                                    <li (click)="onClickMenuItem()" class="nav-item">
+                                        <a class="nav-link" routerLink="./settings" routerLinkActive="active"
+                                            dbstring>settings</a>
+                                    </li>
+                                    <li (click)="onClickMenuItem()" class="nav-item">
+                                        <a class="nav-link" routerLink="./chat" routerLinkActive="active"
+                                            dbstring>chat</a>
+                                    </li>
+                                    <li (click)="onClickMenuItem()" class="nav-item">
+                                        <a class="nav-link nav-logout" (click)="logout()" dbstring>logout</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="center-i">
+                        <set-db-notifications dbNotifications></set-db-notifications>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+</div>

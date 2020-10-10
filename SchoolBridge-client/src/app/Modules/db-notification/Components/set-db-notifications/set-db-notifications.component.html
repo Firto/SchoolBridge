@@ -1,6 +1,5 @@
 <div class="panel panel-default float-right mr-4">
   <div class="panel-body">
-      <!-- Single button -->
       <div class="btn-group pull-right top-head-dropdown dropdown">
           <label (onMutation)="onNtfMenuChange($event)" [mutationConfig]="{attributes: true}" class="ntf-toggle-btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="fas fa-bell"></i>
@@ -8,8 +7,8 @@
           </label>
 
           <ul class="dropdown-menu dropdown-menu-right" (scroll)="onNtfScroll($event)">
-              <label class="hide-menu-btn position-fixed">
-                  <i class="fas fa-times"></i>
+              <label class="hide-menu-btn position-fixed item-size">
+                  <i class="fas fa-times "></i>
               </label>
               <base-db-ntf *ngFor="let item of ntfService.notifications" [ntf]="item" (onChange)="onChange()" ></base-db-ntf>
               <ng-container *ngIf="loader">
