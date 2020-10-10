@@ -17,5 +17,9 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Task<PermanentSubscribeDto> StartRegister(string email, string role);
 
         Task<LoggedDto> EndRegister(EndRegisterDto entity, string uuid);
+
+        PermanentSubscribeDto ChangePasswordEmail(string email);
+
+        Task<LoggedDto> EndChangePasswordEmail(EndChangePasswordEmailDto entity, string uuid);
     }
 }

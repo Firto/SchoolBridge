@@ -36,6 +36,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                                 IDataBaseNotificationService dataBaseNotificationService,
                                 IImageService imageService,
                                 IMapper mapper)
+
         {
             _userService = userService;
             _tokenService = tokenService;
@@ -149,14 +150,5 @@ namespace SchoolBridge.Domain.Services.Implementation
         public async Task LogoutAll(IHeaderDictionary headers)
             => await _tokenService.DeactivateAllTokens(headers);
 
-        public Task ChangePasswordEmail(string email)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task<LoggedDto> EndChangePasswordEmail(EndChangePasswordEmailDto entity)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

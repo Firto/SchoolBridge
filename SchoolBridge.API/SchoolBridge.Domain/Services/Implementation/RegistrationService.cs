@@ -62,7 +62,9 @@ namespace SchoolBridge.Domain.Services.Implementation
                     { "r-token-inc", new ClientError("Incorrect registration token!")},
                     { "r-token-already-used", new ClientError("User with this registration token is already registered!")},
                     { "r-login-alrd-reg", new ClientError("User with this login is already registered!") },
-                    { "r-email-alrd-reg", new ClientError("User with this email is already registered!")}
+                    { "r-email-alrd-reg", new ClientError("User with this email is already registered!")},
+                    { "r-ch-pass-token-inc", new ClientError("Change password token incorrect") },
+                    { "r-email-no-reg", new ClientError("Change password token incorrect")}
                 }));
         }
 
@@ -98,6 +100,29 @@ namespace SchoolBridge.Domain.Services.Implementation
 
             return _configuration.TokenHandler.WriteToken(token);
         }
+
+        public string CreateChnagePasswordToken(TimeSpan exp, string email, string oldPassword)
+        {
+            DateTime expires = DateTime.Now.Add(exp);
+
+            var claims = new List<Claim>
+            {
+                new Claim("email", email),
+                new Claim("oldPassword", oldPassword)
+            };
+
+            var creds = new SigningCredentials(_configuration.RegistrationTokenValidation.IssuerSigningKey, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration.RegistrationTokenValidation.ValidIssuer,
+                claims: claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+
+            return _configuration.TokenHandler.WriteToken(token);
+        }
+
         public string CreateRegistrationToken(TimeSpan exp, string email, Role role)
         {
             return CreateRegistrationToken(exp, email, role, null);
@@ -182,6 +207,41 @@ namespace SchoolBridge.Domain.Services.Implementation
             var usr = await _userService.AddAsync(user, noPermissions);
             usr.Role = await _roleService.GetAsync(usr.RoleId);
             return await _loginService.Login(usr, uuid);
+        }
+
+        public PermanentSubscribeDto ChangePasswordEmail(string email)
+        {
+            if (!_userService.IsIssetByEmail(email))
+                throw new ClientException("r-email-no-reg");
+
+            var permanent = _permanentConnectionService.CreatePermanentToken(TimeSpan.FromHours(1), out var permTokenId);
+            var regToken = CreateChnagePasswordToken(_configuration.ChangePasswordTokenExpires, email, _userService.GetByEmail(email).PasswordHash);
+            _emailService.SendByDraft(email,
+                                        "registration@schoolbridge.com",
+                                        "Change password in Schoolbridge",
+                                        "changing-password",
+                                        SendEmailCompleated,
+                                        EmailEntityPriority.High,
+                                        permTokenId,
+                                        regToken);
+            return permanent;
+        }
+
+        public async Task<LoggedDto> EndChangePasswordEmail(EndChangePasswordEmailDto entity, string uuid)
+        {
+            var token = ValidateRegistrationToken(entity.changePasswordToken);
+
+            var user = await _userService.GetByEmailAsync(token.Claims.First(x => x.Type == "email").Value);
+
+            if (user == null)
+                throw new ClientException("r-email-no-reg");
+           
+            if (user.PasswordHash != token.Claims.First(x => x.Type == "oldPassword").Value)
+                throw new ClientException("r-ch-pass-token-inc");
+
+            await _userService.SetPasswordAsync(user, entity.newPassword);
+
+            return await _loginService.Login(_userService.GetAll(user.Id), uuid);
         }
     }
 }
