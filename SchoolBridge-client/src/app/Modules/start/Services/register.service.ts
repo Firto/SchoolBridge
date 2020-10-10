@@ -19,6 +19,7 @@ import { PermanentConnectionService } from 'src/app/Modules/start/Services/perma
 import { DeviceUUIDService } from 'src/app/Services/device-uuid.service';
 import { GlobalizationStringService } from '../../globalization/Services/globalization-string.service';
 import { Toaster } from '../../ngx-toast-notifications';
+import { EndForgotPassword } from '../Models/endforgotpassword.model';
 
 @Injectable()
 export class RegisterService {
@@ -57,6 +58,23 @@ export class RegisterService {
 
     end(model: EndRegister): Observable<Loginned> {
         return this._baseService.send<Loginned>(this.ser, "end", model, {headers: {'UUID':this._uuidService.uuid}}).pipe(
+            tap(res => {
+                this._userService.localLogin(<Loginned>res);
+            })
+        );
+    }
+
+    forgotPassword(email: string): Observable<PermanentSubscribe>  {
+        return this._baseService.send<PermanentSubscribe>(this.ser, "forgotpassword", null, { headers: {'UUID':this._uuidService.uuid}, params: { email: email}}).pipe(
+            tap(res => {
+                this._permanentConnectionService.subscribe(res.token).subscribe();
+                this._loaderService.showww('wait-snd-em');
+            })
+        );
+    }
+
+    endForgotPassword(model: EndForgotPassword): Observable<Loginned> {
+        return this._baseService.send<Loginned>(this.ser, "endforgotpassword", model, {headers: {'UUID':this._uuidService.uuid}}).pipe(
             tap(res => {
                 this._userService.localLogin(<Loginned>res);
             })

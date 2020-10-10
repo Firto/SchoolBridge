@@ -14,6 +14,7 @@ import { MdGlobalization } from '../globalization/Services/md-globalization.serv
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HomeComponent } from './Components/home/home.component';
 import { ForgotPasswordComponent } from './Components/forgot-password/forgot-password.component';
+import { EndForgotPasswordComponent } from './Components/end-forgot-password/end-forgot-password.component';
 
 @NgModule({
     declarations: [
@@ -23,7 +24,8 @@ import { ForgotPasswordComponent } from './Components/forgot-password/forgot-pas
         LoginComponent,
         EmailRegisterComponent,
         RegisterComponent,
-        ForgotPasswordComponent
+        ForgotPasswordComponent,
+        EndForgotPasswordComponent
     ],
     providers: [
         RegisterService,

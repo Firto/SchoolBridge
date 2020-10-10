@@ -56,7 +56,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             IDictionary<string, IEnumerable<string>> valid = new Dictionary<string, IEnumerable<string>>();
             PropValidateContext _context = new PropValidateContext(_provider, null, null);
             _context.Valid = new List<string>();
-            _context.PropName = objName.ToLower();
+            _context.PropName = char.ToLower(objName[0]) + objName.Substring(1);
             foreach (var s in attrs)
                 if (!_validateFunctions.ContainsKey(s))
                     throw new ClientException("v-func-no");
@@ -101,7 +101,7 @@ namespace SchoolBridge.Domain.Services.Implementation
                 if (temp != null) {
                     if (_context.Valid == null)
                         _context.Valid = new List<string>();
-                    _context.PropName = item.Name.ToLower();
+                    _context.PropName = char.ToLower(item.Name[0]) + item.Name.Substring(1);
 
                     foreach (var s in temp.FuncIdsAtributes)
                         if (!_validateFunctions.ContainsKey(s))

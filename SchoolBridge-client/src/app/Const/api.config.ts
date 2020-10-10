@@ -29,6 +29,14 @@ export const apiConfig: Record<string, Service> = {
             "end": {
                 url: "end/",
                 type: "POST"
+            },
+            "forgotpassword": {
+                url: "changepassword/",
+                type: "GET"
+            },
+            "endforgotpassword": {
+                url: "endchangepassword/",
+                type: "POST"
             }
         }
     },

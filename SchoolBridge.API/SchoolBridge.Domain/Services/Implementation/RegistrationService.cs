@@ -217,13 +217,13 @@ namespace SchoolBridge.Domain.Services.Implementation
             var permanent = _permanentConnectionService.CreatePermanentToken(TimeSpan.FromHours(1), out var permTokenId);
             var regToken = CreateChnagePasswordToken(_configuration.ChangePasswordTokenExpires, email, _userService.GetByEmail(email).PasswordHash);
             _emailService.SendByDraft(email,
-                                        "registration@schoolbridge.com",
+                                        "changepassword@schoolbridge.com",
                                         "Change password in Schoolbridge",
-                                        "changing-password",
+                                        "email-forgotpassword",
                                         SendEmailCompleated,
                                         EmailEntityPriority.High,
                                         permTokenId,
-                                        regToken);
+                                         string.Format("{0}:{1}/start/endforgotpassword?token={2}", _httpContext.Connection.RemoteIpAddress.ToString(), 4200, HttpUtility.UrlEncode(regToken)));
             return permanent;
         }
 
@@ -239,7 +239,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             if (user.PasswordHash != token.Claims.First(x => x.Type == "oldPassword").Value)
                 throw new ClientException("r-ch-pass-token-inc");
 
-            await _userService.SetPasswordAsync(user, entity.newPassword);
+            await _userService.SetPasswordAsync(user, entity.Password);
 
             return await _loginService.Login(_userService.GetAll(user.Id), uuid);
         }

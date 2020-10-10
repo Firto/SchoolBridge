@@ -6,6 +6,7 @@ import { EmailRegisterComponent } from './Components/email-register/email-regist
 import { LoginRegisterGuard } from 'src/app/Guard/login-register.guard';
 import { HomeComponent } from './Components/home/home.component';
 import { ForgotPasswordComponent } from './Components/forgot-password/forgot-password.component';
+import { EndForgotPasswordComponent } from './Components/end-forgot-password/end-forgot-password.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: 'register', component: EmailRegisterComponent, data: {animation: 'RegisterPage'} },
   { path: 'endregister', component: RegisterComponent, data: {animation: 'EndRegisterPage'} },
   { path: 'forgotpassword', component: ForgotPasswordComponent },
+   { path: 'endforgotpassword', component: EndForgotPasswordComponent },
   { path: '', redirectTo: 'home', pathMatch: "prefix" }
 ];
 
