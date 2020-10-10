@@ -4,7 +4,9 @@
             <nav class="navbar navbar-expand-lg navbar-light">
                 <div class="container">
                     <app-language-selector class="lang-selector"></app-language-selector>
-                   
+                    <div class="center-i">
+                        <set-db-notifications dbNotifications></set-db-notifications>
+                    </div>
                     <button class="navbar-toggler" type="button" data-toggle="collapse"
                         data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -29,14 +31,11 @@
                                             dbstring>chat</a>
                                     </li>
                                     <li (click)="onClickMenuItem()" class="nav-item">
-                                        <a class="nav-link nav-logout" (click)="logout()" dbstring>logout</a>
+                                        <a class="nav-link" (click)="logout()" dbstring>logout</a>
                                     </li>
                                 </ul>
                             </li>
                         </ul>
-                    </div>
-                    <div class="center-i">
-                        <set-db-notifications dbNotifications></set-db-notifications>
                     </div>
                 </div>
             </nav>

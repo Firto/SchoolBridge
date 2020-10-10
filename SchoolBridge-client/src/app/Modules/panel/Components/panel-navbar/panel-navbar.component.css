@@ -20,7 +20,7 @@ p {
 }
 
 .navBar{
-    background-color: hsl(51deg 100% 58% / 75%);
+    background-color: hsl(51deg 37% 91% / 75%);
 }
 
 nav a img {
@@ -39,6 +39,10 @@ nav a img {
     height: 50px;
     width: 50px;
     margin-right: 20px;
+}
+
+.nav-link{
+    cursor: pointer;
 }
 
 .menu {
@@ -179,11 +183,7 @@ small small.badge-pill {
     padding: 0px;
     display: inline-block; 
 }
-@media (max-width: 991px) {
-    .header_area .navbar .nav .nav-item .nav-link {
-        color: #ffffff; 
-    } 
-}
+
 .header_area .navbar .nav .nav-item .nav-link:after {
     display: none; 
 }
@@ -311,8 +311,4 @@ small small.badge-pill {
 }
 .header_area.white-header.navbar_fixed .main_menu .navbar .nav .nav-item.active .nav-link, .header_area.white-header.navbar_fixed .main_menu .navbar .nav .nav-item:hover .nav-link {
     color:#b18100; 
-}
-
-.nav-logout {
-    color: red;
 }

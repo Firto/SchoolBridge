@@ -10,3 +10,7 @@
   background-color: hsl(51deg 43% 33% / 75%);
   border-radius: 5px;
 }
+
+.a-left{
+  margin-right: 20px;
+}

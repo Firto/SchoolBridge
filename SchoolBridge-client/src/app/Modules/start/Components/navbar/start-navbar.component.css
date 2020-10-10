@@ -3,6 +3,7 @@
     width: 100%;
     z-index: 99;
     transition: background 0.4s, all 0.3s linear; 
+    background-color: hsl(51deg 37% 91% / 75%);
 }
 .header_area .navbar {
     background: transparent;
@@ -10,6 +11,11 @@
     border: 0px;
     border-radius: 0px; 
 }
+
+.nav-link{
+    cursor: pointer;
+}
+
 .header_area .navbar .nav .nav-item {
     margin-right: 45px;
 }
@@ -19,11 +25,6 @@
     color: #002347;
     padding: 0px;
     display: inline-block; 
-}
-@media (max-width: 991px) {
-    .header_area .navbar .nav .nav-item .nav-link {
-        color: #ffffff; 
-    } 
 }
 .header_area .navbar .nav .nav-item .nav-link:after {
     display: none; 
