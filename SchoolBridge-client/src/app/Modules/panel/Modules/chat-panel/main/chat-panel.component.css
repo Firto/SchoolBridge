@@ -1,5 +1,5 @@
 .messaging {
-  height: calc(100vh - 80px);
+  height: calc(100vh - 50px);
   max-width: 1200px;
   margin: 0 auto;
   background: gray;

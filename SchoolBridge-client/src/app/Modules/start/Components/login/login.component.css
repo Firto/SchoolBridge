@@ -1,6 +1,6 @@
 .login_banner_area{
     z-index: 1;
-  min-height: 900px;
+    height: 100vh;
   position: relative;
   background: url(./../home/img/login_banner.jpg) no-repeat center;
   background-size: cover;

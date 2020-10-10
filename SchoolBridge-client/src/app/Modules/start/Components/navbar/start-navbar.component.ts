@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, Renderer2, ViewChild, ElementRef } from '@angular/core';
 import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
 import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globalization.service';
 
@@ -10,6 +10,11 @@ import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globa
 })
 //@Globalization('cm-st-nav', [])
 export class StartNavbarComponent {
+  @ViewChild('navBar') nav: ElementRef;
+  constructor(
+              private _render: Renderer2) { }
 
-  constructor(private gbService: GlobalizationService) { }
+  hide(){
+    this._render.removeClass(this.nav.nativeElement, "show");
+  }
 }

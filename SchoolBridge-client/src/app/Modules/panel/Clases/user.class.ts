@@ -1,9 +1,7 @@
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, MonoTypeOperatorFunction, Observable } from "rxjs";
 import { OnlineService } from "../Services/online.service";
 import { UserModel } from "../Models/user.model";
 import { environment } from "src/environments/environment";
-import { tap } from 'rxjs/operators';
-import { UsersService } from '../Services/users.service';
 import { ShortUserModel } from '../Models/short-user.model';
 import { UserGetTokenModel } from '../Models/user-get-token.model';
 
@@ -49,6 +47,9 @@ export class User {
 }
 
 export class ShortUser{
+  pipe(arg0: MonoTypeOperatorFunction<unknown>): import("rxjs").SchedulerLike {
+    throw new Error('Method not implemented.');
+  }
   private readonly _user$: BehaviorSubject<User>;
 
   get id(): string {

@@ -1,6 +1,11 @@
-@import url("https://fonts.googleapis.com/css?family=Roboto:400,400i,500|Rubik:500, 600");
-@import url("./css/bootstrap.css");
+.main{
+  background-color: #fff;
+}
 
+.main > section{
+  overflow: hidden;
+  height: 100vh;
+}
 
 h1,
 h2,

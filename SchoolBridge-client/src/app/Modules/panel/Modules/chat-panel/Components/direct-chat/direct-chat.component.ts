@@ -32,6 +32,6 @@ export class DirectChatComponent extends OnUnsubscribe implements OnInit, OnChan
     this.onChange = merge(this.source.user.userObs.pipe(tap(x => {
       if(!x) return;
       x.onlineStatusObs.pipe(takeUntil(this._destroy)).subscribe(() => markDirty(this));
-    })), this.source.lastMessageObs).pipe(takeUntil(this._destroy), debounceTime(300));
+    })), this.source.lastMessageObs, this.source.typingObs).pipe(takeUntil(this._destroy), debounceTime(100));
   }
 }

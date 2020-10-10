@@ -26,7 +26,7 @@ export class MessagesComponent extends OnUnsubscribe implements OnInit, OnChange
   private _sender$: Observable<any> = this._senderbase$.pipe(throttleTime(1000), mergeMap(x => this._chatService.typing(this.chat.id)));
 
   private _onChange$: Subject<void> = new Subject<void>();
-  private _onChange$$: Observable<void> = this._onChange$.pipe(debounceTime(300));
+  private _onChange$$: Observable<void> = this._onChange$.pipe(debounceTime(50));
   private _subs: Subscription = null;
 
   public isLoading: IsLoading = new IsLoading();
@@ -46,7 +46,13 @@ export class MessagesComponent extends OnUnsubscribe implements OnInit, OnChange
       this._subs?.unsubscribe();
       return;
     }
-    this._subs = merge(this.chat.messagesObs, this.chat.user.userObs).subscribe(() => this._onChange$.next());
+    this._subs = merge(this.chat.messagesObs,
+                      this.chat.user.userObs.pipe(
+                        tap(x => {
+                          if (!x) return;
+                          x.onlineStatusObs.pipe(takeUntil(this._destroy)).subscribe(() => this._onChange$.next())
+                        }))
+                  ).pipe(takeUntil(this._destroy)).subscribe(() => this._onChange$.next());
 
     this.isLoading.status = true;
     this.chat.getMoreMessages().pipe(finalize(() => this.isLoading.status = false)).subscribe();

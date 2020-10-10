@@ -15,7 +15,8 @@
   </div>
   <div class="card-body">
     <h4 class="card-title">{{ source.user.user?.login }}</h4>
-    <p class="card-text">{{ source.lastMessage?.toString() }}</p>
+    <typing-indicator [chat]="source"></typing-indicator>
+    <p *ngIf="!source.typing" class="card-text">{{ source.lastMessage?.toString() }}</p>
   </div>
 </ng-template>
 <ng-template [ngIf]="!source.user.user">

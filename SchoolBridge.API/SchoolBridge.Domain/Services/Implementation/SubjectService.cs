@@ -155,5 +155,15 @@ namespace SchoolBridge.Domain.Services.Implementation
         {
             await _subjectGR.DeleteAsync(pupilSubject);
         }
+
+        public PupilSubject GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PupilSubject> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
