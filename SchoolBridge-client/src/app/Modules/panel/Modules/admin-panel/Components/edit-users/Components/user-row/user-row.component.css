@@ -1,0 +1,12 @@
+.circle:before {
+    content: ' \25CF';
+    font-size: 30px;
+}
+
+.online {
+    color: #3f9b3f;
+}
+
+.offline {
+    color: rgb(246 95 95);
+}

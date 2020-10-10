@@ -1,6 +1,6 @@
 <div class="container-fluid bg-light no-gutters">
   <table class="table">
-    <thead>
+    <thead class="thead-dark">
       <tr>
         <th scope="col" dbstring>login</th>
         <th scope="col" dbstring>role</th>
@@ -14,6 +14,7 @@
         user-row
         [source]="item"
         (edit)="editUser(item)"
+        class="table-info"
       ></tr>
     </tbody>
   </table>

@@ -10,7 +10,10 @@ const routes: Routes = [
   {
     path: 'edit-usrs',
     component: EditUsersComponent
-  }
+  },
+  { path: '',
+    component: GlobalizationComponent,
+  },
 ];
 
 @NgModule({

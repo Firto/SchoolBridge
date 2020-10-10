@@ -1,4 +1,55 @@
 <div class="container-fluid bg-light no-gutters">
+  <div class="tab-pane fade show active" id="languages" role="tabpanel" aria-labelledby="languages-tab">
+    <div *ngIf="'CreateLanguage' | userPerm" class="p-3">
+      <button (click)="toggleEditingMode()" class="btn btn-warning rounded-pill mb-3 w-25 mr-1" dbstring>
+        toggle-edit-mode
+      </button>
+      <button id="add-lang-btn" class="btn btn-warning rounded-pill mb-3 w-25 ml-1" data-toggle="collapse" href="#cllps-add-lang"
+        type="button" aria-expanded="false" aria-controls="cllps-add-lang" dbstring>
+        add-lang
+      </button>
+      <div class="collapse" id="cllps-add-lang">
+        <div class="def-form w-100">
+          <div class="form-group" *ngFor="let som of form.argsV">
+            <input id="{{ som.name }}" type="{{ som.type }}"
+              class="form-control rounded-pill form-control-lg text-lowercase" dbstring
+              [attrString]="{ str: 'pn-' + som.name, arg: 'placeholder' }" [dbPrefix]="false"
+              (change)="onChange(som.name)" />
+            <p class="text-danger font-weight-bold text-center" *ngFor="let item of som.errors">
+              {{ item | async }}
+            </p>
+          </div>
+          <button (click)="addLanguage()" class="btn mt-5 rounded-pill btn-lg btn-custom btn-block text-uppercase"
+            dbstring>
+            submit
+          </button>
+        </div>
+      </div>
+    </div>
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col" dbstring>tag</th>
+          <th scope="col" class="w-50" dbstring>name</th>
+          <th *ngIf="'RemoveLanguage' | userPerm" scope="col" dbstring>remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of gbiService.info.awaibleLanguages | keyvalue" class="table-info">
+          <th class="text-uppercase" scope="row">{{ item.key }}</th>
+          <td>{{ item.value }}</td>
+          <td *ngIf="'RemoveLanguage' | userPerm">
+            <button class="btn btn-danger rounded-circle" title="{{ item.key }}" (click)="removeLanguage($event)">
+              <i class="fas fa-times"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- <div class="container-fluid bg-light no-gutters">
   <ul class="nav nav-tabs" id="myTab" role="tablist">
     <li *ngIf="'GetLanguagesEditTab' | userPerm" class="nav-item">
       <a
@@ -119,4 +170,4 @@
       </button>
     </div>
   </div>
-</div>
+</div> -->
