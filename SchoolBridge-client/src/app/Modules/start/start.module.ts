@@ -13,6 +13,7 @@ import { PermanentConnectionService } from './Services/permanent-connection.serv
 import { MdGlobalization } from '../globalization/Services/md-globalization.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HomeComponent } from './Components/home/home.component';
+import { ForgotPasswordComponent } from './Components/forgot-password/forgot-password.component';
 
 @NgModule({
     declarations: [
@@ -21,7 +22,8 @@ import { HomeComponent } from './Components/home/home.component';
         StartNavbarComponent,
         LoginComponent,
         EmailRegisterComponent,
-        RegisterComponent
+        RegisterComponent,
+        ForgotPasswordComponent
     ],
     providers: [
         RegisterService,
