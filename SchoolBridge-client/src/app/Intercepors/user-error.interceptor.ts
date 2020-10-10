@@ -25,7 +25,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                     if (event.body.ok)
                         return <any>event.clone({body: event.body.result});
                     event.body.result.message = this._gbsService.convertString(event.body.result.message);
-                    if ("additionalInfo" in event.body.result)
+                    if (event.body.result.id == 'v-dto-invalid' && "additionalInfo" in event.body.result)
                         Object.keys(event.body.result.additionalInfo).forEach(x => {
                             event.body.result.additionalInfo[x].forEach((r, i) => {
                                 console.log(r);
