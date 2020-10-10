@@ -11,5 +11,6 @@ namespace SchoolBridge.Helpers.DtoModels
         public string Photo { get; set; }
         public OnlineStatus OnlineStatus { get; set; }
         public string OnlineStatusSubscriptionToken { get; set; }
+        public bool Banned { get; set; }
     }
 }

@@ -53,8 +53,12 @@ namespace SchoolBridge.Domain.Services.Implementation
 
                         new Permission { Name = "GetStringsEditTab" },
                             new Permission { Name = "UpdateBaseUpdateId" },
-                            new Permission { Name = "ToggleEditGbStringsMode" },
                             new Permission { Name = "EditGbStrings" },
+
+                    new Permission { Name = "GetAllUsers"},
+                        new Permission { Name = "EditUser"},         
+                        new Permission { Name = "BanUser"},
+                        new Permission { Name = "UnbanUser"}
             };
 
             permissionService.AddPermissions(adminPerms.Concat(pupilPerms));

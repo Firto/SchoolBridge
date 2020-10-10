@@ -23,26 +23,41 @@ namespace SchoolBridge.API.Controllers
         private readonly IGenericRepository<User> _usersGR;
         private readonly IOnlineService _onlineService;
         private readonly IUserService _userService;
+        private readonly IBanUsserService _banUsserService;
 
         public UserController(IGenericRepository<User> usersGR,
                                IOnlineService onlineService,
-                               IUserService userService)
+                               IUserService userService,
+                               IBanUsserService banUsserService)
         {
             _usersGR = usersGR;
             _onlineService = onlineService;
             _userService = userService;
-        }
-
-        [HttpGet]
-        [HasPermission("GetAllUsers")]
-        public async Task<ResultDto> GetAll([BindNever] JwtSecurityToken token)
-        {
-            return ResultDto.Create((await _usersGR.GetAllIncludeAsync(x => true, x => x.Role)).Select(x => new UserDto { Id = x.Id, Login = x.Login, Role = x.Role.Name, OnlineStatus = _onlineService.GetOnlineStatus(x.Id), OnlineStatusSubscriptionToken = _onlineService.CreateOnlineStatusSubscriptionToken(token.Id, x.Id) }));
+            _banUsserService = banUsserService;
         }
 
         [HttpGet]
         [MyAutorize]
-        public async Task<ResultDto> GetAllShort([BindNever] JwtSecurityToken token)
+        [HasPermission("GetAllUsers")]
+        public async Task<ResultDto> GetAll([BindNever] JwtSecurityToken token)
+        {
+            return ResultDto.Create((await _usersGR.GetAllIncludeAsync(
+                x => true,
+                x => x.Role)).Select(x => new UserDto { 
+                                        Id = x.Id, 
+                                        Login = x.Login, 
+                                        Role = x.Role.Name, 
+                                        OnlineStatus = _onlineService.GetOnlineStatus(x.Id), 
+                                        OnlineStatusSubscriptionToken = _onlineService.CreateOnlineStatusSubscriptionToken(token.Id, x.Id),
+                                        Banned = x.Banned != null
+                                    })
+                );
+        }
+
+        [HttpGet]
+        [MyAutorize]
+        [HasPermission("GetAllUsers")]
+        public async Task<ResultDto> GetAllShort()
         {
             return ResultDto.Create((await _usersGR.GetAllAsync()).Select(x => _userService.GetShortDto(x.Id)));
         }
@@ -52,6 +67,24 @@ namespace SchoolBridge.API.Controllers
         public async Task<ResultDto> Get([FromQuery, ArgValid("str-input")]string getToken, [BindNever] JwtSecurityToken token)
         {
             return ResultDto.Create(await _userService.GetFullDtoByGetTokenAsync(token.Id, getToken));
+        }
+
+        [HttpPost]
+        [MyAutorize]
+        [HasPermission("BanUser")]
+        public async Task<ResultDto> Ban([FromBody, MyValidation] BanUserDto entity)
+        {
+            await _banUsserService.BanAsync(entity.UserId, entity.Reason);
+            return ResultDto.Create(null);
+        }
+
+        [HttpPost]
+        [MyAutorize]
+        [HasPermission("UnbanUser")]
+        public async Task<ResultDto> Unban([FromBody, MyValidation] UnbanUserDto entity)
+        {
+            await _banUsserService.UnbanAsync(entity.UserId);
+            return ResultDto.Create(null);
         }
 
         [HttpPost]

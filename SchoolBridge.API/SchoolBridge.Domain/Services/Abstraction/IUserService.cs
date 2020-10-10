@@ -51,7 +51,10 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Task ChangeLoginAsync(string Login, User user);
 
 
-        Task RemoveAsync(User user);
-        Task BlockAsync(User ovner, User user, string comment, DateTime unblockDate);
+        void Ban(User user, string reason);
+        void Unban(User user);
+
+        Task BanAsync(User user, string reason);
+        Task UnbanAsync(User user);
     }
 }

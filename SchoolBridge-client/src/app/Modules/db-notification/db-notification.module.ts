@@ -10,6 +10,8 @@ import { DbNtfNewChatMessageComponent } from './Components/db-notifications/db-n
 import { GlobalizationModule } from '../globalization/globalization.module';
 import { TimeAgoDirectiveModule } from '../TimeAgoPipe/time-ago-directive.module';
 import { BaseDbNtfComponent } from './Components/base-db-ntf-component/base-db-ntf.component';
+import { DbNtfBanComponent } from './Components/db-notifications/db-ntf-ban/db-ntf-ban.component';
+import { DbNtfUnbanComponent } from './Components/db-notifications/db-ntf-unban/db-ntf-unban.component';
 
 @NgModule({
     declarations: [
@@ -19,6 +21,8 @@ import { BaseDbNtfComponent } from './Components/base-db-ntf-component/base-db-n
         DbNtfMessageComponent,
         DbNtfOnLoginComponent,
         DbNtfNewChatMessageComponent,
+        DbNtfBanComponent,
+        DbNtfUnbanComponent
     ],
     imports: [
         CommonModule,
@@ -29,4 +33,4 @@ import { BaseDbNtfComponent } from './Components/base-db-ntf-component/base-db-n
         SetDbNotificationsComponent
     ]
 })
-export class DbNotificationModule {} 
+export class DbNotificationModule {}

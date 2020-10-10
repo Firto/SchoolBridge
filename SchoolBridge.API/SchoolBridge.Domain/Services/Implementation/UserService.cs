@@ -204,11 +204,6 @@ namespace SchoolBridge.Domain.Services.Implementation
             return await AddAsync(user, noPermissions);
         }
 
-        public Task BlockAsync(User ovner, User user, string comment, DateTime unblockDate)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<User> GetByEmailAsync(string email)
         {
             return (await _userGR.GetAllAsync(x => x.Email == email)).FirstOrDefault();
@@ -280,10 +275,6 @@ namespace SchoolBridge.Domain.Services.Implementation
             await _userGR.DeleteAsync(user);
         }
 
-        public Task Unblock(User ovner, User user, string comment, DateTime unblockDate)
-        {
-            throw new NotImplementedException();
-        }
 
         public User GetAll(string Id)
         {
@@ -383,6 +374,34 @@ namespace SchoolBridge.Domain.Services.Implementation
         {
             user = await _userGR.FindAsync(user.Id);
             user.Login = Login;
+            await _userGR.UpdateAsync(user);
+        }
+
+        public void Ban(User user, string reason)
+        {
+            user = _userGR.Find(user.Id);
+            user.Banned = reason;
+            _userGR.Update(user);
+        }
+
+        public void Unban(User user)
+        {
+            user = _userGR.Find(user.Id);
+            user.Banned = null;
+            _userGR.Update(user);
+        }
+
+        public async Task BanAsync(User user, string reason)
+        {
+            user = await _userGR.FindAsync(user.Id);
+            user.Banned = reason;
+            await _userGR.UpdateAsync(user);
+        }
+
+        public async Task UnbanAsync(User user)
+        {
+            user = await _userGR.FindAsync(user.Id);
+            user.Banned = null;
             await _userGR.UpdateAsync(user);
         }
     }

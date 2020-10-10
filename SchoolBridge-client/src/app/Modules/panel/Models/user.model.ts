@@ -5,4 +5,5 @@ export class UserModel{
     onlineStatus: number;
     photo: string;
     onlineStatusSubscriptionToken: string;
+    banned: boolean;
 }

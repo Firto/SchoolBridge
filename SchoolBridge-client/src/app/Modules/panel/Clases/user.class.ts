@@ -34,7 +34,12 @@ export class User {
   get onlineStatus(): number {
     return this._onlineService.stats[this.id];
   }
-
+  get banned(): boolean {
+    return this.model.banned;
+  }
+  set banned(val: boolean) {
+    this.model.banned = val;
+  }
   constructor(
     private readonly _model: UserModel,
     private readonly _onlineService: OnlineService
@@ -64,7 +69,6 @@ export class ShortUser{
   set user(val: User){
     this._user$.next(val);
   }
-
   constructor(private readonly _model: ShortUserModel){
     this._user$ = new BehaviorSubject<User>(null);
   }

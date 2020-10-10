@@ -108,6 +108,8 @@ namespace SchoolBridge.API
             services.UseSubjectService(new SubjectServiceConfiguration());
             services.UseLoginRegistrationService(_configuration.GetSection("RegistrationService"));
             services.UseLanguageStringService(new LanguageStringServiceConfiguration { DefaultLanguage = "en" });
+
+            services.AddScoped<IBanUsserService, BanUserService>();
             //SignalR
             services.AddSignalR().AddNewtonsoftJsonProtocol().AddHubOptions<ServerHub>(options =>
             {

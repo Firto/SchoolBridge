@@ -12,12 +12,17 @@
                     <i class="fas fa-globe"></i>&nbsp;<span dbstring >globalization</span>
                 </a>
             </li>
+            <li *ngIf="'GetAllUsers' | userPerm" >
+              <a routerLink="./edit-usrs" routerLinkActive="router-link-active" style="white-space: nowrap;">
+                  <i class="fas fa-users"></i>&nbsp;<span dbstring >users</span>
+              </a>
+          </li>
         </ul>
 
     </nav>
 
     <!-- Page Content  -->
-    <div id="content" class="w-100 px-3">
+    <div id="content" class="w-100">
         <router-outlet ></router-outlet>
     </div>
 </div>
