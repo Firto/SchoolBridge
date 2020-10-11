@@ -35,18 +35,18 @@ namespace SchoolBridge.Domain.Services.Implementation
 
                 if (prop.Length > configuration.MaxCountCharsName)
                     ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {255}]");
-                if (prop.Length < configuration.MinCountCharsName)
+                /*if (prop.Length < configuration.MinCountCharsName)
                     ctx.Valid.Add($"[str-too-short, [pn-{ctx.PropName}], {255}]");
                 if (!Regex.Match(prop, "^[ а-яА-ЯҐґЄєІіЇї]+$").Success)
-                    ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Name musn't have specials chars!"
+                    ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Name musn't have specials chars!"*/
             });
             validatingService.AddValidateFunc("str-sb-comment", (string prop, PropValidateContext ctx) => {
                 if (prop == null) return;
 
                 if (prop.Length > configuration.MaxCountCharsComment)
                     ctx.Valid.Add($"[str-too-long, [pn-{ctx.PropName}], {255}]");
-                if (!Regex.Match(prop, "^[ а-яА-ЯҐґЄєІіЇї]+$").Success)
-                    ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Comment musn't have specials chars!"
+                /*if (!Regex.Match(prop, "^[ а-яА-ЯҐґЄєІіЇї]+$").Success)
+                    ctx.Valid.Add($"[str-no-spc-ch-2, [pn-{ctx.PropName}]]"); //"Comment musn't have specials chars!"*/
             });
             validatingService.AddValidateFunc("number-day-sb", (string prop, PropValidateContext ctx) => {
                 int value;
@@ -156,14 +156,26 @@ namespace SchoolBridge.Domain.Services.Implementation
             await _subjectGR.DeleteAsync(pupilSubject);
         }
 
-        public PupilSubject GetAll()
+        public IEnumerable<PupilSubjectDto> GetAll(User user)
         {
-            throw new NotImplementedException();
+            return _subjectGR.GetAll(x => x.PupilId == user.Id).Select(x => new PupilSubjectDto
+            {
+                Day = x.DayNumber,
+                Lesson = x.LessonNumber,
+                Description = x.Comment,
+                LessonName = x.SubjectName
+            });
         }
 
-        public Task<PupilSubject> GetAllAsync()
+        public async Task<IEnumerable<PupilSubjectDto>> GetAllAsync(User user)
         {
-            throw new NotImplementedException();
+            return (await _subjectGR.GetAllAsync(x => x.PupilId == user.Id)).Select(x => new PupilSubjectDto
+            {
+                Day = x.DayNumber,
+                Lesson = x.LessonNumber,
+                Description = x.Comment,
+                LessonName = x.SubjectName
+            });
         }
     }
 }

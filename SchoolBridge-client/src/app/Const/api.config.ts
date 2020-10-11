@@ -159,4 +159,19 @@ export const apiConfig: Record<string, Service> = {
       },
     },
   },
+  subject: {
+    url: "subject/",
+    methods: {
+      getAll: {
+        url: "getAll",
+        type: "GET",
+
+      },
+      addOrUpdate: {
+        url: "addOrUpdate",
+        type: "POST",
+        loader: false,
+      }
+    },
+  }
 };

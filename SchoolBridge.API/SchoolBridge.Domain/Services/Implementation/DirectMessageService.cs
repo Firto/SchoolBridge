@@ -266,16 +266,16 @@ namespace SchoolBridge.Domain.Services.Implementation
             {
                 LastModify = DateTime.Now,
                 Messages = new List<DirectMessage>() {
-                    _directMessageGR.Create(new DirectMessage
+                    new DirectMessage
                         {
 
                             SenderId = token.Subject,
                             Type = type,
                             Date = DateTime.Now,
                             Base64Source = ObjectToBase64String(message)
-                        })
+                        }
                     },
-                Read = chat.User1Id == token.Subject ? 2 : 1,
+
                 User1Id = token.Subject,
                 User2Id = userId
             });
@@ -316,16 +316,15 @@ namespace SchoolBridge.Domain.Services.Implementation
             {
                 LastModify = DateTime.Now,
                 Messages = new List<DirectMessage>() {
-                    _directMessageGR.Create(new DirectMessage
+                    new DirectMessage
                         {
 
                             SenderId = token.Subject,
                             Type = type,
                             Date = DateTime.Now,
                             Base64Source = ObjectToBase64String(message)
-                        })
+                        }
                     },
-                Read = chat.User1Id == token.Subject ? 2 : 1,
                 User1Id = token.Subject,
                 User2Id = userId
             });

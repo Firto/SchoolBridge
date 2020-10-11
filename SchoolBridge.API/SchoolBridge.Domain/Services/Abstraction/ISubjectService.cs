@@ -9,7 +9,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
 {
     public interface ISubjectService: IOnInitService
     {
-        PupilSubject GetAll();
+        IEnumerable<PupilSubjectDto> GetAll(User user);
 
         PupilSubject Get(int id);
         PupilSubject GetByName(string name);
@@ -20,7 +20,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
 
         //Async
 
-        Task<PupilSubject> GetAllAsync();
+        Task<IEnumerable<PupilSubjectDto>> GetAllAsync(User user);
 
         Task<PupilSubject> GetAsync(int id);
         Task<PupilSubject> GetByNameAsync(string name);

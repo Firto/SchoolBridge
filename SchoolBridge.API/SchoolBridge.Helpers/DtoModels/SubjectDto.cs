@@ -7,7 +7,7 @@ namespace SchoolBridge.Helpers.DtoModels
 {
     public class SubjectDto
     {
-        [PropValid("str-input", "str-sb-name")]
+        [PropValid("str-sb-name")]
         public string SubjectName { get; set; }
         [PropValid("str-sb-comment")]
         public string Comment { get; set; }

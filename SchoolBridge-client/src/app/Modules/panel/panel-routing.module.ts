@@ -6,6 +6,7 @@ import { SettingsComponent } from './Components/settings/settings.component';
 
 import { ChatPanelComponent } from './Modules/chat-panel/main/chat-panel.component';
 import { UserPermissionGuard } from './Modules/user-permission/user-permission.guard';
+import { SubjectPanelComponent } from './Components/subject-panel/subject-panel.component';
 
 const routes: Routes = [
   { path: 'admin',
@@ -23,6 +24,9 @@ const routes: Routes = [
   },
   { path: 'settings',
     component: SettingsComponent
+  },
+  { path: 'subjects',
+    component: SubjectPanelComponent
   },
   { path: '',
     pathMatch: 'prefix',
