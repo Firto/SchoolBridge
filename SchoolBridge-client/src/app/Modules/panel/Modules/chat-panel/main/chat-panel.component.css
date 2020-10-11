@@ -84,3 +84,34 @@
 .chat::-webkit-scrollbar {
   width: 0;
 }
+
+@media screen and (max-width:800px) {
+	.messaging{
+		position: absolute;
+		width: 100%;
+		overflow: hidden;
+	}
+
+	.inbox_msg{
+		position: relative;
+	}
+
+  .inbox_people, .mesgs {
+		position: absolute;
+		top: 0;
+		left: 0;
+        width: 100%;
+	}
+
+	.inbox_people.mclose{
+		left: -100%;
+	}
+
+	.mesgs.mclose{
+		left: 100%;
+	}
+
+	.mesgs{
+		margin-top: 0;
+	}
+}
