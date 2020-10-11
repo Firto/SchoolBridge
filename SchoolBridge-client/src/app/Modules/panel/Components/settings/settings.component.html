@@ -4,7 +4,7 @@
   </h1>
   <div class="row" style="height: 100%">
     <div class="col-md-3">
-      <div class=""><img *ngIf="pService.info | async as info" src="{{apiUrl}}image/{{info.photo}}" height="130px" width="130px"
+      <div class=""><img *ngIf="pService.info | async as info" src="{{apiUrl}}image/{{info.photo}}" class="image-profile"
           style="margin:0;"><br><br>
         <div class="inputWrapper btn btn-primary rounded-pill w-50">
           <input class="fileInput" (change)="changed($event)" type="file" name="file1" />
