@@ -26,12 +26,24 @@ namespace SchoolBridge.API.Controllers
             _subjectService = subjectService;
         }
 
+        [HttpGet]
+        [MyAutorize]
+        public async Task<ResultDto> GetAll([BindNever] User user)
+        {
+            return ResultDto.Create(await _subjectService.GetAllAsync(user));
+        }
 
         [HttpPost]
         [MyAutorize]
-        public async Task<ResultDto> AddUpdate([FromBody, MyValidation] SubjectDto entity, [BindNever] User user)
+        public async Task<ResultDto> AddOrUpdate([FromBody, MyValidation] SubjectDto entity, [BindNever] User user)
         {
-            return ResultDto.Create(await _subjectService.AddUpdateSubjectAsync(entity, user));
+            var mm = await _subjectService.AddUpdateSubjectAsync(entity, user);
+            var kk = new PupilSubjectDto();
+            kk.Day = mm.DayNumber;
+            kk.Lesson = mm.DayNumber;
+            kk.LessonName = mm.SubjectName;
+            kk.Description = mm.Comment;
+            return ResultDto.Create(kk);
         }
     }
 }

@@ -31,10 +31,10 @@ namespace SchoolBridge.Domain.Managers.CClientErrorManager.Middleware
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(JsonConvert.SerializeObject(_clientErrorManager.MapClientErrorDtoToResultDto(ex.Id, ex.AdditionalInfo), _jsonSerializerSettings));
             }
-            catch (NullReferenceException) {
+            /*catch (NullReferenceException) {
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(JsonConvert.SerializeObject(_clientErrorManager.MapClientErrorDtoToResultDto("v-dto-invalid"), _jsonSerializerSettings));
-            }
+            }*/
         }
     }
 }

@@ -12,18 +12,22 @@ import { GlobalizationModule } from '../globalization/globalization.module';
 import { ProfileService } from './Services/profile.service';
 import { UsersService } from './Services/users.service';
 import { OnlineService } from './Services/online.service';
+import { SubjectPanelComponent } from './Components/subject-panel/subject-panel.component';
+import { SubjectService } from './Services/subject.service';
 
 @NgModule({
     declarations: [
         PanelComponent,
         PanelNavbarComponent,
         SelectPanelComponent,
-        SettingsComponent
+        SettingsComponent,
+        SubjectPanelComponent
     ],
     providers: [
         ProfileService,
         OnlineService,
-        UsersService
+        UsersService,
+        SubjectService
     ],
     imports: [
         CommonModule,
@@ -36,4 +40,4 @@ import { OnlineService } from './Services/online.service';
         PanelComponent
     ]
 })
-export class PanelModule  {} 
+export class PanelModule  {}
