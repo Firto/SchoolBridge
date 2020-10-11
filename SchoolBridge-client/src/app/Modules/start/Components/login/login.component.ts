@@ -1,4 +1,4 @@
-import {  Component, ElementRef, OnInit, ViewChild, ɵmarkDirty } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ɵmarkDirty } from '@angular/core';
 import { LoginService } from '../../../../Services/login.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GlobalizationService } from 'src/app/Modules/globalization/Services/globalization.service';
@@ -8,6 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import { OnUnsubscribe } from 'src/app/Services/super.controller';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { markDirty } from 'src/app/Helpers/mark-dirty.func';
+import { UserPermissionService } from 'src/app/Modules/panel/Modules/user-permission/user-permission.service';
 
 @Component({
   selector: 'app-login',
@@ -23,11 +24,12 @@ import { markDirty } from 'src/app/Helpers/mark-dirty.func';
 })
 export class LoginComponent extends OnUnsubscribe implements OnInit {
   public returnUrl: string = null;
-  public form: NgxFormModel = new NgxFormModel("form", ["login", {name: "password", type: "password"}]);
+  public form: NgxFormModel = new NgxFormModel("form", ["login", { name: "password", type: "password" }]);
 
   constructor(private authService: LoginService,
-              private router:Router,
-              private route: ActivatedRoute) {
+    private router: Router,
+    private route: ActivatedRoute,
+    private userPermisionService: UserPermissionService) {
     super();
   }
 
@@ -41,16 +43,24 @@ export class LoginComponent extends OnUnsubscribe implements OnInit {
     });
   }
 
-  onChange(arg: string){
+  onChange(arg: string) {
     if (this.form.valid) return;
     this.form.args[arg].clearErrorsD();
   }
 
-  logon(){
+  logon() {
     if (this.form.valid)
       this.authService.login(this.form.args.login.value, this.form.args.password.value).subscribe(
         val => {
-          this.router.navigateByUrl(this.returnUrl);
+          console.log('!!!!!!!!!!!!!!!!!!!!!!  ' + this.returnUrl);
+          if (!this.route.snapshot.queryParams['returnUrl']) {
+            if (!this.userPermisionService.HasPermission(['GetAdminPanel']))
+              this.router.navigateByUrl('/panel/subjects');
+            else
+              this.router.navigateByUrl('/panel');
+          }
+          else
+            this.router.navigateByUrl(this.returnUrl);
         },
         err => {
           if (err.id == "v-dto-invalid")

@@ -6,7 +6,7 @@ import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globa
   selector: 'start-navbar',
   templateUrl: './start-navbar.component.html',
   styleUrls: ['./start-navbar.component.css'],
-  providers: MdGlobalization('nav')
+  providers: MdGlobalization('nav')  
 })
 //@Globalization('cm-st-nav', [])
 export class StartNavbarComponent {

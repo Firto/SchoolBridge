@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from 'src/app/Services/user.service';
 import { Router } from '@angular/router';
+import { UserPermissionService } from 'src/app/Modules/panel/Modules/user-permission/user-permission.service';
 
 @Component({
   selector: 'app-default',
@@ -9,9 +10,14 @@ import { Router } from '@angular/router';
 export class DefaultComponent {
 
   constructor(userService: UserService,
-              route: Router) { 
-    if (userService.user)
-      route.navigateByUrl('/panel');
+    userPermisionService: UserPermissionService,
+    route: Router) {
+    if (userService.user) {
+      if (!userPermisionService.HasPermission(['GetAdminPanel']))
+        route.navigateByUrl('/panel/subjects');
+      else
+        route.navigateByUrl('/panel');
+    }
     else route.navigateByUrl('/start');
   }
 

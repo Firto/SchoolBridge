@@ -1,32 +1,39 @@
 <nav class="navBar">
-  <svg class="h-100" viewBox="0 0 20 18">
-      <text x="0" y="15" class="fill-white text-uppercase font-weight-slight" >sb</text>
-  </svg>
-  <input type="checkbox" id="chkk" name="chkk">
-  <label for="chkk" class="show-menu-btn">
-      <img src="./../../../assets/img/menu.png" class="nav-img" alt="menu" />
-  </label>
-  <ul class="menu align-middle">
-      <li (click)="onClickMenuItem()" >
-          <a routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" dbstring >panels</a>
-      </li>
-      <li (click)="onClickMenuItem()" >
-          <a routerLink="./settings" routerLinkActive="active" dbstring >settings</a>
-      </li>
-      <li (click)="onClickMenuItem()" >
-          <a routerLink="./chat" routerLinkActive="active" dbstring >chat</a>
-      </li>
-      <li (click)="onClickMenuItem()" >
-          <a class="cancel" (click)="logout()" dbstring >logout</a>
-      </li>
-      <li>
-          <app-language-selector ></app-language-selector>
-      </li>
-      <li >
-          <label for="chkk" class="hide-menu-btn">
-              <i class="fas fa-times"></i>
-          </label>
-      </li>
-  </ul>
-  <set-db-notifications dbNotifications></set-db-notifications>
+    <svg class="h-100" viewBox="0 0 20 18">
+        <text x="0" y="15" class="fill-white text-uppercase font-weight-slight">sb</text>
+    </svg>
+    <input type="checkbox" id="chkk" name="chkk">
+    <label for="chkk" class="show-menu-btn">
+        <img src="./../../../assets/img/menu.png" class="nav-img" alt="menu" />
+    </label>
+    <ul class="menu align-middle">
+        <li *ngIf="'GetAdminPanel' | userPerm" (click)="onClickMenuItem()">
+            <a routerLink="./admin" routerLinkActive="active" dbstring>admin-panel</a>
+        </li>
+        <li *ngIf="'GetAdminPanel' | userPerm" (click)="onClickMenuItem()">
+            <a routerLink="./" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" dbstring>panels</a>
+        </li>
+        <li (click)="onClickMenuItem()">
+            <a routerLink="./subjects" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+                dbstring>subject</a>
+        </li>
+        <li (click)="onClickMenuItem()">
+            <a routerLink="./chat" routerLinkActive="active" dbstring>chat</a>
+        </li>
+        <li (click)="onClickMenuItem()">
+            <a routerLink="./settings" routerLinkActive="active" dbstring>settings</a>
+        </li>
+        <li (click)="onClickMenuItem()">
+            <a class="cancel" (click)="logout()" dbstring>logout</a>
+        </li>
+        <li>
+            <app-language-selector></app-language-selector>
+        </li>
+        <li>
+            <label for="chkk" class="hide-menu-btn">
+                <i class="fas fa-times"></i>
+            </label>
+        </li>
+    </ul>
+    <set-db-notifications dbNotifications></set-db-notifications>
 </nav>

@@ -27,7 +27,7 @@ a.forgot-link:hover{
     z-index: 1;
     height: 100vh;
     position: relative;
-    background: url(./../home/img/register-background.jpg) no-repeat center;
+    background: url(./../../../../../assets/img/register-background.jpg) no-repeat center;
     background-size: cover;
 }
 .form-background{

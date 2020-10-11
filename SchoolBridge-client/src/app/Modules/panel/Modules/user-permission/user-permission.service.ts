@@ -3,7 +3,7 @@ import { UserService } from '../../../../Services/user.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class UserPermissionService {
     public guards = [ ]; 
     public onUpdatePermissions: Subject<string[]> = new Subject<string[]>();

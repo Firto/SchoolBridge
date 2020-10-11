@@ -9,7 +9,7 @@ namespace SchoolBridge.Helpers.DtoModels.Globalization
     {
         [PropValid("str-input", "lss-str-id-name")]
         public string Name { get; set; }
-        [PropValid("str-input", "lss-lng-type")]
+        [PropValid("str-input", "lss-lng-full-name")]
         public string String { get; set; }
     }
 }

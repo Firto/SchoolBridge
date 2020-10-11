@@ -8,7 +8,7 @@
   </button>
   <div
     *ngIf="chat.direct; else elseBlock"
-    class="col-2 offset-4 row no-gutters"
+    class="col-2 offset-4 row no-gutters justify-content-center"
   >
     <div class="position-relative" >
       <img class="rounded-circle" src="{{ chat.user.user?.photo }}" />
@@ -49,7 +49,7 @@
 </div>
 <div *ngIf="chat" class="chat__form">
   <div (keyup.enter)="sendBtn()">
-    <input (input)="change()" id="inp_msg" type="text" />
+    <input (input)="change()" id="inp_msg" type="text" dbstring [attrString]="{str:'input-message' , arg: 'placeholder'}"/>
     <button (click)="sendBtn()"><i class="fas fa-paper-plane"></i></button>
   </div>
 </div>
@@ -57,5 +57,5 @@
   <i class="fa fa-angle-down"></i>
 </button>
 <div *ngIf="!chat" class="text-white font-weight-bold text-center nomesgs">
-  <span>Select chat</span>
+  <span dbstring>select-chat</span>
 </div>
