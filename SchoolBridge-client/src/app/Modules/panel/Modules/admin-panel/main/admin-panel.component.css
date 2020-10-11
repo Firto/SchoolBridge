@@ -15,7 +15,7 @@ a:focus {
 }
 
 #sidebar {
-  height: calc(100vh - 80px);
+  height: calc(100vh - 50px);
   background: black;
   color: #fff;
   transition: all 0.3s;

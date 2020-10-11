@@ -22,10 +22,10 @@
 a.forgot-link:hover{
 	color:#9e09e3;
 }
-  
+
 .register_banner_area{
     z-index: 1;
-    min-height: 900px;
+    height: 100vh;
     position: relative;
     background: url(./../home/img/register-background.jpg) no-repeat center;
     background-size: cover;

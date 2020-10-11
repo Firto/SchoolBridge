@@ -9,6 +9,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
 {
     public interface ISubjectService: IOnInitService
     {
+        PupilSubject GetAll();
+
         PupilSubject Get(int id);
         PupilSubject GetByName(string name);
 
@@ -17,6 +19,8 @@ namespace SchoolBridge.Domain.Services.Abstraction
         void ChangePosition(PupilSubject pupilSubject, byte dayNumber, byte lessonNumber);
 
         //Async
+
+        Task<PupilSubject> GetAllAsync();
 
         Task<PupilSubject> GetAsync(int id);
         Task<PupilSubject> GetByNameAsync(string name);

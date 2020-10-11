@@ -8,7 +8,7 @@
                     aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                <div #navBar class="collapse navbar-collapse offset" id="navbarSupportedContent">
                     <ul class="nav navbar-nav menu_nav ml-auto">
                         <li class="nav-item">
                             <a class="nav-link" routerLink="./home" routerLinkActive="active">Home</a>
@@ -16,7 +16,7 @@
                         <li class="nav-item submenu dropdown">
                             <a class="nav-link dropdown-toggle" data-toggle="dropdown" role="button"
                                 aria-haspopup="true" aria-expanded="false">Start</a>
-                            <ul class="dropdown-menu">
+                            <ul (click)="hide()" class="dropdown-menu dropdown-menu-right">
                                 <li class="nav-item" >
                                     <a class="nav-link" routerLink="./register" routerLinkActive="active"
                                         dbstring>Register</a>

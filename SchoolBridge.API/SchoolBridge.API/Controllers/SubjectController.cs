@@ -28,6 +28,13 @@ namespace SchoolBridge.API.Controllers
 
         [HttpPost]
         [MyAutorize]
+        public async Task<ResultDto> Start()
+        {
+            return ResultDto.Create(await _subjectService.AddUpdateSubjectAsync(entity, user));
+        }
+
+        [HttpPost]
+        [MyAutorize]
         public async Task<ResultDto> AddUpdate([FromBody, MyValidation] SubjectDto entity, [BindNever] User user)
         {
             return ResultDto.Create(await _subjectService.AddUpdateSubjectAsync(entity, user));

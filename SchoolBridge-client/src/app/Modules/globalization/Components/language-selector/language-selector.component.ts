@@ -8,6 +8,7 @@ import { observed } from 'src/app/Decorators/observed.decorator';
 import { markDirty } from 'src/app/Helpers/mark-dirty.func';
 import { OnUnsubscribe } from 'src/app/Services/super.controller';
 import { GlobalizationStringService } from '../../Services/globalization-string.service';
+import { IsLoading } from 'src/app/Helpers/is-loading.class';
 
 @Component({
   selector: 'app-language-selector',
@@ -15,30 +16,27 @@ import { GlobalizationStringService } from '../../Services/globalization-string.
   styleUrls: ['./language-selector.component.css']
 })
 export class LanguageSelectorComponent extends OnUnsubscribe implements OnInit  {
-  private _isChanging: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public info: GlobalizationInfo = null;
+  public isLoading: IsLoading = new IsLoading();
 
-  @observed() public isChangingObs: Observable<boolean> = this._isChanging;
+  @observed() public isChangingObs: Observable<boolean> = this.isLoading.event;
 
   constructor(public gbService: GlobalizationService,
-              private _gbsService: GlobalizationStringService,
-              private _gbiService: GlobalizationInfoService) {
+              public gbiService: GlobalizationInfoService,
+              private _gbsService: GlobalizationStringService) {
     super();
   }
 
   ngOnInit(){
-    this._gbiService.infoObs.pipe(
+    this.gbiService.infoObs.pipe(
       takeUntil(this._destroy),
       delayWhen(() => this._gbsService.loading ? this._gbsService.loading.event.pipe(filter(x => !x)) : of())
     ).subscribe(x => {
-      this.info = x;
-      this._isChanging.next(false);
+      this.isLoading.status = false;
     })
-    this.info = this._gbiService.info;
   }
 
   public onSelect(e: MouseEvent){
-    this._isChanging.next(true);
+    this.isLoading.status = true;
     this.gbService.changeLanguage((<any>e.target).classList[1])
     .pipe().subscribe();
   }

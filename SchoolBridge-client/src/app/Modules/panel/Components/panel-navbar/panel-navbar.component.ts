@@ -12,15 +12,26 @@ import { MdGlobalization } from 'src/app/Modules/globalization/Services/md-globa
   providers: MdGlobalization('nv')
 })
 //@Globalization('cm-pn-nav', [])
-export class PanelNavbarComponent{
+export class PanelNavbarComponent implements AfterViewInit{
+  private checkbox: HTMLInputElement;
+
   constructor(_gb: GlobalizationService,
               private loginService: LoginService,
               private router: Router) { }
 
+  onClickMenuItem(): void {
+    if (this.checkbox.checked)
+        this.checkbox.checked = false;
+  }
 
   logout(): void {
     this.loginService.logout().subscribe(() => {
       this.router.navigateByUrl("/start");
     });
   }
+
+  ngAfterViewInit(): void {
+    this.checkbox = <HTMLInputElement> document.getElementById("chkk");
+  }
+
 }
