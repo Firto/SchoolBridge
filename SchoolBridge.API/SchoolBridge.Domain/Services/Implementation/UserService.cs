@@ -27,13 +27,15 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         private readonly IGenericRepository<DefaultRolePermission> _defaultRolePermissionGR;
         private readonly IOnlineService _onlineService;
+        private readonly IImageService _imageService;
         private readonly UserServiceConfiguration _configuration;
         public UserService(IGenericRepository<User> userGR,
                             IPermissionService permissionService,
                             IRoleService roleService,
                             IGenericRepository<DefaultRolePermission> defaultRolePermissionGR,
                             IOnlineService onlineService,
-                            UserServiceConfiguration configuration)
+                            UserServiceConfiguration configuration,
+                            IImageService imageService)
         {
             _userGR = userGR;
             _permissionService = permissionService;
@@ -41,6 +43,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             _defaultRolePermissionGR = defaultRolePermissionGR;
             _onlineService = onlineService;
             _configuration = configuration;
+            _imageService = imageService;
         }
 
         public static void OnInit(ClientErrorManager manager)
@@ -368,6 +371,33 @@ namespace SchoolBridge.Domain.Services.Implementation
             user = _userGR.Find(user.Id);
             user.Login = Login;
             _userGR.Update(user);
+        }
+
+        public async Task<ProfileDto> ChangeImageAsync(string image, User user)
+        {
+            user = await GetAsync(user.Id);
+            string remPhotoId = "";
+            if (image != null)
+            {
+                remPhotoId = user.PhotoId;
+                user.PhotoId = await _imageService.Add(image);
+            }
+            await _userGR.UpdateAsync(user);
+            if (remPhotoId != null) await _imageService.Remove(remPhotoId);
+            return await GetProfileInfoAsync(user);
+        }
+
+        public async Task<ProfileDto> GetProfileInfoAsync(User user)
+        {
+            ProfileDto model = new ProfileDto();
+            user = await GetAsync(user.Id);
+            model.Login = user.Login;
+            model.Email = user.Email;
+            model.Name = user.Name;
+            model.Surname = user.Surname;
+            model.Lastname = user.Lastname;
+            model.Photo = user.PhotoId;
+            return model;
         }
 
         public async Task ChangeLoginAsync(string Login, User user)

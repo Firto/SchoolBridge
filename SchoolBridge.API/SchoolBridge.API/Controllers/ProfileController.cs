@@ -28,6 +28,13 @@ namespace SchoolBridge.API.Controllers
             return ResultDto.Create(null);
         }
 
+        [HttpPost]
+        [MyAutorize]
+        public async Task<ResultDto> ChangeImage([FromBody, MyValidation] ChangeImageDto model, [BindNever]User user)
+        {
+            return ResultDto.Create(await _userService.ChangeImageAsync(model.Image, user));
+        }
+
         [HttpGet]
         [MyAutorize]
         public async Task<ResultDto> Info([BindNever]User user)
@@ -42,6 +49,5 @@ namespace SchoolBridge.API.Controllers
             model.Photo = user.PhotoId;
             return ResultDto.Create(model);
         }
-
     }
 }

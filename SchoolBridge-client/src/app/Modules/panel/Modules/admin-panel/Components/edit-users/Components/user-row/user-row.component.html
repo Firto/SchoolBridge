@@ -1,6 +1,20 @@
-<th class="text-uppercase" scope="row">{{ user.login }}</th>
-<td>{{ user.role }}</td>
-<td>{{ user.onlineStatus }}</td>
+<th scope="row">{{ user.login }}</th>
+<td *ngIf="user.role == 'Pupil'; else second" class="text-primary">
+  <strong>{{ user.role }}</strong>
+</td>
+<ng-template #second>
+  <td *ngIf="user.role == 'Admin'" class="text-danger">
+    <strong>{{ user.role }}</strong>
+  </td>
+</ng-template>
+<td *ngIf="user.onlineStatus == 0; else online" class="offline">
+  <span class="circle"></span>
+</td>
+<ng-template #online>
+  <td class="online">
+    <span class="circle"></span>
+  </td>
+</ng-template>
 <td>
   <button *ngIf="!user.banned; else elsBlck" class="btn btn-danger" (click)="this.editEvent.emit()" dbstring>
     ban

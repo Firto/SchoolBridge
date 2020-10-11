@@ -18,6 +18,7 @@ import { markDirty } from 'src/app/Helpers/mark-dirty.func';
 })
 export class SettingsComponent extends OnUnsubscribe implements OnInit {
   public form: NgxFormModel = new NgxFormModel("form", ["login"]);
+  private t_fileType: string;
   @ViewChild("login", { static: true }) public el_lg: ElementRef;
 
   public apiUrl: string = environment.apiUrl;
@@ -34,6 +35,23 @@ export class SettingsComponent extends OnUnsubscribe implements OnInit {
   onChange(arg: string){
     if (this.form.valid) return;
     this.form.args[arg].clearErrorsD();
+  }
+
+  changed(evt: any) {
+    const file: File = evt.target.files[0];
+
+    if (file) {
+      const reader = new FileReader();
+      this.t_fileType = file.type;
+      reader.onload = this.handleReaderLoaded.bind(this);
+      reader.readAsBinaryString(file);
+    }
+  }
+
+  handleReaderLoaded(e) {
+      this.pService
+        .changeImage('data:' + this.t_fileType + ';base64,' + btoa(e.target.result))
+        .subscribe();
   }
 
   changeLogin() {

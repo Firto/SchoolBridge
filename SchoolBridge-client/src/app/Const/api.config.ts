@@ -108,6 +108,10 @@ export const apiConfig: Record<string, Service> = {
         url: "changeLogin",
         type: "POST",
       },
+      "change-image": {
+        url: "changeImage",
+        type: "POST",
+      }
     },
   },
   users: {

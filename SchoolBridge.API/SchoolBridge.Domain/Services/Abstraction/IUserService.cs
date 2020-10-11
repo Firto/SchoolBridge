@@ -35,6 +35,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
         Task<User> GetAsync(string Id);
         Task<User> GetByEmailAsync(string email);
         Task<User> GetByLoginAsync(string login);
+        Task<ProfileDto> GetProfileInfoAsync(User user);
 
         Task<User> GetAllAsync(string Id);
         Task<User> GetAllByEmailAsync(string email);
@@ -49,6 +50,7 @@ namespace SchoolBridge.Domain.Services.Abstraction
 
         Task SetPasswordAsync(User user, string password);
         Task ChangeLoginAsync(string Login, User user);
+        Task<ProfileDto> ChangeImageAsync(string Image, User user);
 
 
         void Ban(User user, string reason);

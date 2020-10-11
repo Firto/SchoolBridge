@@ -42,6 +42,16 @@ export class ProfileService {
       );
   }
 
+  changeImage(image: string): Observable<any> {
+    return this.baseService
+      .send<any>(this._ser, "change-image", { image })
+      .pipe(
+        tap((x) => {
+          this._info.next(x);
+        })
+      );
+  }
+
   getInfo(): Observable<ProfileModel> {
     return this.baseService.send<ProfileModel>(this._ser, "info").pipe(
       tap((res) => {

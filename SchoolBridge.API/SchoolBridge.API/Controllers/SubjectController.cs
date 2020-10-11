@@ -26,12 +26,6 @@ namespace SchoolBridge.API.Controllers
             _subjectService = subjectService;
         }
 
-        [HttpPost]
-        [MyAutorize]
-        public async Task<ResultDto> Start()
-        {
-            return ResultDto.Create(await _subjectService.AddUpdateSubjectAsync(entity, user));
-        }
 
         [HttpPost]
         [MyAutorize]
