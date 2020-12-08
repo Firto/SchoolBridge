@@ -1,0 +1,86 @@
+.messaging {
+  height: calc(100vh - 50px);
+  max-width: 1200px;
+  margin: 0 auto;
+  background: gray;
+}
+.inbox_people {
+  background: #fff;
+  float: left;
+  overflow: hidden;
+  width: 30%;
+  height: inherit;
+}
+.inbox_msg {
+  height: inherit;
+}
+.recent_heading {
+  float: left;
+  width: 40%;
+}
+.srch_bar {
+  display: inline-block;
+  text-align: right;
+  width: 60%;
+}
+.headind_srch {
+  padding: 10px 29px 10px 20px;
+  overflow: hidden;
+  border-bottom: 1px solid #c4c4c4;
+}
+.recent_heading h4 {
+  color: #0465ac;
+  font-size: 16px;
+  margin: auto;
+  line-height: 29px;
+}
+.srch_bar input {
+  outline: 0;
+  border: 1px solid #cdcdcd;
+  border-width: 0 0 1px 0;
+  width: 80%;
+  padding: 2px 0 4px 6px;
+  background: 0 0;
+}
+.chat_people {
+  overflow: hidden;
+  clear: both;
+}
+.inbox_chat {
+  height: 100%;
+  overflow-y: auto;
+}
+.mesgs {
+  float: left;
+  overflow: hidden;
+  width: 70%;
+  height: inherit;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.nomesgs {
+  float: left;
+  width: 70%;
+  height: inherit;
+  margin-top: -8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.type_msg {
+  border-top: 1px solid #c4c4c4;
+  position: relative;
+}
+.chat {
+  width: 100%;
+  height: calc(100vh - 50px);
+  padding: 15px 30px;
+  margin: 0 auto;
+  overflow-y: auto;
+  transform: rotate(180deg);
+  direction: rtl;
+}
+.chat::-webkit-scrollbar {
+  width: 0;
+}

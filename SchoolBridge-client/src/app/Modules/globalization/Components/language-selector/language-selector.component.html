@@ -1,0 +1,14 @@
+<div class="dropdown d-inline" *ngIf="gbiService.info">
+    <button class="btn btn-warning btn-rounded dropdown-toggle text-uppercase" type="button"
+        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{gbiService.info.currentLanguage}}
+        <div *ngIf="isLoading.status" class="loader-topbar d-inline-block" style="width: 15px; height: 15px; margin: 0;"></div>
+    </button>
+
+    <div class="dropdown-menu dropdown-warning dropdown-menu-left" aria-labelledby="dropdownMenuButton">
+        <button class="dropdown-item {{item.key}}" (click)="onSelect($event)"
+            *ngFor="let item of gbiService.info.awaibleLanguages | keyvalue;">
+            {{item.value}}
+        </button>
+    </div>
+</div>

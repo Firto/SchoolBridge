@@ -1,15 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SchoolBridge.DataAccess.Entities;
 using SchoolBridge.DataAccess.Entities.Authorization;
+using SchoolBridge.DataAccess.Entities.Chat;
 using SchoolBridge.DataAccess.Entities.Files;
 using SchoolBridge.DataAccess.Entities.Files.Images;
 using SchoolBridge.Helpers.Managers;
 
-namespace GreenP.DataAccess
+namespace SchoolBridge.DataAccess
 {
     public class AuthContext<AUser> : DbContext where AUser: AuthUser
     {
-        public DbSet<ActiveRefreshToken<AUser>> ActiveRefreshTokens { get; set; }
+        public DbSet<ActiveRefreshToken> ActiveRefreshTokens { get; set; }
         public DbSet<AUser> Users { get; set; }
 
         public AuthContext(DbContextOptions options) : base(options){}
@@ -17,56 +18,68 @@ namespace GreenP.DataAccess
 
     public class ApplicationContext: AuthContext<User>
     {
-        public DbSet<Notification<User>> Notifications { get; set; }
-
-        public DbSet<Image> Photos { get; set; }
         public DbSet<Role> Roles { get; set; }
+
+        public DbSet<DirectChat> DirectChats { get; set; }
+        public DbSet<DirectMessage> DirectMessages { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+
+        public DbSet<File> Files { get; set; }
+        public DbSet<Image> Images { get; set; }
+        public DbSet<PupilSubject> PupilSubjects { get; set; }
+
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<DefaultRolePermission> DefaultRolePermissions { get; set; }
+        public DbSet<UserPermission> UserPermissions { get; set; }
+
+        public DbSet<Language> Languages { get; set; }
+        public DbSet<LanguageStringId> LanguageStringIds { get; set; }
+        public DbSet<LanguageStringType> LanguageStringTypes { get; set; }
+        public DbSet<LanguageStringIdType> LanguageStringIdTypes { get; set; }
+        public DbSet<LanguageString> LanguageStrings { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options){}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Role>().HasData(
-                new Role { Id = 1, Name = "Admin" },
-                new Role { Id = 2, Name = "Moderator" },
-                new Role { Id = 3, Name = "RegionModerator" },
-                new Role { Id = 4, Name = "DistinctModerator" },
-                new Role { Id = 5, Name = "Director" },
-                new Role { Id = 6, Name = "SchoolModerator" },
-                new Role { Id = 7, Name = "Teacher" },
-                new Role { Id = 8, Name = "Pupil" }
-            );
-
-            modelBuilder.Entity<File>().HasData(
-               new File { Id = "default-user-photo"}
-           );
-
-            modelBuilder.Entity<Image>().HasData(
-                new Image { FileId = "default-user-photo", Type = "image/jpeg", Static = true }
-            );
-
-            modelBuilder.Entity<User>().HasData(new User { 
-                Id = "admin",
-                Name = "Admin",
-                Surname = "Admin",
-                Lastname = "Admin",
-                Email = "admin@admin.admin",
-                EmailConfirmed = true,
-                Login = "admin",
-                PasswordHash = PasswordHandler.CreatePasswordHash("admin"),
-                PhotoId = "default-user-photo",
-                RoleId = 1
-            });
+            // Keys
 
             modelBuilder.Entity<Image>().HasKey((x) => x.FileId);
 
-            modelBuilder.Entity<Notification<User>>()
+            modelBuilder.Entity<DefaultRolePermission>().HasKey((x) => new { x.RoleId, x.PermissionId });
+            modelBuilder.Entity<UserPermission>().HasKey((x) => new { x.UserId, x.PermissionId });
+
+            modelBuilder.Entity<LanguageString>().HasKey((x) => new { x.IdId, x.LanguageId });
+            modelBuilder.Entity<LanguageStringIdType>().HasKey((x) => new { x.TypeId, x.StringIdId });
+
+            //
+
+            modelBuilder.Entity<LanguageString>()
+                .HasOne(x => x.Language)
+                .WithMany(x => x.Strings);
+
+            modelBuilder.Entity<LanguageStringIdType>()
+                .HasOne(x => x.StringId)
+                .WithMany(x => x.Types);
+
+            modelBuilder.Entity<LanguageStringIdType>()
+               .HasOne(x => x.Type)
+               .WithMany(x => x.Strings);
+
+            modelBuilder.Entity<Notification>()
                .HasOne((x) => x.User)
                .WithMany(x => x.Notifications);
+
+            modelBuilder.Entity<UserPermission>()
+               .HasOne((x) => x.User)
+               .WithMany(x => x.Permissions);
+
+            modelBuilder.Entity<DefaultRolePermission>()
+               .HasOne((x) => x.Role)
+               .WithMany(x => x.DefaultPermissions);
 
             modelBuilder.Entity<User>()
                .HasOne(t => t.Role)
                .WithMany(t => t.Users);
-
 
             base.OnModelCreating(modelBuilder);
         }

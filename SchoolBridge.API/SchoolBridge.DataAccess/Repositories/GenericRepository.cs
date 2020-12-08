@@ -42,6 +42,22 @@ namespace SchoolBridge.DataAccess.Repositories
             return entry.Entity;
         }
 
+        public IEnumerable<TEntity> Create(IEnumerable<TEntity> entities)
+        {
+            List<TEntity> added = new List<TEntity>();
+            EntityEntry<TEntity> entry;
+
+            foreach (var item in entities)
+            {
+                entry = _db.Set<TEntity>().Add(item);
+                added.Add(entry.Entity);
+            }
+            _db.SaveChanges();
+
+            return added;
+        }
+
+
         public async Task<IEnumerable<TEntity>> CreateAsync(IEnumerable<TEntity> entities)
         {
             List<TEntity> added = new List<TEntity>();

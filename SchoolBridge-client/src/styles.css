@@ -1,1 +1,89 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900');
+@import url("https://use.fontawesome.com/releases/v5.6.1/css/all.css");
+
+body{
+  background-color: #424242;
+}
+
+.loader-topbar {
+  margin: 5px auto;
+  border: 3px solid #ddd;
+  border-radius: 50%;
+  border-top: 3px solid #666;
+  width: 22px;
+  height: 22px;
+  -webkit-animation: spin-topbar 1s linear infinite;
+  animation: spin-topbar 1s linear infinite;
+}
+
+@keyframes spin-topbar {
+  0% {
+      -webkit-transform: rotate(0deg);
+  }
+  100% {
+      -webkit-transform: rotate(360deg);
+  }
+}
+
+.login-container{
+	height: 75vh;
+	width: 100%;
+	color: #fff;
+  }
+  .def-form{
+	margin: auto;
+	width: 370px;
+	padding: 15px;
+	max-width: 100%;
+  }
+  .def-form .form-control{
+	font-size: 15px;
+	min-height: 48px;
+	font-weight: 500;
+  }
+  a.forgot-link{
+	  text-decoration: none;
+    color:#666;
+  }
+  a.forgot-link:hover{
+	  color:#0984e3;
+  }
+
+  .form-control:focus{
+	  border-color:#0984e3;
+	  box-shadow: 0 0 0 0.2rem #0984e3;
+  }
+
+  .form-control.ng-invalid{
+    border-color:#e33c09;
+	  box-shadow: 0 0 0 0.2rem #e33c09;
+  }
+
+  .btn-custom{
+	background: #74b9ff;
+	border-color:#74b9ff;
+	color:#fff;
+	font-size: 15px;
+	font-weight: 600;
+	min-height: 48px;
+  }
+  .btn-custom:focus,
+  .btn-custom:hover,
+  .btn-custom:active,
+  .btn-custom:active:focus{
+	background: #0984e3;
+	border-color: #0984e3;
+	color:#fff;
+  }
+
+  .btn-custom:focus{
+	box-shadow: 0 0 0 0.2rem #0984e3;
+  }
+
+  .fill-white{
+    fill: white;
+  }
+
+  .font-weight-slight{
+    font-weight: 100!important;
+  }

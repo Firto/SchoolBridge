@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using SchoolBridge.Helpers.Managers;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 
 namespace SchoolBridge.API.Controllers.Attributes
 {

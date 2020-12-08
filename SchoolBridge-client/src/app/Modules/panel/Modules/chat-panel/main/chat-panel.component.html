@@ -1,0 +1,27 @@
+<div class="messaging">
+  <div class="inbox_msg">
+    <div [ngClass]="{'mclose': curChat}" class="inbox_people mclose">
+      <!--<div class="headind_srch">
+        <div class="recent_heading">
+          <h4>Recent</h4>
+        </div>
+        <div class="srch_bar">
+          <div class="stylish-input-group">
+            <input type="text" class="search-bar" placeholder="Search" />
+          </div>
+        </div>
+      </div>-->
+      <div class="inbox_chat scroll card-group vgr-cards">
+        <div *ngIf="isLoading.value" class="loader-topbar"></div>
+        <direct-chat
+          class="card"
+          *ngFor="let item of chats"
+          [source]="item"
+          (click)="selectChat(item)"
+          [ngClass]="{'select': item.id === curChat?.id}"
+        ></direct-chat>
+      </div>
+    </div>
+    <app-messages class="mesgs" [ngClass]="{'mclose': !curChat}" [source]="curChat" (back)="selectChat(null)" ></app-messages>
+  </div>
+</div>

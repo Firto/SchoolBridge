@@ -1,0 +1,41 @@
+.btn-cancel {
+	background: #ff7474;
+	border-color:#ff7474;
+  }
+.btn-cancel:focus,
+  .btn-cancel:hover,
+  .btn-cancel:active,
+  .btn-cancel:active:focus {
+	background: #ff3232;
+	border-color: #ff3232;
+}
+  .btn-cancel:focus{
+	box-shadow: 0 0 0 0.2rem #ff3232;
+  }
+
+.inputWrapper {
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.fileInput {
+  cursor: pointer;
+  height: 100%;
+  position: absolute;
+  /* top: 0;
+  right: 0;
+  z-index: 99;
+  font-size:50px;  */
+  opacity: 0;
+  -moz-opacity: 0;
+  filter: progid: DXImageTransform.Microsoft.Alpha(opacity=0)
+}
+
+.image-profile{
+  height: 12rem;
+  width: 12rem;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  object-fit: cover;
+}

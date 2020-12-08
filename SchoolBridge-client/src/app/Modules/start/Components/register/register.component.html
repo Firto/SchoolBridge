@@ -1,0 +1,20 @@
+<section class="register_banner_area">
+    <div class="d-flex justify-content-center text-white align-items-center register-container">
+        <div class="form-background">
+            <div class="def-form text-center" (keyup.enter)="register()">
+                <h1 class="mb-5 font-weight-light text-uppercase" dbstring>header</h1>
+                <div class="form-group" *ngFor="let som of form.argsV">
+                    <input id="{{som.name}}" type="{{som.type}}" class="form-control rounded-pill form-control-lg"
+                        dbstring [attrString]="{str:'pn-' + som.name, arg: 'placeholder'}" [dbPrefix]="false"
+                        (change)="onChange(som.name)"/>
+                    <p class="text-danger font-weight-bold text-center" *ngFor="let item of som.errors">
+                        {{item | async}}
+                    </p>
+                </div>
+                <button (click)="register()"
+                    class=" btn mt-5 rounded-pill btn-lg btn-warning btn-block text-uppercase"
+                    dbstring>button</button>
+            </div>
+        </div>
+    </div>
+</section>

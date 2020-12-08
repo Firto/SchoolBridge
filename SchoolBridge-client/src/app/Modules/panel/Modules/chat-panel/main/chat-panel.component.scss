@@ -1,0 +1,34 @@
+.vgr-cards {
+  flex-direction: row;
+  .card {
+    display: flex;
+    flex-flow: wrap;
+    flex: 100%;
+    height: 60px;
+    border-radius: 0;
+    border: 0;
+    transition: 0.3s;
+    border-bottom: 1px solid #cdcdcd;
+
+    &:nth-child(even) .card-img-body {
+      order: 2;
+    }
+
+    &:nth-child(even) .card-body {
+      padding-left: 0;
+      padding-right: 1.25rem;
+    }
+
+    @media (max-width: 576px) {
+      margin: 0;
+    }
+  }
+
+  .card:hover{
+    background-color: lightblue;
+  }
+
+  .card.select, .card.select:hover{
+    background-color: rgb(104, 194, 224);
+  }
+}

@@ -1,0 +1,50 @@
+.top-text-block {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: inherit !important;
+    border-bottom: 1px solid #f4f4f4;
+    position: relative;
+    overflow: hidden;
+}
+
+.top-text-block.unread:before {
+    content: '';
+    width: 4px;
+    background: #f05a1a;
+    left: 0px;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+}
+
+.top-text-block.unread:hover:before {
+    width: 6px;
+}
+
+.top-text-block:before {
+    content: '';
+    width: 4px;
+    background: #276bb9;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+}
+
+.top-text-block:hover:before {
+    width: 6px;
+}
+
+.top-text-block .top-text-light {
+    color: #999;
+    font-size: 0.8em;
+}
+
+.top-text-block a.top-text-light:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}

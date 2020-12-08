@@ -1,0 +1,11 @@
+<div class="d-flex justify-content-center align-items-center login-container">
+    <form class="login-form text-center" [formGroup]="registerForm">
+        <h1 class="mb-5 font-weight-light text-uppercase">Register</h1>
+        <div class="form-group">
+            <input formControlName="email" type="text" class="form-control rounded-pill form-control-lg" placeholder="Email">
+            <p class="text-danger font-weight-bold text-center" >{{registerForm.controls.email.getError("err")}}</p>
+        </div>
+        <button (click)="register()" type="submit" class="btn-reg btn mt-5 rounded-pill btn-lg btn-custom btn-block text-uppercase">Register</button>
+        <p class="mt-3 font-weight-normal">Don't have an account? <a routerLink="/login"><strong>Login Now</strong></a></p>
+    </form>
+</div>

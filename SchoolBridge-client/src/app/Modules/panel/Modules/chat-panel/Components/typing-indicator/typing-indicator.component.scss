@@ -1,0 +1,41 @@
+.typing-indicator {
+  $ti-color-bg: #E6E7ED;
+  background-color: $ti-color-bg;
+  will-change: transform;
+  height: 26px;
+  width: 40px;
+  border-radius: 13px 2px 13px 13px;
+  // padding: 20px;
+  display: flex;
+  flex-flow: row nowrap;
+  position: relative;
+  animation: 2s bulge infinite ease-out;
+  justify-content: center;
+  align-items: center;
+  span {
+    height: 6px;
+    width: 6px;
+    margin: 0 1px;
+    background-color: #9E9EA1;
+    display: block;
+    border-radius: 50%;
+    opacity: 0.4;
+    @for $i from 1 through 3 {
+      &:nth-of-type(#{$i}) {
+        animation: 1s blink infinite ($i * .3333s);
+      }
+    }
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes bulge {
+  50% {
+    transform: scale(1.05);
+  }
+}

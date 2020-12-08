@@ -1,0 +1,42 @@
+.login-form a:hover{
+	color: #faea09;
+}
+.form-control:focus{
+	border-color: #faea09;
+	box-shadow: 0 0 0 0.2rem #faea09;
+}
+.btn-reg {
+  background: #e874ff;
+	border-color:#e874ff;
+}
+.btn-reg:focus,
+.btn-reg:hover,
+.btn-reg:active,
+.btn-reg:active:focus {
+	background: #faea09;
+	border-color:  #faea09;
+}
+.btn-reg:focus{
+	box-shadow: 0 0 0 0.2rem  #faea09;
+}
+.login-form a:hover{
+	color: #faea09;
+}
+.register-container{
+  height: 100vh;
+  width: 100%;
+  color: #fff;
+}
+
+.register_banner_area{
+  z-index: 1;
+  height: 100vh;
+  position: relative;
+  background: url(./../../../../../assets/img/login_banner.jpg) no-repeat center;
+  background-size: cover;
+}
+
+.form-background{
+  background-color: hsl(51deg 43% 33% / 75%);
+  border-radius: 5px;
+}

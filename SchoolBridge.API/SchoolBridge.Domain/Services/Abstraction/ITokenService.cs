@@ -6,16 +6,16 @@ using SchoolBridge.Helpers.DtoModels.Authefication;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface ITokenService<AUser> where AUser : AuthUser
+    public interface ITokenService: IOnInitService
     {
-        int CountLoggedDevices(AUser user);
+        int CountLoggedDevices(string userId);
 
-        Task<LoggedDto> Login(AUser user, string uuid);
-        Task<LoggedDto> RefreshToken(string token, string uuid);
+        Task<LoggedTokensDto> Login(string userId, string uuid);
+        Task<LoggedTokensDto> RefreshToken(string token, string uuid);
 
-        AUser GetUser(string token);
-        AUser GetUser(IHeaderDictionary headers);
-        AUser GetUser(HttpContext context);
+        string GetUser(string token);
+        string GetUser(IHeaderDictionary headers);
+        string GetUser(HttpContext context);
 
         JwtSecurityToken ValidateRefreshToken(string token);
         JwtSecurityToken ValidateToken(string token);

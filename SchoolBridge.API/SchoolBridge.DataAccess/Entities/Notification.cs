@@ -5,22 +5,25 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SchoolBridge.DataAccess.Entities
 {
-    public class Notification<AUser> : ICloneable where AUser : AuthUser
+    public class Notification : ICloneable
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
         public string Type { get; set; }
+        [Required]
         public DateTime Date { get; set; }
+        [Required]
         public string Base64Sourse { get; set; }
+        [Required]
         public bool Read { get; set; } = false;
 
         [ForeignKey("User")]
         public string UserId { get; set; }
-        public AUser User { get; set; }
+        public User User { get; set; }
 
         public object Clone()
-            => new Notification<AUser>
+            => new Notification
             {
                 Id = Id,
                 Type = Type,

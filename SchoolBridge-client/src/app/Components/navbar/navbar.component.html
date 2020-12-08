@@ -1,0 +1,39 @@
+<nav class="navBar">
+    <input type="checkbox" id="chk" name="chk">
+    <label for="chk" class="show-menu-btn">
+        <img src="./../../../assets/img/menu.png" class="nav-img" alt="menu" />
+    </label>
+    <ul class="menu align-middle">
+        <li (click)="onClickMenuItem()" >
+            <a routerLink="/home">home</a>
+        </li>
+        <li *ngIf="(userService.user | async) != null; then thenBlock else elseBlock"></li>
+        <ng-template #thenBlock>
+            <li (click)="onClickMenuItem()" >
+                <a (click)="logout()">logout</a>
+            </li>
+            <li (click)="onClickMenuItem()" >
+                <a >settings</a>
+            </li>
+            <li *ngIf="'GetAdminPanel' | userPerm" (click)="onClickMenuItem()" >
+                <a >admin panel</a>
+            </li>
+        </ng-template>
+        <ng-template #elseBlock>
+            <li (click)="onClickMenuItem()" >
+                <a routerLink="/login">sign In</a>
+            </li>
+            <li (click)="onClickMenuItem()" >
+                <a routerLink="/register">register</a>
+            </li>
+        </ng-template>
+        <li >
+            <label for="chk" class="hide-menu-btn">
+                <i class="fas fa-times"></i>
+            </label>
+        </li>
+    </ul>
+    <ng-template [ngIf]="(userService.user | async) != null">
+        <set-db-notifications dbNotifications></set-db-notifications>
+    </ng-template>
+</nav>

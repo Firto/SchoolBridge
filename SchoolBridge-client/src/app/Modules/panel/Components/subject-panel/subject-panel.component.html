@@ -1,0 +1,72 @@
+<div
+  class="main container-fluid p-0 p-1 d-flex align-items-stretch flex-column flex-lg-row"
+>
+  <div class="flex-grow-1 d-flex align-items-stretch flex-column m-1">
+    <div
+      class="flex-grow-1 h-100 w-100 m-1 bg-light rounded d-flex align-items-stretch"
+      *ngFor="
+        let item of [
+          ['mounday', 0],
+          ['tuesday', 1],
+          ['wednesday', 2]
+        ]
+      "
+    >
+      <div class="flex-grow-0 day" dbstring >{{ item[0] }}</div>
+      <div class="flex-grow-1">
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col" dbstring >lesson</th>
+              <th scope="col" dbstring >desc</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let it of [1, 2, 3, 4, 5, 6, 7, 8]">
+              <th scope="row">{{ it }}</th>
+              <td><input id="sub-{{ item[1] }}-{{ it - 1 }}" type="text" (change)="change(item[1], it - 1)" /></td>
+              <td>
+                <input id="desc-{{ item[1] }}-{{ it - 1 }}" type="text" (change)="change(item[1], it - 1)" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="flex-grow-1 d-flex align-items-stretch flex-column m-1">
+    <div
+      class="flex-grow-1 h-100 w-100 m-1 bg-light rounded d-flex align-items-stretch"
+      *ngFor="
+        let item of [
+          ['thursday', 3],
+          ['friday', 4],
+          ['saturday', 5]
+        ]
+      "
+    >
+      <div class="flex-grow-0 day" dbstring >{{ item[0] }}</div>
+      <div class="flex-grow-1">
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col" dbstring >lesson</th>
+              <th scope="col" dbstring >desc</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let it of [1, 2, 3, 4, 5, 6, 7, 8]">
+              <th scope="row">{{ it }}</th>
+              <td><input id="sub-{{ item[1] }}-{{ it - 1 }}" type="text" (change)="change(item[1], it - 1)" /></td>
+              <td>
+                <input id="desc-{{ item[1] }}-{{ it - 1 }}" type="text" (change)="change(item[1], it - 1)" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

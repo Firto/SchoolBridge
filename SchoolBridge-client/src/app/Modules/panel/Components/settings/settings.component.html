@@ -1,0 +1,42 @@
+<div class="align-items-center container content clear-fix text-center">
+  <h1 class="mb-5 mt-5 font-weight-light text-uppercase text-white" dbstring>
+    header
+  </h1>
+  <div class="row" style="height: 100%">
+    <div class="col-md-3">
+      <div class=""><img *ngIf="pService.info | async as info" src="{{apiUrl}}image/{{info.photo}}" class="image-profile"
+          style="margin:0;"><br><br>
+        <div class="inputWrapper btn btn-primary rounded-pill w-50" >
+          <input class="fileInput" (change)="changed($event)" type="file" name="file1" />
+          <span dbstring>upload-btn</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-9 text-left">
+      <div class="def-form w-100">
+        <div class="form-group">
+          <input #login type="text" class="form-control rounded-pill form-control-lg" dbstring
+            [attrString]="{ str: 'pn-login', arg: 'placeholder' }" [dbPrefix]="false" (change)="onChange('login')"
+            value="{{ (pService.info | async)?.login }}" />
+          <p class="text-danger font-weight-bold text-center" *ngFor="let item of form.args.login.errors">
+            {{ item | async }}
+          </p>
+        </div>
+        <div class="row mt-5">
+          <div class="col mt-1">
+            <button (click)="changeLogin()" class="btn rounded-pill btn-lg btn-custom btn-block text-uppercase"
+              dbstring>
+              btn-save
+            </button>
+          </div>
+          <div class="col mt-1">
+            <button routerLink="../" type="button"
+              class="btn rounded-pill btn-lg btn-custom btn-block text-uppercase btn-cancel" dbstring>
+              btn-cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

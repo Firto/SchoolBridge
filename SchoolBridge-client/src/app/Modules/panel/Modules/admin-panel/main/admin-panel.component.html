@@ -1,0 +1,28 @@
+<div class="wrapper">
+    <!-- Sidebar  -->
+    <nav #navBar id="sidebar" class="active">
+        <div class="sidebar-header">
+            <h3 (click)="hide()" >Admin</h3>
+            <strong (click)="show()" >AP</strong>
+            <!--<a  ><i class="fas fa-arrow-right"></i></a>-->
+        </div>
+        <ul class="list-unstyled components">
+            <li *ngIf="'GetGlobalizationTab' | userPerm" >
+                <a routerLink="./globalization" routerLinkActive="router-link-active" style="white-space: nowrap;">
+                    <i class="fas fa-globe"></i>&nbsp;<span dbstring >globalization</span>
+                </a>
+            </li>
+            <li *ngIf="'GetAllUsers' | userPerm" >
+              <a routerLink="./edit-usrs" routerLinkActive="router-link-active" style="white-space: nowrap;">
+                  <i class="fas fa-users"></i>&nbsp;<span dbstring >users</span>
+              </a>
+          </li>
+        </ul>
+
+    </nav>
+
+    <!-- Page Content  -->
+    <div id="content" class="w-100">
+        <router-outlet ></router-outlet>
+    </div>
+</div>

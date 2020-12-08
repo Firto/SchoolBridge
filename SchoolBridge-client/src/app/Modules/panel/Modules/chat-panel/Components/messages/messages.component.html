@@ -1,0 +1,61 @@
+<div *ngIf="chat" class="msg_bar row no-gutters bg-white">
+  <button
+    (click)="backEvent.emit(null)"
+    type="button"
+    class="btn bg-dark rounded-0 text-white col-1"
+  >
+    <i class="fa fa-angle-left"></i>
+  </button>
+  <div
+    *ngIf="chat.direct; else elseBlock"
+    class="col-2 offset-4 row no-gutters justify-content-center"
+  >
+    <div class="position-relative" >
+      <img class="rounded-circle" src="{{ chat.user.user?.photo }}" />
+      <i
+      class="fa fa-circle onl-status"
+      [ngClass]="{
+        online: chat.user.user?.onlineStatus === 1,
+        offline: chat.user.user?.onlineStatus === 0
+      }"
+    ></i>
+    </div>
+    <p class="text-dark">{{ chat.user.user?.login }}</p>
+  </div>
+  <ng-template #elseBlock>
+    Content to render when condition is false.
+  </ng-template>
+</div>
+<div
+  *ngIf="chat"
+  class="chat"
+  libScrollEvent
+  (onScroll)="onChatScroll($event)"
+  [bottomOffset]="50"
+  [topOffset]="50"
+>
+  <div class="chat__wrapper">
+    <div *ngIf="isLoading.status" class="loader-topbar"></div>
+    <div
+      *ngFor="let item of chat.messages"
+      class="chat__message"
+      [ngClass]="{ 'chat__message-own': chat.user.id != item.sender.id }"
+    >
+      <div class="date" [timeAgo]="item.date"></div>
+      <div>{{ item.toString() }}</div>
+    </div>
+    <typing-indicator [chat]="chat"></typing-indicator>
+  </div>
+</div>
+<div *ngIf="chat" class="chat__form">
+  <div (keyup.enter)="sendBtn()">
+    <input (input)="change()" id="inp_msg" type="text" dbstring [attrString]="{str:'input-message' , arg: 'placeholder'}"/>
+    <button (click)="sendBtn()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+<button *ngIf="chat" #toBottomBtn class="backBtn" (click)="toBottom()">
+  <i class="fa fa-angle-down"></i>
+</button>
+<div *ngIf="!chat" class="text-white font-weight-bold text-center nomesgs">
+  <span dbstring>select-chat</span>
+</div>

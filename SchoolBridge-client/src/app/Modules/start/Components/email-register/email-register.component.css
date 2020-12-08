@@ -1,0 +1,36 @@
+.def-form a:hover{
+	color:#9e09e3;
+}
+.form-control:focus{
+	border-color:#9e09e3;
+	box-shadow: 0 0 0 0.2rem #9e09e3;
+}
+.btn-reg {
+	background: #e874ff;
+	border-color:#e874ff;
+}
+.btn-reg:focus,
+.btn-reg:hover,
+.btn-reg:active,
+.btn-reg:active:focus {
+	background: #9e09e3;
+	border-color: #9e09e3;
+}
+.btn-reg:focus{
+	box-shadow: 0 0 0 0.2rem #9e09e3;
+}
+a.forgot-link:hover{
+	color:#9e09e3;
+}
+
+.register_banner_area{
+    z-index: 1;
+    height: 100vh;
+    position: relative;
+    background: url(./../../../../../assets/img/register-background.jpg) no-repeat center;
+    background-size: cover;
+}
+.form-background{
+	background-color: hsl(51deg 10% 15% / 75%);
+	border-radius: 5px;
+}

@@ -1,0 +1,29 @@
+<section class="login_banner_area">
+    <div class="d-flex justify-content-center align-items-center login-container">
+        <div class="form-background">
+            <div class="def-form text-center" (keyup.enter)="logon()">
+                <h1 class="mb-5 font-weight-light text-uppercase" dbstring>header</h1>
+                <div class="form-group" *ngFor="let som of form.argsV">
+                    <input id="{{som.name}}" type="{{som.type}}" class="form-control rounded-pill form-control-lg"
+                        dbstring [attrString]="{str:'pn-' + som.name, arg: 'placeholder'}" [dbPrefix]="false"
+                        (change)="onChange(som.name)">
+                    <p class="text-danger font-weight-bold text-center" *ngFor="let item of som.errors">
+                        {{item | async}}
+                    </p>
+                </div>
+                <button (click)="logon()" class="btn mt-5 rounded-pill btn-lg btn-warning btn-block text-uppercase"
+                    dbstring>
+                    btn-login
+                </button>
+                <p class="mt-3 font-weight-normal">
+                    <a class="font-weight-normal text-decoration-none text-warning a-left" routerLink="../register">
+                        <strong dbstring>reg-now</strong>
+                    </a>
+                    <a class="font-weight-normal text-decoration-none text-danger" routerLink="../forgotpassword">
+                        <strong dbstring>change-password</strong>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

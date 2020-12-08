@@ -2,8 +2,8 @@
 using SchoolBridge.DataAccess.Interfaces;
 using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Domain.Managers.CClientErrorManager;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -13,28 +13,33 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using SchoolBridge.Helpers.DtoModels.Authefication;
+using SchoolBridge.DataAccess.Entities;
 
 namespace SchoolBridge.Domain.Services.Implementation
 {
-    public class JwtTokenService<AUser> : ITokenService<AUser> where AUser : AuthUser
+    public class JwtTokenService : ITokenService
     {
-        private readonly IGenericRepository<ActiveRefreshToken<AUser>> _activeRefreshTokensGR;
-        private readonly IGenericRepository<AUser> _usersGR;
+        private readonly IGenericRepository<ActiveRefreshToken> _activeRefreshTokensGR;
+        private readonly IGenericRepository<User> _usersGR;
+        private readonly IUserConnectionService _userConnectionService;
         private readonly TokenServiceConfiguration _configuration;
 
         private string TakeBearerTokenFromHeader(string header)
             => new string(header.Skip(7).ToArray());
 
-        public JwtTokenService(IGenericRepository<ActiveRefreshToken<AUser>> activeRefreshTokensGR,
-                               IGenericRepository<AUser> usersGR,
-                               TokenServiceConfiguration configuration,
-                               ClientErrorManager clientErrorManager) {
+        public JwtTokenService(IGenericRepository<ActiveRefreshToken> activeRefreshTokensGR,
+                               IGenericRepository<User> usersGR,
+                               IUserConnectionService userConnectionService,
+                               TokenServiceConfiguration configuration) {
             _activeRefreshTokensGR = activeRefreshTokensGR;
             _usersGR = usersGR;
+            _userConnectionService = userConnectionService;
             _configuration = configuration;
+        }
 
-            if (!clientErrorManager.IsIssetErrors("Token"))
-                clientErrorManager.AddErrors(new ClientErrors("Token", new Dictionary<string, ClientError> {
+        public static void OnInit(ClientErrorManager manager)
+        {
+            manager.AddErrors(new ClientErrors("TokenService", new Dictionary<string, ClientError> {
                     {"inc-refresh-token", new ClientError("Incorrect refresh token!")},
                     {"inc-token", new ClientError("Incorrect token!")},
                     {"no-uuid", new ClientError("No UUID!")},
@@ -43,8 +48,8 @@ namespace SchoolBridge.Domain.Services.Implementation
                 }));
         }
 
-        public int CountLoggedDevices(AUser user)
-            => _activeRefreshTokensGR.CountWhere((x) => x.UserId == user.Id);
+        public int CountLoggedDevices(string userId)
+            => _activeRefreshTokensGR.CountWhere((x) => x.UserId == userId);
 
         // Validating
 
@@ -94,12 +99,12 @@ namespace SchoolBridge.Domain.Services.Implementation
         public async Task DeactivateToken(string token)
         {
             JwtSecurityToken stoken = ValidateToken(token);
-            ActiveRefreshToken<AUser> tkn = await _activeRefreshTokensGR.FindAsync(stoken.Id);
+            ActiveRefreshToken tkn = await _activeRefreshTokensGR.FindAsync(stoken.Id);
 
             if (tkn == null)
                 throw new ClientException("inc-token");
 
-            _activeRefreshTokensGR.DeleteAsync(tkn);
+            await _activeRefreshTokensGR.DeleteAsync(tkn);
         }
 
         public async Task DeactivateToken(IHeaderDictionary headers)
@@ -116,12 +121,12 @@ namespace SchoolBridge.Domain.Services.Implementation
         public async Task DeactivateAllTokens(string token)
         {
             JwtSecurityToken stoken = ValidateToken(token);
-            ActiveRefreshToken<AUser> tkn = (await _activeRefreshTokensGR.GetAllIncludeAsync((x) => x.Jti == stoken.Id, (x) => x.User)).FirstOrDefault();
+            ActiveRefreshToken tkn = (await _activeRefreshTokensGR.GetAllIncludeAsync((x) => x.Jti == stoken.Id, (x) => x.User)).FirstOrDefault();
 
             if (tkn == null)
                 throw new ClientException("inc-token");
 
-            _activeRefreshTokensGR.DeleteAsync((x) => x.UserId == tkn.UserId);
+            await _activeRefreshTokensGR.DeleteAsync((x) => x.UserId == tkn.UserId);
         }
 
         public async Task DeactivateAllTokens(IHeaderDictionary headers)
@@ -137,10 +142,10 @@ namespace SchoolBridge.Domain.Services.Implementation
 
         // base methods
 
-        public async Task<LoggedDto> RefreshToken(string token, string uuid)
+        public async Task<LoggedTokensDto> RefreshToken(string token, string uuid)
         {
             JwtSecurityToken to = ValidateRefreshToken(token);
-            ActiveRefreshToken<AUser> activeJwtRefreshToken = _activeRefreshTokensGR.GetAllInclude((x) => x.Jti == to.Id, (s) => s.User).FirstOrDefault();
+            ActiveRefreshToken activeJwtRefreshToken = _activeRefreshTokensGR.GetAll((x) => x.Jti == to.Id).FirstOrDefault();
 
             if (activeJwtRefreshToken == null)
                 throw new ClientException("inc-refresh-token");
@@ -149,17 +154,19 @@ namespace SchoolBridge.Domain.Services.Implementation
                 throw new ClientException("inc-uuid");
 
             await _activeRefreshTokensGR.DeleteAsync(activeJwtRefreshToken);
-            return await Login(activeJwtRefreshToken.User, activeJwtRefreshToken.UUID);
+            var ttoken = await Login(activeJwtRefreshToken.UserId, activeJwtRefreshToken.UUID);
+            _userConnectionService.UpdateUserToken(to.Id, ttoken.Token);
+            return ttoken;
         }
 
-        public async Task<LoggedDto> Login(AUser user, string uuid) {
+        public async Task<LoggedTokensDto> Login(string userId, string uuid) {
             var refreshExpires = DateTime.Now.Add(_configuration.RefreshTokenExpires);
             var expires = DateTime.Now.Add(_configuration.TokenExpires);
 
             var jti = Guid.NewGuid().ToString();
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, userId),
                 new Claim(JwtRegisteredClaimNames.Jti, jti)
             };
 
@@ -182,21 +189,21 @@ namespace SchoolBridge.Domain.Services.Implementation
                signingCredentials: creds
             );
 
-            await _activeRefreshTokensGR.DeleteAsync((x) => x.UUID == uuid && x.UserId == user.Id);
-            await _activeRefreshTokensGR.CreateAsync(new ActiveRefreshToken<AUser> { Jti = jti, UUID = uuid, User = user, Expire = refreshExpires });
-            return new LoggedDto { RefreshToken = _configuration.TokenHandler.WriteToken(refreshToken), Token = _configuration.TokenHandler.WriteToken(token), Expires = expires.ToUnixTimestamp() };
+            await _activeRefreshTokensGR.DeleteAsync((x) => x.UUID == uuid && x.UserId == userId);
+            await _activeRefreshTokensGR.CreateAsync(new ActiveRefreshToken { Jti = jti, UUID = uuid, UserId = userId, Expire = refreshExpires });
+            return new LoggedTokensDto { RefreshToken = _configuration.TokenHandler.WriteToken(refreshToken), Token = _configuration.TokenHandler.WriteToken(token), Expires = expires.ToUnixTimestamp() };
         }
 
-        public AUser GetUser(string token)
+        public string GetUser(string token)
         {
             JwtSecurityToken stoken = ValidateToken(token);
-            AUser usr = _usersGR.Find(stoken.Subject);
+            User usr = _usersGR.Find(stoken.Subject);
             if (usr == null)
                 throw new ClientException("inc-token");
-            return usr;
+            return usr.Id;
         }
 
-        public AUser GetUser(IHeaderDictionary headers)
+        public string GetUser(IHeaderDictionary headers)
         {
             if (!headers.ContainsKey("Authorization"))
                 throw new ClientException("inc-token");
@@ -204,7 +211,7 @@ namespace SchoolBridge.Domain.Services.Implementation
             return GetUser(TakeBearerTokenFromHeader(headers["Authorization"]));
         }
 
-        public AUser GetUser(HttpContext context)
+        public string GetUser(HttpContext context)
             => GetUser(context.Request.Headers);
 
     }

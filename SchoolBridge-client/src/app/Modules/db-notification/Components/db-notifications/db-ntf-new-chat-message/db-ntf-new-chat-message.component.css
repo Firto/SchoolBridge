@@ -1,0 +1,33 @@
+.text-message {
+    display: block;
+  }
+  .text-message img {
+    float: left;
+    border-radius: 50%;
+    max-width: 30px;
+  }
+  .text-message .about {
+    margin-left: 8px;
+    margin-top: 8px;
+  }
+  .text-message .about {
+    padding-left: 30px;
+  }
+  .text-message .status {
+    color: #92959E;
+  }
+
+  .online, .offline, .me {
+    margin-right: 3px;
+    font-size: 10px;
+  }
+  
+  .online {
+    color: #86BB71;
+  }
+
+  
+  
+  .offline {
+    color: #E38968;
+  }

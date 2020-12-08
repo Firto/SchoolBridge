@@ -1,0 +1,12 @@
+.login_banner_area{
+    z-index: 1;
+    height: 100vh;
+  position: relative;
+  background: url(./../../../../../assets/img/login_banner.jpg) no-repeat center;
+  background-size: cover;
+}
+
+.form-background{
+  background-color: hsl(51deg 43% 33% / 75%);
+  border-radius: 5px;
+}

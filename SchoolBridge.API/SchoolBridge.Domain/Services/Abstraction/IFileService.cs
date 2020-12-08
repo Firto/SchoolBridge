@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface IFileService
+    public interface IFileService: IOnInitService, IOnFirstInitService
     {
         Task<string> Add(string source);
         Task<IEnumerable<string>> Add(IEnumerable<string> sources);

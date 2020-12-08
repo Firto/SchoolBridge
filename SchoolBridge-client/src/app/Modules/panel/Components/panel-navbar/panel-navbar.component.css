@@ -1,0 +1,158 @@
+h1 {
+  color: #fff;
+  font-size: 48px;
+}
+
+p {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+#chkk {
+  position: absolute;
+  visibility: hidden;
+  z-index: -1111;
+}
+
+nav {
+  height: 50px;
+  border-width: 0px;
+  border-radius: 0;
+  background-color: #fdc632;
+}
+
+nav a img {
+  vertical-align: middle;
+  width: 50px;
+  height: 50px;
+}
+
+.navBar::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.nav-img {
+  height: 50px;
+  width: 50px;
+  margin-right: 20px;
+}
+
+.menu {
+  margin: 0;
+  position: fixed;
+  width: 300px;
+  height: 100vh;
+  background: #333;
+  right: -300px;
+  top: 0;
+  text-align: center;
+  padding: 80px 0;
+  line-height: normal;
+  transition: 0.7s;
+  text-decoration: none;
+  z-index: 120;
+}
+
+.menu > li {
+  display: inline;
+}
+
+.menu a {
+  color: #fff;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: 0.4s;
+  cursor: pointer;
+  border-radius: 10px;
+  display: block;
+  padding: 10px;
+  margin: 10px;
+}
+
+.show-menu-btn,
+.hide-menu-btn {
+  transition: 0.4s;
+  cursor: pointer;
+  color: gray;
+  display: block;
+}
+
+.hide-menu-btn {
+  position: absolute;
+  top: 10px;
+  right: 30px;
+  z-index: 1000;
+}
+
+.show-menu-btn {
+  float: right;
+  margin-bottom: 0;
+}
+
+.show-menu-btn i {
+  line-height: 100px;
+}
+
+.menu a:hover,
+.menu a.active,
+.show-menu-btn:hover,
+.hide-menu-btn:hover {
+  color: #b18100;
+}
+
+.menu a:hover {
+  background-color: #272727;
+}
+
+.menu a.active,
+.menu a.active:hover {
+  cursor: default;
+  background-color: white;
+  color: black;
+}
+
+.menu a.cancel:hover {
+  color: white;
+  background-color: #ff000098;
+}
+
+.soc {
+  color: white;
+  transition: 0.4s;
+  font-size: 22px;
+  text-decoration: none;
+  margin-left: 12px;
+}
+
+.soc i {
+  transition: 0.4s all;
+}
+
+.soc:hover > i {
+  transform: scale(1.6) rotate(10deg);
+}
+
+small small.badge-pill {
+  text-align: center;
+  padding: 0;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  font-weight: inherit;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+#chkk:checked ~ .menu {
+  right: 0;
+}
+
+@media screen and (max-width: 800px) {
+  .menu {
+    width: 100%;
+    right: -100%;
+  }
+}

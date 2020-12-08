@@ -1,25 +1,22 @@
-using System;
-using System.Text;
 using AutoMapper;
-using GreenP.DataAccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using SchoolBridge.DataAccess.Entities;
+using SchoolBridge.DataAccess;
 using SchoolBridge.DataAccess.Interfaces;
 using SchoolBridge.DataAccess.Repositories;
 using SchoolBridge.Domain.Hostings;
+using SchoolBridge.Domain.Managers.CClientErrorManager.Middleware;
 using SchoolBridge.Domain.Profiles;
 using SchoolBridge.Domain.Services.Abstraction;
 using SchoolBridge.Domain.Services.Configuration;
 using SchoolBridge.Domain.Services.Implementation;
+using SchoolBridge.Domain.Services.ServiceProviderExtentions;
 using SchoolBridge.Domain.SignalR.Hubs;
-using SchoolBridge.Helpers.Managers.CClientErrorManager;
-using SchoolBridge.Helpers.Managers.CClientErrorManager.Middleware;
+using SchoolBridge.Helpers.AddtionalClases.ProgramStatusService;
+using SchoolBridge.Helpers.Extentions;
 
 namespace SchoolBridge.API
 {
@@ -27,92 +24,109 @@ namespace SchoolBridge.API
     public class Startup
     {
         private readonly IConfiguration _configuration;
-        private readonly IConfiguration _jwtConfiguration;
         private readonly IWebHostEnvironment _env;
+
+        //private readonly IEnumerable<string> _allowedOrgins = new string[] { "http://192.168.0.4:4200", "http://192.168.0.4:4300" };
 
         public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             _configuration = configuration;
-            _jwtConfiguration = _configuration.GetSection("JwtSettings");
             _env = env;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DbContext, ApplicationContext>(opt =>
-                opt.UseSqlServer(_configuration.GetSection("ConnectionStrings")["mymssql"]), optionsLifetime: ServiceLifetime.Singleton);
+            // Initialization
 
+            services.AddHostedService<ServiceInitializationHosting>();
+
+            // Db Context
+            services.AddDbContext<DbContext, ApplicationContext>(opt =>
+                opt.UseNpgsql(_configuration.GetSection("ConnectionStrings")["mypostgres"]), optionsLifetime: ServiceLifetime.Singleton);
+
+            // Mapper
             services.AddSingleton(new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new DomainMapperProfile());
             }).CreateMapper());
 
-            // configuration
+            services.AddSingleton<IJsonConverterService, JsonConverterService>();
 
-            services.AddSingleton(new TokenServiceConfiguration
+            // Program status
+
+            services.UseProgramStatusService(new ProgramStatusServiceConfiguration
             {
-                TokenValidation = new TokenValidationParameters
+                CurrentStatusPath = "./Assets/ProgramStatus.json",
+                DefaultStatus = new ProgramStatus
                 {
-                    ValidateLifetime = true,
-                    ValidateAudience = false,
-                    ValidateIssuer = true,
-                    ValidIssuer = _jwtConfiguration["Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration["Key"])),
-                    ClockSkew = TimeSpan.Zero
-                },
-                RefreshTokenValidation = new TokenValidationParameters
-                {
-                    ValidateLifetime = true,
-                    ValidateAudience = false,
-                    ValidateIssuer = true,
-                    ValidIssuer = _jwtConfiguration["Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration["RefreshKey"])),
-                    ClockSkew = TimeSpan.Zero
-                },
-                TokenExpires = TimeSpan.FromMinutes(int.Parse(_jwtConfiguration["ExpireMinuts"])),
-                RefreshTokenExpires = TimeSpan.FromDays(int.Parse(_jwtConfiguration["RefreshExpireDays"])),
-                RefreshTokenRemove = TimeSpan.FromDays(int.Parse(_jwtConfiguration["RefreshRemoveDays"]))
+                    IsLoadedFirst = true
+                }
             });
 
-            services.AddSingleton(new FileServiceConfiguration
+            // Client errors
+            services.UseClientErrorManager();
+
+            // Signalr notification
+
+            services.AddSingleton<IUserConnectionService, UserConnectionService>();
+            services.AddSingleton<INotificationService, NotificationService>();
+
+            services.UsePermanentConnectionService(_configuration.GetSection("PermanentConnectionService"));
+            services.UseOnlineService(_configuration.GetSection("OnlineService"));
+            services.UseChatEventService(_configuration.GetSection("ChatEventService"));
+            services.AddScoped<IDataBaseNotificationService, DataBaseNotificationService>();
+
+            // File service
+            services.UseFileService(new FileServiceConfiguration
             {
-                SaveDirectory = _env.ContentRootPath + "/" + "Files"
+                SaveDirectory = _env.ContentRootPath + "/Assets/Files"
             });
 
-            services.AddSingleton(new ImageServiceConfiguration());
+            // Image Service
+            services.UseImageService(new ImageServiceConfiguration());
 
-            // Singleton
-            services.AddSingleton<ClientErrorManager>();
-            services.AddSingleton(typeof(INotificationService<>), typeof(NotificationService<>));
+            // Email Service
+            services.UseEmailService(_configuration.GetSection("EmailService"));
 
-            // Hosted Services
-            services.AddHostedService<TokenRemoveHosting<User>>();
+            // Custom jwt auth
+            services.UseJwtTokenService(_configuration.GetSection("JwtSettings"));
 
             // Scoped Services
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            services.AddScoped(typeof(ITokenService<>), typeof(JwtTokenService<>));
-            services.AddScoped(typeof(IDataBaseNotificationService<>), typeof(DataBaseNotificationService<>));
+            services.AddScoped<ScopedHttpContext>();
+            services.AddScoped<IValidatingService, ValidatingService>();
 
-            services.AddScoped<IAccountService, AccountService>();
-            services.AddScoped<IFileService, FileService>();
-            services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<ILanguageStringService, LanguageStringService>();
+            services.AddScoped<IRoleService, RoleService>();
+            services.UseUserService(_configuration.GetSection("UserService"));
+            services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<IRegistrationService, RegistrationService>();
+            services.AddScoped<ILoginService, LoginService>();
+            services.AddScoped<IDirectMessagesService, DirectMessageService>();
 
+            services.UseSubjectService(new SubjectServiceConfiguration());
+            services.UseLoginRegistrationService(_configuration.GetSection("RegistrationService"));
+            services.UseLanguageStringService(new LanguageStringServiceConfiguration { DefaultLanguage = "en" });
+
+            services.AddScoped<IBanUsserService, BanUserService>();
             //SignalR
-
-            services.AddSignalR();
+            services.AddSignalR().AddNewtonsoftJsonProtocol().AddHubOptions<ServerHub>(options =>
+            {
+                options.EnableDetailedErrors = true;
+            });
             services.AddControllers();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
+            app.UseCors(x => x.SetIsOriginAllowed(_ => true/*(x) => { Console.WriteLine(x); return _allowedOrgins.Contains(x); }*/)
+                            .AllowAnyHeader()
+                            .WithMethods("GET", "POST")
+                            .AllowCredentials());
 
             app.UseDeveloperExceptionPage();
+            app.UseMiddleware<ScopedHttpContextMiddleware>();
             app.UseMiddleware<ClientErrorsMiddleware>();
 
             app.UseRouting();
@@ -120,7 +134,7 @@ namespace SchoolBridge.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<NotificationHub<User>>("/api/notify");
+                endpoints.MapHub<ServerHub>("/api/notify");
             });
         }
     }

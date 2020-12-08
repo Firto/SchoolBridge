@@ -1,0 +1,24 @@
+<ng-template [ngIf]="source.user.user">
+  <div class="card-img-body">
+    <img
+      class="card-img"
+      src="{{ source.user.user?.photo }}"
+      alt="{{ source.user.user?.login }}"
+    />
+    <i
+      class="fa fa-circle onl-status"
+      [ngClass]="{
+        online: source.user.user?.onlineStatus === 1,
+        offline: source.user.user?.onlineStatus === 0
+      }"
+    ></i>
+  </div>
+  <div class="card-body">
+    <h4 class="card-title">{{ source.user.user?.login }}</h4>
+    <typing-indicator [chat]="source"></typing-indicator>
+    <p *ngIf="!source.typing" class="card-text">{{ source.lastMessage?.toString() }}</p>
+  </div>
+</ng-template>
+<ng-template [ngIf]="!source.user.user">
+  <div class="loader-topbar"></div>
+</ng-template>

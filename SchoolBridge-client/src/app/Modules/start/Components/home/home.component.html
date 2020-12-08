@@ -1,0 +1,160 @@
+<div class="main">
+  <section class="home_banner_area">
+    <div class="banner_inner">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="banner_content text-center">
+              <p class="text-uppercase" dbstring>
+                <!-- Best online education service In the world -->
+                best
+              </p>
+              <h2 class="text-uppercase mt-4 mb-5" dbstring>
+                <!-- One Step Ahead This Season -->
+                one-step
+              </h2>
+              <div>
+                <a routerLink="../register" class="primary-btn ml-sm-3 ml-0" dbstring>register</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!--================ End Home Banner Area =================-->
+
+  <!--================ Start Feature Area =================-->
+  <section class="feature_area section_gap_top">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-5">
+          <div class="main_title">
+            <h2 class="mb-3" dbstring>awesome-feature</h2>
+            <p dbstring>
+              <!-- Replenish man have thing gathering lights yielding shall you -->
+              replenish
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6">
+          <div class="single_feature">
+            <div class="icon">
+              <i class="fas fa-graduation-cap icon-size"></i>
+            </div>
+            <div class="desc">
+              <h4 class="mt-3 mb-2" dbstring>scholarship-facility</h4>
+              <p dbstring>
+                <!-- One make creepeth, man bearing theira firmament won't great
+                heaven -->
+                one-make
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="single_feature">
+            <div class="icon"><i class="fas fa-book-open icon-size"></i></div>
+            <div class="desc">
+              <h4 class="mt-3 mb-2" dbstring>sell-online-course</h4>
+              <p dbstring>
+                <!-- One make creepeth, man bearing theira firmament won't great
+                heaven -->
+                one-make
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="single_feature">
+            <div class="icon">
+              <i class="fas fa-globe-americas icon-size"></i>
+            </div>
+            <div class="desc">
+              <h4 class="mt-3 mb-2" dbstring>global-certification</h4>
+              <p dbstring>
+                <!-- One make creepeth, man bearing theira firmament won't great
+                heaven -->
+                one-make
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!--================ End Feature Area =================-->
+
+  <!--================ Start Registration Area =================-->
+  <div class="section_gap registration_area">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-7">
+          <div class="row clock_sec clockdiv" id="clockdiv">
+            <div class="col-lg-12">
+              <h1 class="mb-3" dbstring>register-now</h1>
+              <p dbstring>
+                <!-- There is a moment in the life of any aspiring astronomer that it
+                is time to buy that first telescope. It’s exciting to think
+                about setting up your own viewing station. -->
+                there-is
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 offset-lg-1">
+          <div class="register_form">
+            <h3 dbstring>register-now</h3>
+            <div class="form_area" id="myForm" action="mail.html" method="post">
+              <div class="row">
+                <div
+                  class="col-lg-12 form_group"
+                  *ngFor="let som of form.argsV"
+                >
+                  <input
+                    (keyup.enter)="register()"
+                    id="{{ som.name }}"
+                    type="{{ som.type }}"
+                    [attrString]="{ str: 'pn-' + som.name, arg: 'placeholder' }"
+                    [dbPrefix]="false"
+                    (change)="onChange(som.name)"
+                    dbstring
+                  />
+                  <p
+                    class="text-danger font-weight-bold text-center"
+                    *ngFor="let item of som.errors"
+                  >
+                    {{ item | async }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-lg-12 text-center">
+                <button (click)="register()" class="primary-btn" dbstring>submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--================ End Registration Area =================-->
+
+  <!--================ Start footer Area  =================-->
+  <footer class="footer-area section_gap">
+    <div class="container">
+      <div class="row footer-bottom d-flex justify-content-between">
+        <p class="col-lg-8 col-sm-12 footer-text m-0 text-white">
+          &copy;
+          <script>
+            document.write(new Date().getFullYear());
+          </script>
+          SchoolBridge 2020
+        </p>
+      </div>
+    </div>
+  </footer>
+</div>

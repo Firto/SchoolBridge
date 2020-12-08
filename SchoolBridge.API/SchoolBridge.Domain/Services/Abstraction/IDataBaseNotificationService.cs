@@ -6,14 +6,17 @@ using System.Threading.Tasks;
 
 namespace SchoolBridge.Domain.Services.Abstraction
 {
-    public interface IDataBaseNotificationService<AUser> where AUser : AuthUser
+    public interface IDataBaseNotificationService: IOnInitService
     {
-        Task Notify(AUser usr, string type, IDataBaseNotificationSourse sourse);
-        Task Notify(AUser usr, string tokenId, string type, IDataBaseNotificationSourse sourse);
-        Task Notify(AUser[] usrs, string type, IDataBaseNotificationSourse sourse);
-        Task Read(AUser usr, string last);
-        Task<IEnumerable<DataBaseSourse>> Get(AUser usr, string last, int count = 20);
-        Task<IEnumerable<DataBaseSourse>> GetAndRead(AUser usr, string last, int count = 20);
-        Task<int> GetCountUnread(AUser usr);
+        Task NotifyAsync(string userId, string type, IDataBaseNotificationSourse sourse);
+        Task NotifyAsync(string userId, string tokenId, string type, IDataBaseNotificationSourse sourse);
+        Task NotifyAsync(string[] userIds, string type, IDataBaseNotificationSourse sourse);
+        Task NotifyNoBaseAsync(string userId, string type, IDataBaseNotificationSourse sourse);
+        Task NotifyNoBaseAsync(string userId, string tokenId, string type, IDataBaseNotificationSourse sourse);
+        Task NotifyNoBaseAsync(string[] userIds, string type, IDataBaseNotificationSourse sourse);
+        Task ReadAsync(string userId, string last);
+        Task<IEnumerable<DataBaseSourse>> GetAsync(string userId, string last, int count = 20);
+        Task<IEnumerable<DataBaseSourse>> GetAndReadAsync(string userId, string last, int count = 20);
+        Task<int> GetCountUnreadAsync(string userId);
     }
 }

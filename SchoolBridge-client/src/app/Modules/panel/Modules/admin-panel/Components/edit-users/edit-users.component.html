@@ -1,0 +1,21 @@
+<div class="bg-light no-gutters">
+  <table class="table">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col" dbstring>login</th>
+        <th scope="col" dbstring>role</th>
+        <th scope="col" dbstring>online</th>
+        <th scope="col" dbstring>ban</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let item of users"
+        user-row
+        [source]="item"
+        (edit)="editUser(item)"
+        class="table-info"
+      ></tr>
+    </tbody>
+  </table>
+</div>
